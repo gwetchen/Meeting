@@ -1,0 +1,10 @@
+## Interface: 11200
+## Title: Meeting
+## Title-zhCN: 集合石
+## Version: 0.1.0
+## SavedVariables: MEETING_DB
+
+Init.lua
+Util.lua
+GUI.lua
+Meeting.lua
