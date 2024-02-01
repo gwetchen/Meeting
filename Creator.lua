@@ -349,7 +349,13 @@ for i = 1, 5 do
 end
 
 function Meeting.CreatorFrame:UpdateApplicantList()
+    if not Meeting.CreatorFrame:IsShown() then
+        return
+    end
     local activity = Meeting:FindActivity(Meeting.player)
+    if not activity then
+        return
+    end
     local applicantList = activity.applicantList
 
     if table.getn(applicantList) > table.getn(applicantFramePool) then

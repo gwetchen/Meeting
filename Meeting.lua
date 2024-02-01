@@ -120,6 +120,7 @@ local browserButton = Meeting.GUI.CreateButton({
     click = function()
         Meeting.CreatorFrame:Hide()
         Meeting.BrowserFrame:Show()
+        Meeting.BrowserFrame:Update()
     end
 })
 
@@ -138,6 +139,7 @@ Meeting.GUI.CreateButton({
     click = function()
         Meeting.BrowserFrame:Hide()
         Meeting.CreatorFrame:Show()
+        Meeting.CreatorFrame:UpdateApplicantList()
     end
 })
 
@@ -146,6 +148,11 @@ function Meeting:Toggle()
         mainFrame:Hide()
     else
         mainFrame:Show()
+        if Meeting.BrowserFrame:IsShown() then
+            Meeting.BrowserFrame:Update()
+        elseif Meeting.CreatorFrame:IsShown() then
+            Meeting.CreatorFrame:UpdateApplicantList()
+        end
     end
 end
 

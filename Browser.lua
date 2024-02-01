@@ -327,6 +327,9 @@ for i = 1, 5 do
 end
 
 function Meeting.BrowserFrame:Update()
+    if not Meeting.BrowserFrame:IsShown() then
+        return
+    end
     if table.getn(Meeting.activities) > table.getn(activityFramePool) then
         for i = table.getn(activityFramePool) + 1, table.getn(Meeting.activities) do
             CreateActivityItemFrame()
