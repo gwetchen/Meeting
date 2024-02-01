@@ -163,6 +163,10 @@ function Meeting:Applicant(data)
     Meeting:SendMessage("APPLICANT", data)
 end
 
+function Meeting:Decline(data)
+    Meeting:SendMessage("DECLINE", data)
+end
+
 function Meeting:SyncMembers(data)
     Meeting:SendMessage("MEMBERS", data)
 end
@@ -244,6 +248,7 @@ function Meeting:OnDecline(id, name)
         local item = Meeting:FindActivity(id)
         if item then
             item.applicantStatus = Meeting.APPLICANT_STATUS.Declined
+            Meeting.BrowserFrame:Update()
         end
     end
 end

@@ -350,23 +350,25 @@ end
 
 function Meeting.CreatorFrame:UpdateApplicantList()
     local activity = Meeting:FindActivity(Meeting.player)
-    if table.getn(activity.applicantList) > table.getn(applicantFramePool) then
-        for i = table.getn(applicantFramePool) + 1, table.getn(activity.applicantList) do
+    local applicantList = activity.applicantList
+
+    if table.getn(applicantList) > table.getn(applicantFramePool) then
+        for i = table.getn(applicantFramePool) + 1, table.getn(applicantList) do
             CreateApplicantItemFrame()
         end
     end
 
     for i, item in ipairs(applicantFramePool) do
-        if i > table.getn(activity.applicantList) then
+        if i > table.getn(applicantList) then
             item.frame:Hide()
         else
-            local applicant = activity.applicantList[i]
+            local applicant = applicantList[i]
             local name = applicant.name
             local idx = i
 
             item.frame:SetPoint("TOPLEFT", applicantListFrame, "TOPLEFT", 0, -44 * (i - 1))
-            item.nameText:SetText(applicant.name)
-            local rgb = Meeting.GetClassRGBColor(applicant.class, applicant.name)
+            item.nameText:SetText(name)
+            local rgb = Meeting.GetClassRGBColor(applicant.class, name)
             item.nameText:SetTextColor(rgb.r, rgb.g, rgb.b)
             item.levelText:SetText(applicant.level)
             item.scoreText:SetText(applicant.score)
@@ -387,8 +389,8 @@ function Meeting.CreatorFrame:UpdateApplicantList()
             end
             item.decline = function()
                 applicant.status = Meeting.APPLICANT_STATUS.Declined
-                Meeting:SendMessage("DECLINE", string.format("%s:%s", Meeting.player, name))
-                table.remove(applicant.applicantList, idx)
+                Meeting:Decline(string.format("%s:%s", Meeting.player, name))
+                table.remove(applicantList, idx)
                 Meeting.CreatorFrame:UpdateApplicantList()
             end
             item.frame:Show()
