@@ -1,3 +1,6 @@
+BINDING_HEADER_CS_MEETING_HEADER = "集合石";
+BINDING_NAME_CS_MEETING_NAME = "显示/隐藏";
+
 Meeting = {
     APPLICANT_STATUS = { None = 1, Invited = 2, Declined = 3, Joined = 4 },
 

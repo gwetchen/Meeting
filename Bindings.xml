@@ -1,0 +1,5 @@
+<Bindings>
+	<Binding name="CS_MEETING_NAME" header="CS_MEETING_HEADER"> 
+		Meeting:Toggle()
+	</Binding>
+</Bindings>

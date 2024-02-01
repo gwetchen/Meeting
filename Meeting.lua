@@ -2,19 +2,9 @@ local f = CreateFrame("Frame")
 f:RegisterEvent("CHAT_MSG_HARDCORE")
 f:RegisterEvent("CHAT_MSG_CHANNEL")
 f:RegisterEvent("PLAYER_ENTERING_WORLD")
+f:RegisterEvent("PARTY_MEMBERS_CHANGED")
+f:RegisterEvent("RAID_ROSTER_UPDATE")
 f:SetScript("OnEvent", function()
-    if event == "CHAT_MSG_HARDCORE" then
-        isHC = true
-    end
-
-    if event == "PLAYER_ENTERING_WORLD" then
-
-    end
-
-    if event == "" then
-        
-    end
-
     if event == "CHAT_MSG_CHANNEL" then
         local _, _, source = string.find(arg4, "(%d+)%.")
         if source then
@@ -23,6 +13,12 @@ f:SetScript("OnEvent", function()
         if name == "LFT" and Meeting.Util:StringStarts(arg1, "Meeting:") then
             Meeting:OnRecv(arg1)
         end
+    elseif event == "CHAT_MSG_HARDCORE" then
+        isHC = true
+    elseif event == "PARTY_MEMBERS_CHANGED" or event == "RAID_ROSTER_UPDATE" then
+        
+    elseif event == "PLAYER_ENTERING_WORLD" then
+
     end
 end)
 
