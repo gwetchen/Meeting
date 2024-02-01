@@ -17,3 +17,7 @@ function Util:StringSplit(str, delimiter)
     end)
     return unpack(fields)
 end
+
+function string.isempty(s)
+    return s == nil or s == ''
+end

@@ -1,76 +1,343 @@
 Meeting = {
     APPLICANT_STATUS = { None = 1, Invited = 2, Declined = 3, Joined = 4 },
 
-    Categories = {
-        [1] = {
-            value = "QUEST",
-            label = "任务",
-            children = {}
-        },
-        [2] = {
-            value = "RAID",
-            label = "团队副本",
-            children = {
-                [1] = {
-                    value = "MC",
-                    label = "熔火之心"
-                },
-                [2] = {
-                    value = "ONY",
-                    label = "奥妮克希亚的巢穴"
-                },
-                [3] = {
-                    value = "BWL",
-                    label = "黑翼之巢"
-                },
-                [4] = {
-                    value = "AQ40",
-                    label = "安其拉神殿"
-                },
-                [5] = {
-                    value = "NAXX",
-                    label = "纳克萨玛斯"
-                },
-                [6] = {
-                    value = "ZUG",
-                    label = "祖尔格拉布"
-                },
-                [7] = {
-                    value = "AQ20",
-                    label = "安其拉废墟"
-                },
-                [8] = {
-                    value = "LKH",
-                    label = "卡拉赞下层"
-                },
-                [9] = {
-                    value = "ES",
-                    label = "翡翠圣殿"
-                }
-            }
-        },
-        [3] = {
-            value = "DUNGENO",
-            label = "地下城",
-            children = {}
-        },
-        [4] = {
-            value = "BOSS",
-            label = "世界首领",
-            children = {}
-        },
-        [5] = {
-            value = "PVP",
-            label = "PvP",
-            children = {}
-        },
-        [6] = {
-            value = "OTHER",
-            label = "其他",
-            children = {}
+    createInfo = {},
+
+    searchInfo = {},
+
+    activities = {},
+
+    playerIsHC = false
+}
+
+
+local classNameMap = {
+    [1] = "WARLOCK",
+    [2] = "HUNTER",
+    [3] = "PRIEST",
+    [4] = "PALADIN",
+    [5] = "MAGE",
+    [6] = "ROGUE",
+    [7] = "DRUID",
+    [8] = "SHAMAN",
+    [9] = "WARRIOR",
+}
+
+local classNumberMap = {
+    ["WARLOCK"] = 1,
+    ["HUNTER"] = 2,
+    ["PRIEST"] = 3,
+    ["PALADIN"] = 4,
+    ["MAGE"] = 5,
+    ["ROGUE"] = 6,
+    ["DRUID"] = 7,
+    ["SHAMAN"] = 8,
+    ["WARRIOR"] = 9,
+}
+
+function Meeting.NumberToClass(n)
+    return classNameMap[n]
+end
+
+function Meeting.ClassToNumber(class)
+    return classNumberMap[class]
+end
+
+function Meeting.GetClassRGBColor(class, unitname)
+    local rgb = RAID_CLASS_COLORS[class]
+    if not rgb then
+        if SCCN_storage then
+            local cache = SCCN_storage[unitname]
+            if cache then
+                return Meeting.GetClassRGBColor(Meeting.NumberToClass(cache.c))
+            end
+        end
+        rgb = { r = 1, g = 1, b = 1 }
+    end
+    return rgb
+end
+
+Meeting.Categories = {
+    {
+        key = "DUNGENO",
+        name = "地下城",
+        children = {
+            {
+                key = "RFC",
+                name = "怒焰裂谷",
+                minLevel = 13,
+            },
+            {
+                key = "WC",
+                name = "哀号洞穴",
+                minLevel = 17,
+            },
+            {
+                key = "DM",
+                name = "死亡矿井",
+                minLevel = 17,
+            },
+            {
+                key = "SFK",
+                name = "影牙城堡",
+                minLevel = 22,
+            },
+            {
+                key = "STOCKS",
+                name = "暴风城：监狱",
+                minLevel = 22,
+            },
+            {
+                key = "BFD",
+                name = "黑暗深渊",
+                minLevel = 23,
+            },
+            {
+                key = "SMGY",
+                name = "血色修道院墓地",
+                minLevel = 27,
+            },
+            {
+                key = "SMLIB",
+                name = "血色修道院图书馆",
+                minLevel = 28,
+            },
+            {
+                key = "GNOMER",
+                name = "诺莫瑞根",
+                minLevel = 29,
+            },
+            {
+                key = "RFK",
+                name = "剃刀沼泽",
+                minLevel = 29,
+            },
+            {
+                key = "SMGY",
+                name = "新月林地",
+                minLevel = 32,
+            },
+            {
+                key = "SMARMORY",
+                name = "血色修道院军械库",
+                minLevel = 32,
+            },
+            {
+                key = "SMCATH",
+                name = "血色修道院大教堂",
+                minLevel = 35,
+            },
+            {
+                key = "RFD",
+                name = "剃刀高地",
+                minLevel = 36,
+            },
+            {
+                key = "ULDA",
+                name = "奥达曼",
+                minLevel = 40,
+            },
+            {
+                key = "GILNEAS",
+                name = "吉尔尼斯城",
+                minLevel = 42,
+            },
+            {
+                key = "ZF",
+                name = "祖尔法拉克",
+                minLevel = 44,
+            },
+            {
+                key = "MARAPPURPLE",
+                name = "玛拉顿紫门",
+                minLevel = 45,
+            },
+            {
+                key = "MARAORANGE",
+                name = "玛拉顿橙门",
+                minLevel = 47,
+            },
+            {
+                key = "MARAPRINCESS",
+                name = "玛拉顿公主",
+                minLevel = 47,
+            },
+            {
+                key = "ST",
+                name = "阿塔哈卡神庙",
+                minLevel = 50,
+            },
+            {
+                key = "HFQ",
+                name = "仇恨熔炉采石场",
+                minLevel = 50,
+            },
+            {
+                key = "BRD",
+                name = "黑石深渊",
+                minLevel = 52,
+            },
+            {
+                key = "BRDARENA",
+                name = "黑石深渊竞技场",
+                minLevel = 52,
+            },
+            {
+                key = "UBRS",
+                name = "黑石塔上层",
+                minLevel = 55,
+                members = 10,
+            },
+            {
+                key = "LBRS",
+                name = "黑石塔下层",
+                minLevel = 55,
+            },
+            {
+                key = "DM",
+                name = "厄运之槌：东",
+                minLevel = 55,
+            },
+            {
+                key = "DMN",
+                name = "厄运之槌：北",
+                minLevel = 57,
+            },
+            {
+                key = "DMT",
+                name = "厄运之槌完美贡品",
+                minLevel = 57,
+            },
+            {
+                key = "DMW",
+                name = "厄运之槌：西",
+                minLevel = 57,
+            },
+            {
+                key = "SCHOLO",
+                name = "通灵学院",
+                minLevel = 58,
+            },
+            {
+                key = "STRATUD",
+                name = "斯坦索姆：DK区",
+                minLevel = 58,
+            },
+            {
+                key = "STRATLIVE",
+                name = "斯坦索姆：血色区",
+                minLevel = 58,
+            },
+            {
+                key = "KC",
+                name = "卡拉赞地穴",
+                minLevel = 58,
+            },
+            {
+                key = "COTBM",
+                name = "时间之穴：黑色沼泽",
+                minLevel = 60,
+            },
+            {
+                key = "SWV",
+                name = "暴风城：地牢",
+                minLevel = 60,
+            },
         }
+    },
+    {
+        key = "RAID",
+        name = "团队副本",
+        children = {
+            {
+                key = "MC",
+                name = "熔火之心",
+                minLevel = 60,
+            },
+            {
+                key = "ONY",
+                name = "奥妮克希亚的巢穴",
+                minLevel = 60,
+            },
+            {
+                key = "BWL",
+                name = "黑翼之巢",
+                minLevel = 60,
+            },
+            {
+                key = "AQ40",
+                name = "安其拉神殿",
+                minLevel = 60,
+            },
+            {
+                key = "NAXX",
+                name = "纳克萨玛斯",
+                minLevel = 60,
+            },
+            {
+                key = "ZUG",
+                name = "祖尔格拉布",
+                minLevel = 60,
+                members = 20,
+            },
+            {
+                key = "AQ20",
+                name = "安其拉废墟",
+                minLevel = 60,
+                members = 20,
+            },
+            {
+                key = "LKH",
+                name = "卡拉赞下层",
+                minLevel = 60,
+                members = 10,
+            },
+            {
+                key = "ES",
+                name = "翡翠圣殿",
+                minLevel = 60,
+            }
+        }
+    },
+
+    {
+        key = "QUEST",
+        name = "任务",
+        children = {
+
+        }
+    },
+    {
+        key = "BOSS",
+        name = "世界首领",
+        children = {}
+    },
+    {
+        key = "PVP",
+        name = "PvP",
+        children = {}
+    },
+    {
+        key = "OTHER",
+        name = "其他",
+        children = {}
     }
 }
+
+function Meeting.CaregoryCode2Name(code)
+    for _, value in pairs(Meeting.Categories) do
+        for _, value in pairs(value.children) do
+            if value.key == code then
+                return value.name
+            end
+        end
+    end
+end
+
+function Meeting.GetPlayerClass()
+    local _, class = UnitClass("player")
+    return class
+end
 
 function Meeting:GetMembers()
     local partyCount = GetNumPartyMembers()
@@ -96,4 +363,14 @@ function Meeting:IsInActivity(id)
         end
     end
     return false
+end
+
+function Meeting.GetPlayerScore()
+    if ItemSocre and ItemSocre.ScanUnit then
+        local score = ItemSocre:ScanUnit("player")
+        if score and score > 0 then
+            return score
+        end
+    end
+    return 0
 end
