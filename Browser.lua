@@ -326,7 +326,7 @@ for i = 1, 5 do
     CreateActivityItemFrame()
 end
 
-function Meeting.BrowserFrame:Update()
+function Meeting.BrowserFrame:UpdateList()
     if not Meeting.BrowserFrame:IsShown() then
         return
     end

@@ -348,7 +348,7 @@ for i = 1, 5 do
     CreateApplicantItemFrame()
 end
 
-function Meeting.CreatorFrame:UpdateApplicantList()
+function Meeting.CreatorFrame:UpdateList()
     if not Meeting.CreatorFrame:IsShown() then
         return
     end
@@ -397,7 +397,7 @@ function Meeting.CreatorFrame:UpdateApplicantList()
                 applicant.status = Meeting.APPLICANT_STATUS.Declined
                 Meeting:Decline(string.format("%s:%s", Meeting.player, name))
                 table.remove(applicantList, idx)
-                Meeting.CreatorFrame:UpdateApplicantList()
+                Meeting.CreatorFrame:UpdateList()
             end
             item.frame:Show()
         end

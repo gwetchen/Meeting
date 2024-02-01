@@ -29,21 +29,21 @@ f:SetScript("OnEvent", function()
             activity.members = members
             local data = string.format("%s:%d", Meeting.player, members)
             Meeting:SyncMembers(data)
-            Meeting.BrowserFrame:Update()
-            Meeting.CreatorFrame:UpdateApplicantList()
+            Meeting.BrowserFrame:UpdateList()
+            Meeting.CreatorFrame:UpdateList()
         end
 
         local joined = Meeting:FindJoinedActivity()
         if joined and joined.unitname ~= Meeting.player then
             joined.applicantStatus = Meeting.APPLICANT_STATUS.Joined
-            Meeting.BrowserFrame:Update()
+            Meeting.BrowserFrame:UpdateList()
         end
 
         if Meeting.joinedActivity then
             local activity = Meeting:FindActivity(Meeting.joinedActivity.unitname)
             if activity then
                 activity.applicantStatus = Meeting.APPLICANT_STATUS.None
-                Meeting.BrowserFrame:Update()
+                Meeting.BrowserFrame:UpdateList()
             end
         end
         Meeting.joinedActivity = joined
@@ -103,6 +103,7 @@ mainFrame:SetBackdrop({
 })
 mainFrame:SetBackdropColor(0, 0, 0, 1)
 mainFrame:Hide()
+tinsert(UISpecialFrames, "MeetingMainFrame");
 Meeting.MainFrame = mainFrame
 
 local browserButton = Meeting.GUI.CreateButton({
@@ -120,7 +121,7 @@ local browserButton = Meeting.GUI.CreateButton({
     click = function()
         Meeting.CreatorFrame:Hide()
         Meeting.BrowserFrame:Show()
-        Meeting.BrowserFrame:Update()
+        Meeting.BrowserFrame:UpdateList()
     end
 })
 
@@ -139,7 +140,7 @@ Meeting.GUI.CreateButton({
     click = function()
         Meeting.BrowserFrame:Hide()
         Meeting.CreatorFrame:Show()
-        Meeting.CreatorFrame:UpdateApplicantList()
+        Meeting.CreatorFrame:UpdateList()
     end
 })
 
@@ -149,9 +150,9 @@ function Meeting:Toggle()
     else
         mainFrame:Show()
         if Meeting.BrowserFrame:IsShown() then
-            Meeting.BrowserFrame:Update()
+            Meeting.BrowserFrame:UpdateList()
         elseif Meeting.CreatorFrame:IsShown() then
-            Meeting.CreatorFrame:UpdateApplicantList()
+            Meeting.CreatorFrame:UpdateList()
         end
     end
 end
@@ -229,7 +230,7 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc)
         })
     end
 
-    Meeting.BrowserFrame:Update()
+    Meeting.BrowserFrame:UpdateList()
 end
 
 function Meeting:OnApplicant(id, name, level, class, score, comment)
@@ -246,7 +247,7 @@ function Meeting:OnApplicant(id, name, level, class, score, comment)
 
         table.insert(item.applicantList, applicant)
 
-        Meeting.CreatorFrame:UpdateApplicantList()
+        Meeting.CreatorFrame:UpdateList()
     end
 end
 
@@ -255,7 +256,7 @@ function Meeting:OnDecline(id, name)
         local item = Meeting:FindActivity(id)
         if item then
             item.applicantStatus = Meeting.APPLICANT_STATUS.Declined
-            Meeting.BrowserFrame:Update()
+            Meeting.BrowserFrame:UpdateList()
         end
     end
 end
@@ -264,6 +265,6 @@ function Meeting:OnMembers(id, members)
     local activity = Meeting:FindActivity(id)
     if activity then
         activity.members = tonumber(members)
-        Meeting.BrowserFrame:Update()
+        Meeting.BrowserFrame:UpdateList()
     end
 end
