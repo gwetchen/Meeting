@@ -6,7 +6,8 @@ local EVENTS = {
     CREATE = "C",
     APPLICANT = "A",
     DECLINE = "D",
-    MEMBERS = "M"
+    MEMBERS = "M",
+    CLOSE = "L",
 }
 
 local function stringsplit(str, delimiter)
@@ -32,6 +33,8 @@ function Message.OnRecv(data)
         Meeting:OnDecline(arg1, arg2)
     elseif event == EVENTS.MEMBERS then
         Meeting:OnMembers(arg1, arg2)
+    elseif event == EVENTS.CLOSE then
+        Meeting:OnClose(arg1)
     end
 end
 
@@ -58,4 +61,8 @@ end
 
 function Message.SyncMembers(data)
     Message.Send(EVENTS.MEMBERS, data)
+end
+
+function Message.CloseActivity(data)
+    Message.Send(EVENTS.CLOSE, data)
 end

@@ -172,6 +172,21 @@ function Meeting:FindActivity(creator)
     end
 end
 
+function Meeting:DeleteActivity(id)
+    local index = -1
+    for i, item in ipairs(Meeting.activities) do
+        if item.unitname == id then
+            index = i
+            break
+        end
+    end
+    if index ~= -1 then
+        local activity = Meeting.activities[index]
+        table.remove(Meeting.activities, index)
+        return activity
+    end
+end
+
 function Meeting:OnCreate(id, category, comment, level, class, members, hc)
     local item = Meeting:FindActivity(id)
     if item then
@@ -193,7 +208,7 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc)
             applicantList = {}
         })
     end
-
+    Meeting.CreatorFrame.UpdateActivity()
     Meeting.BrowserFrame:UpdateList()
 end
 
@@ -231,4 +246,16 @@ function Meeting:OnMembers(id, members)
         activity.members = tonumber(members)
         Meeting.BrowserFrame:UpdateList()
     end
+end
+
+function Meeting:OnClose(id)
+    local activity = Meeting:DeleteActivity(id)
+    if activity.unitname == Meeting.player then
+        Meeting.CreatorFrame.UpdateActivity()
+    end
+
+    if Meeting.joinedActivity and Meeting.joinedActivity.unitname == id then
+        Meeting.joinedActivity = nil
+    end
+    Meeting.BrowserFrame:UpdateList()
 end

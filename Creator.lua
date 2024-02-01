@@ -41,6 +41,7 @@ for i, value in ipairs(Meeting.Categories) do
                 Meeting.createInfo.category = k
                 categoryTextFrame:SetText("活动类型：" .. name)
                 Menu:Close()
+                Meeting.CreatorFrame.UpdateActivity()
             end,
         }
     end
@@ -126,7 +127,6 @@ local createButton = Meeting.GUI.CreateButton({
         y = -20
     },
     click = function()
-        this:SetText("修改活动")
         commentFrame:ClearFocus()
         local data = string.format("%s:%s:%s:%d:%d:%d:%d", Meeting.player, Meeting.createInfo.category,
             string.isempty(Meeting.createInfo.comment) and "_" or Meeting.createInfo.comment, UnitLevel("player"),
@@ -135,6 +135,7 @@ local createButton = Meeting.GUI.CreateButton({
         Meeting.Message.CreateActivity(data)
     end
 })
+createButton:Disable()
 
 local closeButton = Meeting.GUI.CreateButton({
     parent = creatorFrame,
@@ -149,7 +150,7 @@ local closeButton = Meeting.GUI.CreateButton({
         y = 0
     },
     click = function()
-
+        Meeting.Message.CloseActivity(Meeting.player)
     end
 })
 closeButton:Disable()
@@ -250,7 +251,6 @@ local function CreateApplicantItemFrame()
             y = 0
         }
     })
-
 
     local levelText = Meeting.GUI.CreateText({
         parent = f,
@@ -401,5 +401,26 @@ function Meeting.CreatorFrame:UpdateList()
             end
             item.frame:Show()
         end
+    end
+end
+
+function Meeting.CreatorFrame.UpdateActivity()
+    local has = Meeting:HasActivity()
+    if has then
+        createButton:SetText("修改活动")
+    else
+        createButton:SetText("创建活动")
+    end
+
+    if string.isempty(Meeting.createInfo.category) then
+        createButton:Disable()
+    else
+        createButton:Enable()
+    end
+
+    if has then
+        closeButton:Enable()
+    else
+        closeButton:Disable()
     end
 end
