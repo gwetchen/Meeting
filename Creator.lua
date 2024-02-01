@@ -132,7 +132,7 @@ local createButton = Meeting.GUI.CreateButton({
             string.isempty(Meeting.createInfo.comment) and "_" or Meeting.createInfo.comment, UnitLevel("player"),
             Meeting.ClassToNumber(Meeting.GetPlayerClass()),
             Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0)
-        Meeting:CreateActivity(data)
+        Meeting.Message.CreateActivity(data)
     end
 })
 
@@ -395,7 +395,7 @@ function Meeting.CreatorFrame:UpdateList()
             end
             item.decline = function()
                 applicant.status = Meeting.APPLICANT_STATUS.Declined
-                Meeting:Decline(string.format("%s:%s", Meeting.player, name))
+                Meeting.Message.Decline(string.format("%s:%s", Meeting.player, name))
                 table.remove(applicantList, idx)
                 Meeting.CreatorFrame:UpdateList()
             end

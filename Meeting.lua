@@ -10,8 +10,8 @@ f:SetScript("OnEvent", function()
         if source then
             _, name = GetChannelName(source)
         end
-        if name == "LFT" and Meeting.Util:StringStarts(arg1, "Meeting:") then
-            Meeting:OnRecv(arg1)
+        if name == "LFT" and string.startswith(arg1, "Meeting:") then
+            Meeting.Message.OnRecv(arg1)
         end
     elseif event == "CHAT_MSG_HARDCORE" then
         isHC = true
@@ -28,7 +28,7 @@ f:SetScript("OnEvent", function()
             local members = Meeting:GetMembers()
             activity.members = members
             local data = string.format("%s:%d", Meeting.player, members)
-            Meeting:SyncMembers(data)
+            Meeting.Message.SyncMembers(data)
             Meeting.BrowserFrame:UpdateList()
             Meeting.CreatorFrame:UpdateList()
         end
@@ -157,28 +157,6 @@ function Meeting:Toggle()
     end
 end
 
-function Meeting:SendMessage(event, data)
-    if GetChannelName("LFT") ~= 0 then
-        SendChatMessage("Meeting:" .. event .. ":" .. data, "CHANNEL", nil, GetChannelName("LFT"))
-    end
-end
-
-function Meeting:CreateActivity(data)
-    Meeting:SendMessage("CREATE", data)
-end
-
-function Meeting:Applicant(data)
-    Meeting:SendMessage("APPLICANT", data)
-end
-
-function Meeting:Decline(data)
-    Meeting:SendMessage("DECLINE", data)
-end
-
-function Meeting:SyncMembers(data)
-    Meeting:SendMessage("MEMBERS", data)
-end
-
 function Meeting:FindActivity(creator)
     local index = -1
     for i, item in ipairs(Meeting.activities) do
@@ -191,20 +169,6 @@ function Meeting:FindActivity(creator)
         return Meeting.activities[index]
     else
         return nil
-    end
-end
-
-function Meeting:OnRecv(data)
-    print(data)
-    local _, event, arg1, arg2, arg3, arg4, arg5, arg6, arg7 = Meeting.Util:StringSplit(data, ":")
-    if event == "CREATE" then
-        Meeting:OnCreate(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
-    elseif event == "APPLICANT" then
-        Meeting:OnApplicant(arg1, arg2, arg3, arg4, arg5, arg6)
-    elseif event == "DECLINE" then
-        Meeting:OnDecline(arg1, arg2)
-    elseif event == "MEMBERS" then
-        Meeting:OnMembers(arg1, arg2)
     end
 end
 

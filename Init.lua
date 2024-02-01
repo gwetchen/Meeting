@@ -304,7 +304,6 @@ Meeting.Categories = {
             }
         }
     },
-
     {
         key = "QUEST",
         name = "任务",
@@ -315,12 +314,45 @@ Meeting.Categories = {
     {
         key = "BOSS",
         name = "世界首领",
-        children = {}
+        children = {
+           
+        }
     },
     {
         key = "PVP",
         name = "PvP",
-        children = {}
+        children = {
+            {
+                key = "AV",
+                name = "奥特兰克山谷",
+                minLevel = 51,
+                members = 40,
+            },
+            {
+                key = "WSG",
+                name = "战歌峡谷",
+                minLevel = 10,
+                members = 10,
+            },
+            {
+                key = "AB",
+                name = "阿拉希盆地",
+                minLevel = 20,
+                members = 15,
+            },
+            {
+                key = "BR",
+                name = "血环竞技场",
+                minLevel = 11,
+                members = 3
+            },
+            {
+                key = "PVP",
+                name = "野外PvP",
+                minLevel = 1,
+                members = 40
+            },
+        }
     },
     {
         key = "OTHER",
