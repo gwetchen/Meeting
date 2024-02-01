@@ -16,16 +16,45 @@ f:SetScript("OnEvent", function()
     elseif event == "CHAT_MSG_HARDCORE" then
         isHC = true
     elseif event == "PARTY_MEMBERS_CHANGED" or event == "RAID_ROSTER_UPDATE" then
-        
+        local activity = Meeting:FindActivity(Meeting.player)
+        if activity then
+            for i, applicant in ipairs(activity.applicantList) do
+                if Meeting:IsInActivity(applicant.name) then
+                    table.remove(activity.applicantList, i)
+                else
+                    applicant.status = Meeting.APPLICANT_STATUS.None
+                end
+            end
+            local members = Meeting:GetMembers()
+            activity.members = members
+            local data = string.format("%s:%d", Meeting.player, members)
+            Meeting:SyncMembers(data)
+            Meeting.BrowserFrame:Update()
+            Meeting.CreatorFrame:UpdateApplicantList()
+        end
+
+        local joined = Meeting:FindJoinedActivity()
+        if joined and joined.unitname ~= Meeting.player then
+            joined.applicantStatus = Meeting.APPLICANT_STATUS.Joined
+            Meeting.BrowserFrame:Update()
+        end
+
+        if Meeting.joinedActivity then
+            local activity = Meeting:FindActivity(Meeting.joinedActivity.unitname)
+            if activity then
+                activity.applicantStatus = Meeting.APPLICANT_STATUS.None
+                Meeting.BrowserFrame:Update()
+            end
+        end
+        Meeting.joinedActivity = joined
     elseif event == "PLAYER_ENTERING_WORLD" then
 
     end
 end)
 
 function Meeting:HasActivity()
-    local unitname = UnitName("player")
     for i, item in ipairs(Meeting.activities) do
-        if item.unitname == unitname then
+        if item.unitname == Meeting.player then
             return true
         end
     end
@@ -134,7 +163,11 @@ function Meeting:Applicant(data)
     Meeting:SendMessage("APPLICANT", data)
 end
 
-function FindActivity(creator)
+function Meeting:SyncMembers(data)
+    Meeting:SendMessage("MEMBERS", data)
+end
+
+function Meeting:FindActivity(creator)
     local index = -1
     for i, item in ipairs(Meeting.activities) do
         if item.unitname == creator then
@@ -158,11 +191,13 @@ function Meeting:OnRecv(data)
         Meeting:OnApplicant(arg1, arg2, arg3, arg4, arg5, arg6)
     elseif event == "DECLINE" then
         Meeting:OnDecline(arg1, arg2)
+    elseif event == "MEMBERS" then
+        Meeting:OnMembers(arg1, arg2)
     end
 end
 
 function Meeting:OnCreate(id, category, comment, level, class, members, hc)
-    local item = FindActivity(id)
+    local item = Meeting:FindActivity(id)
     if item then
         item.category = category
         item.comment = comment
@@ -187,8 +222,8 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc)
 end
 
 function Meeting:OnApplicant(id, name, level, class, score, comment)
-    local item = FindActivity(id)
-    if item and item.unitname == UnitName("player") then
+    local item = Meeting:FindActivity(id)
+    if item and item.unitname == Meeting.player then
         local applicant = {
             name = name,
             level = tonumber(level),
@@ -205,10 +240,18 @@ function Meeting:OnApplicant(id, name, level, class, score, comment)
 end
 
 function Meeting:OnDecline(id, name)
-    if name == UnitName("player") then
-        local item = FindActivity(id)
+    if name == Meeting.player then
+        local item = Meeting:FindActivity(id)
         if item then
             item.applicantStatus = Meeting.APPLICANT_STATUS.Declined
         end
+    end
+end
+
+function Meeting:OnMembers(id, members)
+    local activity = Meeting:FindActivity(id)
+    if activity then
+        activity.members = tonumber(members)
+        Meeting.BrowserFrame:Update()
     end
 end

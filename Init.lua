@@ -2,6 +2,8 @@ BINDING_HEADER_CS_MEETING_HEADER = "集合石";
 BINDING_NAME_CS_MEETING_NAME = "显示/隐藏";
 
 Meeting = {
+    player = UnitName("player"),
+
     APPLICANT_STATUS = { None = 1, Invited = 2, Declined = 3, Joined = 4 },
 
     createInfo = {},
@@ -346,9 +348,9 @@ function Meeting:GetMembers()
     local partyCount = GetNumPartyMembers()
     local raidCount = GetNumRaidMembers()
     if raidCount > 0 then
-        return raidCount
+        return raidCount + 1
     else
-        return partyCount
+        return partyCount + 1
     end
 end
 
@@ -366,6 +368,14 @@ function Meeting:IsInActivity(id)
         end
     end
     return false
+end
+
+function Meeting:FindJoinedActivity()
+    for _, item in ipairs(Meeting.activities) do
+        if Meeting:IsInActivity(item.unitname) then
+            return item
+        end
+    end
 end
 
 function Meeting.GetPlayerScore()

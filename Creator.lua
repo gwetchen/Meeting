@@ -128,10 +128,10 @@ local createButton = Meeting.GUI.CreateButton({
     click = function()
         this:SetText("修改活动")
         commentFrame:ClearFocus()
-        local data = string.format("%s:%s:%s:%d:%d:%d:%d", UnitName("player"), Meeting.createInfo.category,
+        local data = string.format("%s:%s:%s:%d:%d:%d:%d", Meeting.player, Meeting.createInfo.category,
             string.isempty(Meeting.createInfo.comment) and "_" or Meeting.createInfo.comment, UnitLevel("player"),
             Meeting.ClassToNumber(Meeting.GetPlayerClass()),
-            Meeting:GetMembers() + 1, Meeting.playerIsHC and 1 or 0)
+            Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0)
         Meeting:CreateActivity(data)
     end
 })
@@ -349,8 +349,7 @@ for i = 1, 5 do
 end
 
 function Meeting.CreatorFrame:UpdateApplicantList()
-    local id = UnitName("player")
-    local activity = FindActivity()
+    local activity = Meeting:FindActivity(Meeting.player)
     if table.getn(activity.applicantList) > table.getn(applicantFramePool) then
         for i = table.getn(applicantFramePool) + 1, table.getn(activity.applicantList) do
             CreateApplicantItemFrame()
@@ -363,6 +362,7 @@ function Meeting.CreatorFrame:UpdateApplicantList()
         else
             local applicant = activity.applicantList[i]
             local name = applicant.name
+            local idx = i
 
             item.frame:SetPoint("TOPLEFT", applicantListFrame, "TOPLEFT", 0, -44 * (i - 1))
             item.nameText:SetText(applicant.name)
@@ -372,13 +372,24 @@ function Meeting.CreatorFrame:UpdateApplicantList()
             item.scoreText:SetText(applicant.score)
             item.commentText:SetText(applicant.comment ~= "_" and applicant.comment or "")
 
+            if applicant.status == Meeting.APPLICANT_STATUS.Accepted then
+                item.acceptButton:SetText("已同意")
+                item.acceptButton:Disable()
+                item.declineButton:Hide()
+            elseif applicant.status == Meeting.APPLICANT_STATUS.None then
+                item.acceptButton:SetText("同意")
+                item.acceptButton:Enable()
+                item.declineButton:Show()
+            end
             item.accept = function()
                 applicant.status = Meeting.APPLICANT_STATUS.Invited
                 InviteByName(name)
             end
             item.decline = function()
                 applicant.status = Meeting.APPLICANT_STATUS.Declined
-                Meeting:SendMessage("DECLINE", string.format("%s:%s", id, name))
+                Meeting:SendMessage("DECLINE", string.format("%s:%s", Meeting.player, name))
+                table.remove(applicant.applicantList, idx)
+                Meeting.CreatorFrame:UpdateApplicantList()
             end
             item.frame:Show()
         end

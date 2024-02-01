@@ -346,15 +346,25 @@ function Meeting.BrowserFrame:Update()
             item.leaderText:SetTextColor(rgb.r, rgb.g, rgb.b)
             item.membersText:SetText(activity.members)
             item.commentText:SetText(activity.comment ~= "_" and activity.comment or "")
-            if activity.unitname == UnitName("player") then
+            if activity.unitname == Meeting.player then
                 item.requestButton:Disable()
             else
                 item.requestButton:Enable()
-                activity.applicantStatus = Meeting.APPLICANT_STATUS.None
+            end
+            if activity.applicantStatus == Meeting.APPLICANT_STATUS.Invited then
+                item.requestButton:SetText("已申请")
+                item.requestButton:Disable()
+            elseif activity.applicantStatus == Meeting.APPLICANT_STATUS.Declined then
+                item.requestButton:SetText("已拒绝")
+            elseif activity.applicantStatus == Meeting.APPLICANT_STATUS.Joined then
+                item.requestButton:SetText("已加入")
+                item.requestButton:Disable()
+            else
+                item.requestButton:SetText("申请")
             end
             local id = activity.unitname
             item.click = function()
-                local data = string.format("%s:%s:%d:%d:%d:%s", id, UnitName("player"), UnitLevel("player"),
+                local data = string.format("%s:%s:%d:%d:%d:%s", id, Meeting.player, UnitLevel("player"),
                     Meeting.ClassToNumber(Meeting.GetPlayerClass()), Meeting.GetPlayerScore(), "_")
                 Meeting:Applicant(data)
                 activity.applicantStatus = Meeting.APPLICANT_STATUS.Invited
