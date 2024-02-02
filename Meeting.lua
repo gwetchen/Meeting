@@ -61,29 +61,6 @@ function Meeting:HasActivity()
     return false
 end
 
-local floatFrame = Meeting.GUI.CreateButton({
-    name = "MettingFloatFrame",
-    width = 120,
-    height = 40,
-    text = "集合石 0/0",
-    anchor = {
-        point = "TOP",
-        x = 0,
-        y = 0
-    },
-    movable = true,
-    click = function()
-        Meeting:Toggle()
-    end
-})
-floatFrame:SetFrameStrata("DIALOG")
-
-local function UpdateFloat()
-    local activity = Meeting:FindActivity(Meeting.player)
-    local n = activity and table.getn(activity.applicantList) or 0
-    floatFrame:SetText("集合石 " .. n .. "/" .. table.getn(Meeting.activities))
-end
-
 local mainFrame = Meeting.GUI.CreateFrame({
     name = "MeetingMainFrame",
     width = 818,
@@ -234,7 +211,7 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc)
             applicantList = {}
         })
     end
-    UpdateFloat()
+    Meeting.FloatFrame.Update()
     Meeting.CreatorFrame.UpdateActivity()
     Meeting.BrowserFrame:UpdateList()
 end
@@ -255,7 +232,7 @@ function Meeting:OnApplicant(id, name, level, class, score, comment)
 
         Meeting.CreatorFrame:UpdateList()
     end
-    UpdateFloat()
+    Meeting.FloatFrame.Update()
 end
 
 function Meeting:OnDecline(id, name)
@@ -266,7 +243,7 @@ function Meeting:OnDecline(id, name)
             Meeting.BrowserFrame:UpdateList()
         end
     end
-    UpdateFloat()
+    Meeting.FloatFrame.Update()
 end
 
 function Meeting:OnMembers(id, members)
@@ -287,5 +264,5 @@ function Meeting:OnClose(id)
         Meeting.joinedActivity = nil
     end
     Meeting.BrowserFrame:UpdateList()
-    UpdateFloat()
+    Meeting.FloatFrame.Update()
 end
