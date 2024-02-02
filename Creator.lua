@@ -444,28 +444,28 @@ function Meeting.CreatorFrame:UpdateList()
 end
 
 function Meeting.CreatorFrame.UpdateActivity()
-    local has = Meeting:HasActivity()
-    if has then
-        createButton:SetText("修改活动")
-    else
-        createButton:SetText("创建活动")
-    end
-
-    if string.isempty(Meeting.createInfo.category) then
-        createButton:Disable()
-    else
-        createButton:Enable()
-    end
-
-    if has then
-        closeButton:Enable()
-    else
-        closeButton:Disable()
-    end
-
-    if IsRaidLeader() ~= 1 then
+    if Meeting:GetMembers() > 1 and IsRaidLeader() ~= 1 then
         createButton:Disable()
         closeButton:Disable()
+    else
+        local has = Meeting:HasActivity()
+        if has then
+            createButton:SetText("修改活动")
+        else
+            createButton:SetText("创建活动")
+        end
+
+        if string.isempty(Meeting.createInfo.category) then
+            createButton:Disable()
+        else
+            createButton:Enable()
+        end
+
+        if has then
+            closeButton:Enable()
+        else
+            closeButton:Disable()
+        end
     end
 end
 

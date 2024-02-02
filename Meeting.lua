@@ -22,6 +22,7 @@ f:SetScript("OnEvent", function()
                 Meeting.Message.CloseActivity(Meeting.player)
             end
         end
+        Meeting.CreatorFrame.UpdateActivity()
     elseif event == "PARTY_MEMBERS_CHANGED" or event == "RAID_ROSTER_UPDATE" then
         local needUpdateBrowser = false
 
@@ -60,6 +61,7 @@ f:SetScript("OnEvent", function()
         if needUpdateBrowser then
             Meeting.BrowserFrame:UpdateList()
         end
+        Meeting.CreatorFrame.UpdateActivity()
         Meeting.joinedActivity = joined
     elseif event == "PLAYER_ENTERING_WORLD" then
 
