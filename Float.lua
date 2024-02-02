@@ -1,7 +1,7 @@
 local floatFrame = Meeting.GUI.CreateButton({
     name = "MettingFloatFrame",
-    width = 120,
-    height = 40,
+    width = 100,
+    height = 34,
     text = "集合石 0/0",
     anchor = {
         point = "TOP",

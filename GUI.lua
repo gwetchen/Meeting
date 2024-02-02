@@ -2,6 +2,18 @@ local GUI = {}
 
 Meeting.GUI = GUI
 
+local function SetMovable(frame)
+    frame:SetMovable(true)
+    frame:EnableMouse(true)
+    frame:RegisterForDrag("LeftButton")
+    frame:SetScript("OnDragStart", function()
+        this:StartMoving()
+    end)
+    frame:SetScript("OnDragStop", function()
+        this:StopMovingOrSizing()
+    end)
+end
+
 function GUI.CreateFrame(config)
     local parent = config.parent or UIParent
     local frame = CreateFrame("Frame", config.name, parent, config.template)
@@ -12,15 +24,7 @@ function GUI.CreateFrame(config)
             config.anchor.y or 0)
     end
     if config.movable then
-        frame:SetMovable(true)
-        frame:EnableMouse(true)
-        frame:RegisterForDrag("LeftButton")
-        frame:SetScript("OnDragStart", function()
-            this:StartMoving()
-        end)
-        frame:SetScript("OnDragStop", function()
-            this:StopMovingOrSizing()
-        end)
+        SetMovable(frame)
     end
     if Meeting.GUI_DEBUG then
         GUI.CreateBackground(frame, {
@@ -67,6 +71,9 @@ function GUI.CreateButton(config)
         button:SetPoint(config.anchor.point, config.anchor.relative, config.anchor.relativePoint, config.anchor.x or 0,
             config.anchor.y or 0)
     end
+    if config.movable then
+        SetMovable(button)
+    end
     button:SetText(config.text)
     button:SetTextColor(1, 1, 1)
     button:SetFont(STANDARD_TEXT_FONT, config.fontSize or 16, "OUTLINE")
@@ -76,20 +83,7 @@ function GUI.CreateButton(config)
         end
     end)
     button:SetDisabledTextColor(0.5, 0.5, 0.5)
-    button:SetBackdrop({
-        bgFile = "Interface\\BUTTONS\\WHITE8X8",
-        edgeFile = "Interface\\BUTTONS\\WHITE8X8",
-        tile = false,
-        tileSize = 0,
-        edgeSize = 0.7,
-        insets = {
-            left = -0.7,
-            right = -0.7,
-            top = -0.7,
-            bottom = -0.7
-        }
-    })
-    button:SetBackdropColor(0, 0, 0, 1)
+
     if Meeting.GUI_DEBUG then
         GUI.CreateBackground(button, {
             borderColor = {
@@ -98,6 +92,21 @@ function GUI.CreateButton(config)
                 b = math.random(0, 1)
             }
         })
+    else
+        button:SetBackdrop({
+            bgFile = "Interface\\BUTTONS\\WHITE8X8",
+            edgeFile = "Interface\\BUTTONS\\WHITE8X8",
+            tile = false,
+            tileSize = 0,
+            edgeSize = 0.7,
+            insets = {
+                left = -0.7,
+                right = -0.7,
+                top = -0.7,
+                bottom = -0.7
+            }
+        })
+        button:SetBackdropColor(0, 0, 0, 1)
     end
     return button
 end

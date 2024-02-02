@@ -370,12 +370,13 @@ function Meeting.BrowserFrame:UpdateList()
         else
             local activity = Meeting.activities[i]
             item.frame:SetPoint("TOPLEFT", activityListFrame, "TOPLEFT", 0, -44 * (i - 1))
-            item.nameText:SetText(Meeting.CaregoryCode2Name(activity.category))
+            local category = Meeting.FindCaregoryByCode(activity.category)
+            item.nameText:SetText(category.name)
             item.hcText:SetText(activity.hc and "HC" or "FHC")
             local rgb = Meeting.GetClassRGBColor(activity.class, activity.unitname)
             item.leaderText:SetText(activity.unitname)
             item.leaderText:SetTextColor(rgb.r, rgb.g, rgb.b)
-            item.membersText:SetText(activity.members)
+            item.membersText:SetText(activity.members .. "/" .. category.members)
             item.commentText:SetText(activity.comment ~= "_" and activity.comment or "")
             if activity.unitname == Meeting.player then
                 item.requestButton:Disable()
