@@ -264,6 +264,7 @@ end
 function Meeting:OnCreate(id, category, comment, level, class, members, hc)
     local item = Meeting:FindActivity(id)
     if item then
+        item.parent = Meeting.GetCategoryParent(category)
         item.category = category
         item.comment = comment
         item.level = tonumber(level)
@@ -274,6 +275,7 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc)
     else
         table.insert(Meeting.activities, 1, {
             unitname = id,
+            parent = Meeting.GetCategoryParent(category),
             category = category,
             comment = comment,
             level = tonumber(level),

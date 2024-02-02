@@ -401,6 +401,17 @@ Meeting.Categories = {
     }
 }
 
+local CategoryParentMap = {}
+for _, value in ipairs(Meeting.Categories) do
+    for _, child in ipairs(value.children) do
+        CategoryParentMap[child.key] = value.key
+    end
+end
+
+function Meeting.GetCategoryParent(name)
+    return CategoryParentMap[name]
+end
+
 function Meeting.FindCaregoryByCode(code)
     for _, value in pairs(Meeting.Categories) do
         for _, value in pairs(value.children) do

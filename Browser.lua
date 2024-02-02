@@ -27,6 +27,7 @@ local categoryTextFrame = Meeting.GUI.CreateText({
     }
 })
 
+Meeting.searchInfo.parent = ""
 Meeting.searchInfo.category = ""
 
 local options = {
@@ -37,11 +38,13 @@ local options = {
             type = "toggle",
             name = "全部",
             desc = "全部",
-            get = function() return Meeting.searchInfo.category == "" end,
+            get = function() return Meeting.searchInfo.parent == "" end,
             set = function()
+                Meeting.searchInfo.parent = ""
                 Meeting.searchInfo.category = ""
                 Menu:Close()
                 categoryTextFrame:SetText("活动类型：全部活动")
+                Meeting.BrowserFrame:UpdateList()
             end,
         }
     },
@@ -56,12 +59,13 @@ for i, value in ipairs(Meeting.Categories) do
             type = "toggle",
             name = "全部",
             desc = "全部",
-            get = function() return Meeting.searchInfo.category == k and Meeting.searchInfo.child == "" end,
+            get = function() return Meeting.searchInfo.parent == k and Meeting.searchInfo.category == "" end,
             set = function()
-                Meeting.searchInfo.category = k
-                Meeting.searchInfo.child = ""
+                Meeting.searchInfo.parent = k
+                Meeting.searchInfo.category = ""
                 Menu:Close()
                 categoryTextFrame:SetText("活动类型：全部" .. name)
+                Meeting.BrowserFrame:UpdateList()
             end,
         }
     }
@@ -74,11 +78,12 @@ for i, value in ipairs(Meeting.Categories) do
             type = "toggle",
             name = name,
             desc = name,
-            get = function() return Meeting.searchInfo.child == k end,
+            get = function() return Meeting.searchInfo.category == k end,
             set = function()
-                Meeting.searchInfo.child = k
+                Meeting.searchInfo.category = k
                 Menu:Close()
                 categoryTextFrame:SetText("活动类型：" .. name)
+                Meeting.BrowserFrame:UpdateList()
             end,
         }
     end
@@ -358,17 +363,28 @@ function Meeting.BrowserFrame:UpdateList()
     if not Meeting.BrowserFrame:IsShown() then
         return
     end
-    if table.getn(Meeting.activities) > table.getn(activityFramePool) then
-        for i = table.getn(activityFramePool) + 1, table.getn(Meeting.activities) do
+
+    local aactivities = {}
+    for i, activity in ipairs(Meeting.activities) do
+        if Meeting.searchInfo.parent == "" or Meeting.searchInfo.parent == activity.parent then
+            if Meeting.searchInfo.category == "" or Meeting.searchInfo.category == activity.category then
+                table.insert(aactivities, activity)
+            end
+        end
+    end
+    local len = table.getn(aactivities)
+
+    if len > table.getn(activityFramePool) then
+        for i = table.getn(activityFramePool) + 1, len do
             CreateActivityItemFrame()
         end
     end
 
     for i, item in ipairs(activityFramePool) do
-        if i > table.getn(Meeting.activities) then
+        if i > len then
             item.frame:Hide()
         else
-            local activity = Meeting.activities[i]
+            local activity = aactivities[i]
             item.frame:SetPoint("TOPLEFT", activityListFrame, "TOPLEFT", 0, -44 * (i - 1))
             local category = Meeting.FindCaregoryByCode(activity.category)
             item.nameText:SetText(category.name)
