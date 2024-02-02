@@ -22,6 +22,18 @@ function GUI.CreateFrame(config)
             this:StopMovingOrSizing()
         end)
     end
+    if Meeting.GUI_DEBUG then
+        GUI.CreateBackground(frame, {
+            borderColor = {
+                r = math.random(0, 1),
+                g = math.random(0, 1),
+                b = math.random(0, 1)
+            }
+        })
+    end
+    if config.hide then
+        frame:Hide()
+    end
     return frame
 end
 
@@ -42,6 +54,7 @@ function GUI.CreateText(config)
     end
     text:SetJustifyH("LEFT")
     text:SetText(config.text)
+
     return text
 end
 
@@ -77,8 +90,29 @@ function GUI.CreateButton(config)
         }
     })
     button:SetBackdropColor(0, 0, 0, 1)
+    if Meeting.GUI_DEBUG then
+        GUI.CreateBackground(button, {
+            borderColor = {
+                r = math.random(0, 1),
+                g = math.random(0, 1),
+                b = math.random(0, 1)
+            }
+        })
+    end
     return button
 end
+
+local backgroundColor = {
+    r = 0.1,
+    g = 0.1,
+    b = 0.1
+}
+
+local borderColor = {
+    r = 1,
+    g = 1,
+    b = 1
+}
 
 function GUI.CreateBackground(frame, config)
     frame:SetBackdrop({
@@ -94,5 +128,12 @@ function GUI.CreateBackground(frame, config)
             bottom = -0.7
         }
     })
+    if not config.color then
+        config.color = backgroundColor
+    end
     frame:SetBackdropColor(config.color.r, config.color.g, config.color.b, 1)
+    if not config.borderColor then
+        config.borderColor = borderColor
+    end
+    frame:SetBackdropBorderColor(config.borderColor.r, config.borderColor.g, config.borderColor.b, 1)
 end

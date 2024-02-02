@@ -1,9 +1,17 @@
 local Menu = AceLibrary("Dewdrop-2.0")
 
-local browserFrame = CreateFrame("Frame", nil, Meeting.MainFrame)
-browserFrame:SetWidth(782)
-browserFrame:SetHeight(390)
-browserFrame:SetPoint("TOPLEFT", Meeting.MainFrame, "TOPLEFT", 18, -34)
+local browserFrame = Meeting.GUI.CreateFrame({
+    parent = Meeting.MainFrame,
+    width = 782,
+    height = 390,
+    anchor = {
+        point = "TOPLEFT",
+        relative = Meeting.MainFrame,
+        relativePoint = "TOPLEFT",
+        x = 18,
+        y = -34
+    }
+})
 Meeting.BrowserFrame = browserFrame
 
 local categoryTextFrame = Meeting.GUI.CreateText({
@@ -126,10 +134,18 @@ local searchButton = Meeting.GUI.CreateButton({
     end
 })
 
-local activityListHeaderFrame = CreateFrame("Frame", nil, browserFrame)
-activityListHeaderFrame:SetWidth(746)
-activityListHeaderFrame:SetHeight(44)
-activityListHeaderFrame:SetPoint("TOPLEFT", browserFrame, "TOPLEFT", 18, -56)
+local activityListHeaderFrame = Meeting.GUI.CreateFrame({
+    parent = browserFrame,
+    width = 746,
+    height = 44,
+    anchor = {
+        point = "TOPLEFT",
+        relative = browserFrame,
+        relativePoint = "TOPLEFT",
+        x = 18,
+        y = -56
+    }
+})
 
 local categoryText = Meeting.GUI.CreateText({
     parent = activityListHeaderFrame,
@@ -210,17 +226,27 @@ local actionText = Meeting.GUI.CreateText({
     }
 })
 
-local activityListFrame = CreateFrame("Frame", nil, browserFrame)
-activityListFrame:SetWidth(746)
-activityListFrame:SetHeight(352)
-activityListFrame:SetPoint("TOPLEFT", activityListHeaderFrame, "BOTTOMLEFT", 0, 0)
+local activityListFrame = Meeting.GUI.CreateFrame({
+    parent = browserFrame,
+    width = 746,
+    height = 270,
+    anchor = {
+        point = "TOPLEFT",
+        relative = activityListHeaderFrame,
+        relativePoint = "BOTTOMLEFT",
+        x = 0,
+        y = 0
+    }
+})
 
 local activityFramePool = {}
 
 local function CreateActivityItemFrame()
-    local f = CreateFrame("Frame", nil, activityListFrame)
-    f:SetWidth(746)
-    f:SetHeight(44)
+    local f = Meeting.GUI.CreateFrame({
+        parent = activityListFrame,
+        width = 746,
+        height = 44,
+    })
 
     local nameText = Meeting.GUI.CreateText({
         parent = f,

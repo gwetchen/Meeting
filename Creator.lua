@@ -1,10 +1,18 @@
 local Menu = AceLibrary("Dewdrop-2.0")
 
-local creatorFrame = CreateFrame("Frame", nil, Meeting.MainFrame)
-creatorFrame:SetWidth(782)
-creatorFrame:SetHeight(390)
-creatorFrame:SetPoint("TOPLEFT", Meeting.MainFrame, "TOPLEFT", 18, -34)
-creatorFrame:Hide()
+local creatorFrame = Meeting.GUI.CreateFrame({
+    parent = Meeting.MainFrame,
+    width = 782,
+    height = 390,
+    anchor = {
+        point = "TOPLEFT",
+        relative = Meeting.MainFrame,
+        relativePoint = "TOPLEFT",
+        x = 18,
+        y = -34
+    },
+    hide = true
+})
 Meeting.CreatorFrame = creatorFrame
 
 local creatorInfoFrame = Meeting.GUI.CreateFrame({
@@ -168,10 +176,18 @@ local closeButton = Meeting.GUI.CreateButton({
 })
 closeButton:Disable()
 
-local applicantListHeaderFrame = CreateFrame("Frame", nil, creatorFrame)
-applicantListHeaderFrame:SetWidth(558)
-applicantListHeaderFrame:SetHeight(24)
-applicantListHeaderFrame:SetPoint("TOPLEFT", creatorInfoFrame, "TOPRIGHT", 0, 0)
+local applicantListHeaderFrame = Meeting.GUI.CreateFrame({
+    parent = creatorFrame,
+    width = 558,
+    height = 24,
+    anchor = {
+        point = "TOPLEFT",
+        relative = creatorInfoFrame,
+        relativePoint = "TOPRIGHT",
+        x = 0,
+        y = 0
+    }
+})
 
 local nameText = Meeting.GUI.CreateText({
     parent = applicantListHeaderFrame,
@@ -239,17 +255,27 @@ local actionText = Meeting.GUI.CreateText({
     }
 })
 
-local applicantListFrame = CreateFrame("Frame", nil, creatorFrame)
-applicantListFrame:SetWidth(520)
-applicantListFrame:SetHeight(352)
-applicantListFrame:SetPoint("TOPLEFT", applicantListHeaderFrame, "BOTTOMLEFT", 0, 0)
+local applicantListFrame = Meeting.GUI.CreateFrame({
+    parent = creatorFrame,
+    width = 558,
+    height = 352,
+    anchor = {
+        point = "TOPLEFT",
+        relative = applicantListHeaderFrame,
+        relativePoint = "BOTTOMLEFT",
+        x = 0,
+        y = 0
+    }
+})
 
 local applicantFramePool = {}
 
 local function CreateApplicantItemFrame()
-    local f = CreateFrame("Frame", nil, applicantListFrame)
-    f:SetWidth(520)
-    f:SetHeight(44)
+    local f = Meeting.GUI.CreateFrame({
+        parent = applicantListFrame,
+        width = 520,
+        height = 44,
+    })
 
     local nameText = Meeting.GUI.CreateText({
         parent = f,

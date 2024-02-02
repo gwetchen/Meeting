@@ -12,7 +12,9 @@ Meeting = {
 
     activities = {},
 
-    playerIsHC = false
+    playerIsHC = false,
+
+    -- GUI_DEBUG = true
 }
 
 
