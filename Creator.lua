@@ -133,6 +133,8 @@ local createButton = Meeting.GUI.CreateButton({
             Meeting.ClassToNumber(Meeting.GetPlayerClass()),
             Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0)
         Meeting.Message.CreateActivity(data)
+
+        Meeting:SyncActivity()
     end
 })
 createButton:Disable()

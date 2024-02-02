@@ -4,6 +4,7 @@
 ## Version: 0.1.0
 ## SavedVariables: MEETING_DB
 
+Compat.lua
 Init.lua
 Util.lua
 GUI.lua

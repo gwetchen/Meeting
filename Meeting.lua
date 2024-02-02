@@ -63,9 +63,9 @@ end
 
 local floatFrame = Meeting.GUI.CreateButton({
     name = "MettingFloatFrame",
-    width = 80,
+    width = 120,
     height = 40,
-    text = "集合石",
+    text = "集合石 0/0",
     anchor = {
         point = "TOP",
         x = 0,
@@ -76,6 +76,13 @@ local floatFrame = Meeting.GUI.CreateButton({
         Meeting:Toggle()
     end
 })
+floatFrame:SetFrameStrata("DIALOG")
+
+local function UpdateFloat()
+    local activity = Meeting:FindActivity(Meeting.player)
+    local n = activity and table.getn(activity.applicantList) or 0
+    floatFrame:SetText("集合石 " .. n .. "/" .. table.getn(Meeting.activities))
+end
 
 local mainFrame = Meeting.GUI.CreateFrame({
     name = "MeetingMainFrame",
@@ -187,6 +194,25 @@ function Meeting:DeleteActivity(id)
     end
 end
 
+local syncTimer = nil
+
+function Meeting:SyncActivity()
+    if syncTimer then
+        syncTimer:Cancel()
+    end
+
+    syncTimer = C_Timer.NewTicker(60, function()
+        local activity = Meeting:FindActivity(Meeting.player)
+        if activity then
+            local data = string.format("%s:%s:%s:%d:%d:%d:%d", Meeting.player, Meeting.createInfo.category,
+                string.isempty(Meeting.createInfo.comment) and "_" or Meeting.createInfo.comment, UnitLevel("player"),
+                Meeting.ClassToNumber(Meeting.GetPlayerClass()),
+                Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0)
+            Meeting.Message.CreateActivity(data)
+        end
+    end, -1)
+end
+
 function Meeting:OnCreate(id, category, comment, level, class, members, hc)
     local item = Meeting:FindActivity(id)
     if item then
@@ -208,6 +234,7 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc)
             applicantList = {}
         })
     end
+    UpdateFloat()
     Meeting.CreatorFrame.UpdateActivity()
     Meeting.BrowserFrame:UpdateList()
 end
@@ -228,6 +255,7 @@ function Meeting:OnApplicant(id, name, level, class, score, comment)
 
         Meeting.CreatorFrame:UpdateList()
     end
+    UpdateFloat()
 end
 
 function Meeting:OnDecline(id, name)
@@ -238,6 +266,7 @@ function Meeting:OnDecline(id, name)
             Meeting.BrowserFrame:UpdateList()
         end
     end
+    UpdateFloat()
 end
 
 function Meeting:OnMembers(id, members)
@@ -258,4 +287,5 @@ function Meeting:OnClose(id)
         Meeting.joinedActivity = nil
     end
     Meeting.BrowserFrame:UpdateList()
+    UpdateFloat()
 end
