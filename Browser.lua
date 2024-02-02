@@ -250,7 +250,7 @@ local function CreateActivityItemFrame()
     local f = Meeting.GUI.CreateFrame({
         parent = activityListFrame,
         width = 746,
-        height = 44,
+        height = 24,
     })
 
     local nameText = Meeting.GUI.CreateText({
@@ -364,18 +364,18 @@ function Meeting.BrowserFrame:UpdateList()
         return
     end
 
-    local aactivities = {}
+    local activities = {}
     for i, activity in ipairs(Meeting.activities) do
         if Meeting.searchInfo.parent == "" or Meeting.searchInfo.parent == activity.parent then
             if Meeting.searchInfo.category == "" or Meeting.searchInfo.category == activity.category then
-                table.insert(aactivities, activity)
+                table.insert(activities, activity)
             end
         end
     end
-    local len = table.getn(aactivities)
-
-    if len > table.getn(activityFramePool) then
-        for i = table.getn(activityFramePool) + 1, len do
+    local len = table.getn(activities)
+    local poolLen = table.getn(activityFramePool)
+    if len > poolLen then
+        for i = poolLen + 1, len do
             CreateActivityItemFrame()
         end
     end
@@ -384,15 +384,15 @@ function Meeting.BrowserFrame:UpdateList()
         if i > len then
             item.frame:Hide()
         else
-            local activity = aactivities[i]
-            item.frame:SetPoint("TOPLEFT", activityListFrame, "TOPLEFT", 0, -44 * (i - 1))
+            local activity = activities[i]
+            item.frame:SetPoint("TOPLEFT", activityListFrame, "TOPLEFT", 0, -24 * (i - 1))
             local category = Meeting.FindCaregoryByCode(activity.category)
             item.nameText:SetText(category.name)
             item.hcText:SetText(activity.hc and "HC" or "FHC")
             local rgb = Meeting.GetClassRGBColor(activity.class, activity.unitname)
             item.leaderText:SetText(activity.unitname)
             item.leaderText:SetTextColor(rgb.r, rgb.g, rgb.b)
-            item.membersText:SetText(activity.members .. "/" .. category.members)
+            item.membersText:SetText(activity.members .. "/" .. Meeting.GetActivityMaxMembers(activity.category))
             item.commentText:SetText(activity.comment ~= "_" and activity.comment or "")
             if activity.unitname == Meeting.player then
                 item.requestButton:Disable()

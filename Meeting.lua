@@ -203,7 +203,7 @@ function Meeting:FindActivity(creator)
         end
     end
     if index ~= -1 then
-        return Meeting.activities[index]
+        return Meeting.activities[index], index
     else
         return nil
     end
@@ -221,24 +221,6 @@ function Meeting:DeleteActivity(id)
         local activity = Meeting.activities[index]
         table.remove(Meeting.activities, index)
         return activity
-    end
-end
-
-function Meeting.MoveActivityToFirst(id)
-    local index = -1
-    for i, item in ipairs(Meeting.activities) do
-        if item.unitname == id then
-            index = i
-            break
-        end
-    end
-    if index ~= -1 then
-        if index == 1 then
-            return
-        end
-        local activity = Meeting.activities[index]
-        table.remove(Meeting.activities, index)
-        table.insert(Meeting.activities, 1, activity)
     end
 end
 
@@ -262,20 +244,21 @@ function Meeting:SyncActivity()
 end
 
 function Meeting:OnCreate(id, category, comment, level, class, members, hc)
-    local item = Meeting:FindActivity(id)
+    local item, index = Meeting:FindActivity(id)
     if item then
-        item.parent = Meeting.GetCategoryParent(category)
+        item.parent = Meeting.GetCategoryParent(category).key
         item.category = category
         item.comment = comment
         item.level = tonumber(level)
         item.class = Meeting.NumberToClass(tonumber(class))
         item.members = tonumber(members)
         item.isHC = hc == "1"
-        Meeting.MoveActivityToFirst(id)
+        table.remove(Meeting.activities, index)
+        table.insert(Meeting.activities, 1, item)
     else
         table.insert(Meeting.activities, 1, {
             unitname = id,
-            parent = Meeting.GetCategoryParent(category),
+            parent = Meeting.GetCategoryParent(category).key,
             category = category,
             comment = comment,
             level = tonumber(level),
@@ -321,10 +304,11 @@ function Meeting:OnDecline(id, name)
 end
 
 function Meeting:OnMembers(id, members)
-    local activity = Meeting:FindActivity(id)
+    local activity, index = Meeting:FindActivity(id)
     if activity then
         activity.members = tonumber(members)
-        Meeting.MoveActivityToFirst(id)
+        table.remove(Meeting.activities, index)
+        table.insert(Meeting.activities, 1, activity)
         Meeting.BrowserFrame:UpdateList()
     end
 end

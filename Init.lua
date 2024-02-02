@@ -17,7 +17,6 @@ Meeting = {
     -- GUI_DEBUG = true
 }
 
-
 local classNameMap = {
     [1] = "WARLOCK",
     [2] = "HUNTER",
@@ -68,108 +67,92 @@ Meeting.Categories = {
     {
         key = "DUNGENO",
         name = "地下城",
+        members = 5,
         children = {
             {
                 key = "RFC",
                 name = "怒焰裂谷",
                 minLevel = 13,
-                members = 5,
             },
             {
                 key = "WC",
                 name = "哀号洞穴",
                 minLevel = 17,
-                members = 5,
             },
             {
                 key = "DM",
                 name = "死亡矿井",
                 minLevel = 17,
-                members = 5,
             },
             {
                 key = "SFK",
                 name = "影牙城堡",
                 minLevel = 22,
-                members = 5,
             },
             {
                 key = "STOCKS",
                 name = "暴风城：监狱",
                 minLevel = 22,
-                members = 5,
             },
             {
                 key = "BFD",
                 name = "黑暗深渊",
                 minLevel = 23,
-                members = 5,
             },
             {
                 key = "SMGY",
                 name = "血色修道院墓地",
                 minLevel = 27,
-                members = 5,
             },
             {
                 key = "SMLIB",
                 name = "血色修道院图书馆",
                 minLevel = 28,
-                members = 5,
             },
             {
                 key = "GNOMER",
                 name = "诺莫瑞根",
                 minLevel = 29,
-                members = 5,
             },
             {
                 key = "RFK",
                 name = "剃刀沼泽",
                 minLevel = 29,
-                members = 5,
             },
             {
                 key = "SMGY",
                 name = "新月林地",
                 minLevel = 32,
-                members = 5,
             },
             {
                 key = "SMARMORY",
                 name = "血色修道院军械库",
                 minLevel = 32,
-                members = 5,
             },
             {
                 key = "SMCATH",
                 name = "血色修道院大教堂",
                 minLevel = 35,
-                members = 5,
             },
             {
                 key = "RFD",
                 name = "剃刀高地",
                 minLevel = 36,
-                members = 5,
             },
             {
                 key = "ULDA",
                 name = "奥达曼",
                 minLevel = 40,
-                members = 5,
             },
             {
                 key = "GILNEAS",
                 name = "吉尔尼斯城",
                 minLevel = 42,
-                members = 5,
             },
             {
                 key = "ZF",
                 name = "祖尔法拉克",
                 minLevel = 44,
-                members = 5,
             },
             {
                 key = "MARAPPURPLE",
@@ -185,31 +168,26 @@ Meeting.Categories = {
                 key = "MARAPRINCESS",
                 name = "玛拉顿公主",
                 minLevel = 47,
-                members = 5,
             },
             {
                 key = "ST",
                 name = "阿塔哈卡神庙",
                 minLevel = 50,
-                members = 5,
             },
             {
                 key = "HFQ",
                 name = "仇恨熔炉采石场",
                 minLevel = 50,
-                members = 5,
             },
             {
                 key = "BRD",
                 name = "黑石深渊",
                 minLevel = 52,
-                members = 5,
             },
             {
                 key = "BRDARENA",
                 name = "黑石深渊竞技场",
                 minLevel = 52,
-                members = 5,
             },
             {
                 key = "UBRS",
@@ -221,31 +199,26 @@ Meeting.Categories = {
                 key = "LBRS",
                 name = "黑石塔下层",
                 minLevel = 55,
-                members = 5,
             },
             {
                 key = "DM",
                 name = "厄运之槌：东",
                 minLevel = 55,
-                members = 5,
             },
             {
                 key = "DMN",
                 name = "厄运之槌：北",
                 minLevel = 57,
-                members = 5,
             },
             {
                 key = "DMT",
                 name = "厄运之槌完美贡品",
                 minLevel = 57,
-                members = 5,
             },
             {
                 key = "DMW",
                 name = "厄运之槌：西",
                 minLevel = 57,
-                members = 5,
             },
             {
                 key = "SCHOLO",
@@ -256,67 +229,58 @@ Meeting.Categories = {
                 key = "STRATUD",
                 name = "斯坦索姆：DK区",
                 minLevel = 58,
-                members = 5,
             },
             {
                 key = "STRATLIVE",
                 name = "斯坦索姆：血色区",
                 minLevel = 58,
-                members = 5,
             },
             {
                 key = "KC",
                 name = "卡拉赞地穴",
                 minLevel = 58,
-                members = 5,
             },
             {
                 key = "COTBM",
                 name = "时间之穴：黑色沼泽",
                 minLevel = 60,
-                members = 5,
             },
             {
                 key = "SWV",
                 name = "暴风城：地牢",
                 minLevel = 60,
-                members = 5,
             },
         }
     },
     {
         key = "RAID",
         name = "团队副本",
+        members = 40,
         children = {
             {
                 key = "MC",
                 name = "熔火之心",
                 minLevel = 60,
-                members = 40,
             },
             {
                 key = "ONY",
                 name = "奥妮克希亚的巢穴",
                 minLevel = 60,
-                members = 40,
             },
             {
                 key = "BWL",
                 name = "黑翼之巢",
                 minLevel = 60,
-                members = 40,
             },
             {
                 key = "AQ40",
                 name = "安其拉神殿",
                 minLevel = 60,
-                members = 40,
             },
             {
                 key = "NAXX",
                 name = "纳克萨玛斯",
                 minLevel = 60,
-                members = 40,
             },
             {
                 key = "ZUG",
@@ -340,13 +304,13 @@ Meeting.Categories = {
                 key = "ES",
                 name = "翡翠圣殿",
                 minLevel = 60,
-                members = 40,
             }
         }
     },
     {
         key = "QUEST",
         name = "任务",
+        members = 5,
         children = {
 
         }
@@ -354,6 +318,7 @@ Meeting.Categories = {
     {
         key = "BOSS",
         name = "世界首领",
+        members = 40,
         children = {
 
         }
@@ -397,6 +362,7 @@ Meeting.Categories = {
     {
         key = "OTHER",
         name = "其他",
+        members = 40,
         children = {}
     }
 }
@@ -404,12 +370,26 @@ Meeting.Categories = {
 local CategoryParentMap = {}
 for _, value in ipairs(Meeting.Categories) do
     for _, child in ipairs(value.children) do
-        CategoryParentMap[child.key] = value.key
+        CategoryParentMap[child.key] = { key = value.key, members = value.members }
     end
 end
 
-function Meeting.GetCategoryParent(name)
-    return CategoryParentMap[name]
+function Meeting.GetCategoryParent(category)
+    return CategoryParentMap[category]
+end
+
+function Meeting.GetActivityMaxMembers(category)
+    local info = Meeting.FindCaregoryByCode(category)
+    if info and info.members then
+        return info.members
+    end
+
+    local parent = Meeting.GetCategoryParent(category)
+    if parent then
+        return parent.members
+    end
+    
+    return 40
 end
 
 function Meeting.FindCaregoryByCode(code)
