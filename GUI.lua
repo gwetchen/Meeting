@@ -57,8 +57,7 @@ function GUI.CreateText(config)
         text:SetTextColor(1, 1, 1)
     end
     text:SetJustifyH("LEFT")
-    text:SetText(config.text)
-
+    text:SetText(config.text or "")
     return text
 end
 
@@ -74,12 +73,12 @@ function GUI.CreateButton(config)
     if config.movable then
         SetMovable(button)
     end
-    button:SetText(config.text)
+    button:SetText(config.text or "")
     button:SetTextColor(1, 1, 1)
     button:SetFont(STANDARD_TEXT_FONT, config.fontSize or 16, "OUTLINE")
     button:SetScript("OnClick", function()
-        if arg1 == "LeftButton" and config.click then
-            config.click()
+        if config.click then
+            config.click(arg1)
         end
     end)
     button:SetDisabledTextColor(0.5, 0.5, 0.5)

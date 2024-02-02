@@ -246,12 +246,51 @@ local activityListFrame = Meeting.GUI.CreateFrame({
 
 local activityFramePool = {}
 
+local hoverBackgrop = {
+    edgeFile = "Interface\\BUTTONS\\WHITE8X8",
+    edgeSize = 24,
+    insets = { left = -1, right = -1, top = -1, bottom = -1 },
+}
+
 local function CreateActivityItemFrame()
-    local f = Meeting.GUI.CreateFrame({
+    local f = Meeting.GUI.CreateButton({
         parent = activityListFrame,
         width = 746,
         height = 24,
     })
+    f:SetBackdrop(hoverBackgrop)
+    f:SetBackdropBorderColor(1, 1, 1, .04)
+    f:EnableMouse(true)
+    f:SetScript("OnEnter", function()
+        this:SetBackdropBorderColor(1, 1, 1, .2)
+
+        GameTooltip:SetOwner(this, "ANCHOR_RIGHT", 40)
+        GameTooltip:SetText(this.category, 1, 1, 1, 1)
+        GameTooltip:AddLine(this.leader, this.classColor.r, this.classColor.g, this.classColor.b, 1)
+        GameTooltip:AddLine("等级 " .. this.level)
+        if this.comment ~= "_" then
+            GameTooltip:AddLine(this.comment, 0.75, 0.75, 0.75, 1)
+        end
+        GameTooltip:AddLine("\n")
+        GameTooltip:AddLine("<双击>悄悄话", 1, 1, 1, 1)
+        GameTooltip:SetWidth(220)
+        GameTooltip:Show()
+    end)
+    f:SetScript("OnLeave", function()
+        this:SetBackdropBorderColor(1, 1, 1, .04)
+        GameTooltip:Hide()
+    end)
+    f:SetScript("OnDoubleClick", function()
+        if this.leader == Meeting.player then
+            return
+        end
+        local chatFrame = SELECTED_DOCK_FRAME
+        if (not chatFrame) then
+            chatFrame = DEFAULT_CHAT_FRAME;
+        end
+        ChatFrame_OpenChat("/w " .. this.leader, chatFrame)
+    end)
+
 
     local nameText = Meeting.GUI.CreateText({
         parent = f,
@@ -263,7 +302,7 @@ local function CreateActivityItemFrame()
             relative = f,
             relativePoint = "TOPLEFT",
             x = 0,
-            y = 0
+            y = -6
         }
     })
 
@@ -335,14 +374,14 @@ local function CreateActivityItemFrame()
     local requestButton = Meeting.GUI.CreateButton({
         parent = f,
         text = "申请",
-        width = 44,
-        height = 24,
+        width = 34,
+        height = 18,
         anchor = {
             point = "TOPLEFT",
             relative = commentText,
             relativePoint = "TOPRIGHT",
             x = 0,
-            y = 0
+            y = 2
         },
         click = function()
             item.click()
@@ -382,13 +421,18 @@ function Meeting.BrowserFrame:UpdateList()
 
     for i, item in ipairs(activityFramePool) do
         if i > len then
+            item.frame.category = nil
+            item.frame.leader = nil
+            item.frame.classColor = nil
+            item.frame.level = nil
+            item.frame.comment = nil
             item.frame:Hide()
         else
             local activity = activities[i]
-            item.frame:SetPoint("TOPLEFT", activityListFrame, "TOPLEFT", 0, -24 * (i - 1))
+            item.frame:SetPoint("TOPLEFT", activityListFrame, "TOPLEFT", 0, -25 * (i - 1))
             local category = Meeting.FindCaregoryByCode(activity.category)
             item.nameText:SetText(category.name)
-            item.hcText:SetText(activity.hc and "HC" or "FHC")
+            item.hcText:SetText(activity.isHC and "HC" or "FHC")
             local rgb = Meeting.GetClassRGBColor(activity.class, activity.unitname)
             item.leaderText:SetText(activity.unitname)
             item.leaderText:SetTextColor(rgb.r, rgb.g, rgb.b)
@@ -419,10 +463,15 @@ function Meeting.BrowserFrame:UpdateList()
             local id = activity.unitname
             item.click = function()
                 local data = string.format("%s:%s:%d:%d:%d:%s", id, Meeting.player, UnitLevel("player"),
-                    Meeting.ClassToNumber(Meeting.GetPlayerClass()), Meeting.GetPlayerScore(), "_")
+                    Meeting.ClassToNumber(Meeting.playerClass), Meeting.GetPlayerScore(), "_")
                 Meeting.Message.Applicant(data)
                 activity.applicantStatus = Meeting.APPLICANT_STATUS.Invited
             end
+            item.frame.category = category.name
+            item.frame.leader = activity.unitname
+            item.frame.classColor = rgb
+            item.frame.level = activity.level
+            item.frame.comment = activity.comment
             item.frame:Show()
         end
     end

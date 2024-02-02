@@ -1,8 +1,12 @@
 BINDING_HEADER_CS_MEETING_HEADER = "集合石";
 BINDING_NAME_CS_MEETING_NAME = "显示/隐藏";
 
+local _, class = UnitClass("player")
+
 Meeting = {
     player = UnitName("player"),
+
+    playerClass = class,
 
     APPLICANT_STATUS = { None = 1, Invited = 2, Declined = 3, Joined = 4 },
 
@@ -388,7 +392,7 @@ function Meeting.GetActivityMaxMembers(category)
     if parent then
         return parent.members
     end
-    
+
     return 40
 end
 
@@ -400,11 +404,6 @@ function Meeting.FindCaregoryByCode(code)
             end
         end
     end
-end
-
-function Meeting.GetPlayerClass()
-    local _, class = UnitClass("player")
-    return class
 end
 
 function Meeting:GetMembers()

@@ -15,7 +15,7 @@ f:SetScript("OnEvent", function()
             Meeting.Message.OnRecv(arg1)
         end
     elseif event == "CHAT_MSG_HARDCORE" then
-        isHC = true
+        Meeting.playerIsHC = true
     elseif event == "PARTY_LEADER_CHANGED" then
         if Meeting:GetMembers() > 1 and IsRaidLeader() ~= 1 then
             if Meeting:FindActivity(Meeting.player) then
@@ -64,9 +64,25 @@ f:SetScript("OnEvent", function()
         Meeting.CreatorFrame.UpdateActivity()
         Meeting.joinedActivity = joined
     elseif event == "PLAYER_ENTERING_WORLD" then
-
+        Meeting.CheckPlayerHCMode()
     end
 end)
+
+function Meeting.CheckPlayerHCMode()
+    local i = 1
+    while true do
+        local spellName, _ = GetSpellName(i, BOOKTYPE_SPELL)
+        if not spellName then
+            break
+        end
+        if spellName == "硬核模式" then
+            Meeting.playerIsHC = true
+            break
+        else
+            i = i + 1
+        end
+    end
+end
 
 function Meeting:HasActivity()
     for i, item in ipairs(Meeting.activities) do
@@ -234,10 +250,9 @@ function Meeting:SyncActivity()
     syncTimer = C_Timer.NewTicker(60, function()
         local activity = Meeting:FindActivity(Meeting.player)
         if activity then
-            local data = string.format("%s:%s:%s:%d:%d:%d:%d", Meeting.player, Meeting.createInfo.category,
-                string.isempty(Meeting.createInfo.comment) and "_" or Meeting.createInfo.comment, UnitLevel("player"),
-                Meeting.ClassToNumber(Meeting.GetPlayerClass()),
-                Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0)
+            local data = string.format("%s:%s:%s:%d:%d:%d:%d", Meeting.player, activity.category,
+                string.isempty(activity.comment) and "_" or activity.comment, UnitLevel("player"),
+                Meeting.ClassToNumber(Meeting.playerClass), Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0)
             Meeting.Message.CreateActivity(data)
         end
     end, -1)

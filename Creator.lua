@@ -149,7 +149,7 @@ local createButton = Meeting.GUI.CreateButton({
         commentFrame:ClearFocus()
         local data = string.format("%s:%s:%s:%d:%d:%d:%d", Meeting.player, Meeting.createInfo.category,
             string.isempty(Meeting.createInfo.comment) and "_" or Meeting.createInfo.comment, UnitLevel("player"),
-            Meeting.ClassToNumber(Meeting.GetPlayerClass()),
+            Meeting.ClassToNumber(Meeting.playerClass),
             Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0)
         Meeting.Message.CreateActivity(data)
 
