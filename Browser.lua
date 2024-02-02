@@ -2,13 +2,13 @@ local Menu = AceLibrary("Dewdrop-2.0")
 
 local browserFrame = CreateFrame("Frame", nil, Meeting.MainFrame)
 browserFrame:SetWidth(782)
-browserFrame:SetHeight(388)
-browserFrame:SetPoint("TOPLEFT", Meeting.MainFrame, "TOPLEFT", 18, -18)
+browserFrame:SetHeight(390)
+browserFrame:SetPoint("TOPLEFT", Meeting.MainFrame, "TOPLEFT", 18, -34)
 Meeting.BrowserFrame = browserFrame
 
 local categoryTextFrame = Meeting.GUI.CreateText({
     parent = browserFrame,
-    text = "活动类型：",
+    text = "活动类型：全部活动",
     fontSize = 16,
     anchor = {
         point = "TOPLEFT",
@@ -18,6 +18,8 @@ local categoryTextFrame = Meeting.GUI.CreateText({
         y = 0
     }
 })
+
+Meeting.searchInfo.category = ""
 
 local options = {
     type = 'group',

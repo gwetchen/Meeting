@@ -30,7 +30,7 @@ function GUI.CreateText(config)
     local text = parent:CreateFontString(nil)
     text:SetWidth(config.width or 0)
     text:SetHeight(config.height or 0)
-    text:SetFont(STANDARD_TEXT_FONT, config.fontSize, "OUTLINE")
+    text:SetFont(STANDARD_TEXT_FONT, config.fontSize or 14, "OUTLINE")
     if config.anchor then
         text:SetPoint(config.anchor.point, config.anchor.relative, config.anchor.relativePoint, config.anchor.x or 0,
             config.anchor.y or 0)

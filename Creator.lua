@@ -2,18 +2,29 @@ local Menu = AceLibrary("Dewdrop-2.0")
 
 local creatorFrame = CreateFrame("Frame", nil, Meeting.MainFrame)
 creatorFrame:SetWidth(782)
-creatorFrame:SetHeight(388)
-creatorFrame:SetPoint("TOPLEFT", Meeting.MainFrame, "TOPLEFT", 18, -18)
+creatorFrame:SetHeight(390)
+creatorFrame:SetPoint("TOPLEFT", Meeting.MainFrame, "TOPLEFT", 18, -34)
 creatorFrame:Hide()
 Meeting.CreatorFrame = creatorFrame
 
-local categoryTextFrame = Meeting.GUI.CreateText({
+local creatorInfoFrame = Meeting.GUI.CreateFrame({
     parent = creatorFrame,
+    width = 260,
+    height = 372,
+    anchor = {
+        point = "TOPLEFT",
+        relative = creatorFrame,
+        relativePoint = "TOPLEFT",
+    }
+})
+
+local categoryTextFrame = Meeting.GUI.CreateText({
+    parent = creatorInfoFrame,
     text = "活动类型：",
     fontSize = 16,
     anchor = {
         point = "TOPLEFT",
-        relative = creatorFrame,
+        relative = creatorInfoFrame,
         relativePoint = "TOPLEFT",
         x = 0,
         y = 0
@@ -56,7 +67,7 @@ for i, value in ipairs(Meeting.Categories) do
 end
 
 local selectButton = Meeting.GUI.CreateButton({
-    parent = creatorFrame,
+    parent = creatorInfoFrame,
     text = "选择活动",
     width = 80,
     height = 24,
@@ -82,7 +93,7 @@ Menu:Register(selectButton,
 )
 
 local commentTextFrame = Meeting.GUI.CreateText({
-    parent = creatorFrame,
+    parent = creatorInfoFrame,
     text = "活动说明：",
     fontSize = 16,
     anchor = {
@@ -94,7 +105,7 @@ local commentTextFrame = Meeting.GUI.CreateText({
     }
 })
 
-local scrollFrame = CreateFrame("ScrollFrame", "MeetingCreateScrollFrame", creatorFrame, "UIPanelScrollFrameTemplate")
+local scrollFrame = CreateFrame("ScrollFrame", "MeetingCreateScrollFrame", creatorInfoFrame, "UIPanelScrollFrameTemplate")
 scrollFrame:SetWidth(220)
 scrollFrame:SetHeight(140)
 scrollFrame:SetPoint("TOPLEFT", commentTextFrame, 0, -22)
@@ -115,7 +126,7 @@ commentFrame:SetFontObject("ChatFontNormal")
 scrollFrame:SetScrollChild(commentFrame)
 
 local createButton = Meeting.GUI.CreateButton({
-    parent = creatorFrame,
+    parent = creatorInfoFrame,
     width = 80,
     height = 24,
     text = "创建活动",
@@ -140,7 +151,7 @@ local createButton = Meeting.GUI.CreateButton({
 createButton:Disable()
 
 local closeButton = Meeting.GUI.CreateButton({
-    parent = creatorFrame,
+    parent = creatorInfoFrame,
     width = 80,
     height = 24,
     text = "解散活动",
@@ -158,9 +169,9 @@ local closeButton = Meeting.GUI.CreateButton({
 closeButton:Disable()
 
 local applicantListHeaderFrame = CreateFrame("Frame", nil, creatorFrame)
-applicantListHeaderFrame:SetWidth(520)
+applicantListHeaderFrame:SetWidth(558)
 applicantListHeaderFrame:SetHeight(24)
-applicantListHeaderFrame:SetPoint("TOPLEFT", creatorFrame, "TOPLEFT", 260, 0)
+applicantListHeaderFrame:SetPoint("TOPLEFT", creatorInfoFrame, "TOPRIGHT", 0, 0)
 
 local nameText = Meeting.GUI.CreateText({
     parent = applicantListHeaderFrame,

@@ -90,6 +90,43 @@ mainFrame:Hide()
 tinsert(UISpecialFrames, "MeetingMainFrame");
 Meeting.MainFrame = mainFrame
 
+local headerFrame = Meeting.GUI.CreateFrame({
+    parent = mainFrame,
+    width = 818,
+    height = 34,
+    anchor = {
+        point = "TOP",
+        relative = mainFrame,
+        relativePoint = "TOP",
+    }
+})
+
+Meeting.GUI.CreateText({
+    parent = headerFrame,
+    text = "集合石 " .. tostring(GetAddOnMetadata("Meeting", "Version")),
+    fontSize = 16,
+    anchor = {
+        point = "TOP",
+        relative = headerFrame,
+        relativePoint = "TOP",
+        x = 0,
+        y = -10
+    }
+})
+
+Meeting.GUI.CreateText({
+    parent = headerFrame,
+    text = "问题和建议前往龟壳KOOK",
+    fontSize = 10,
+    anchor = {
+        point = "TOPRIGHT",
+        relative = headerFrame,
+        relativePoint = "TOPRIGHT",
+        x = -10,
+        y = -12
+    }
+})
+
 local browserButton = Meeting.GUI.CreateButton({
     parent = mainFrame,
     width = 80,
