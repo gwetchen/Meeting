@@ -462,4 +462,11 @@ function Meeting.CreatorFrame.UpdateActivity()
     else
         closeButton:Disable()
     end
+
+    if IsRaidLeader() ~= 1 then
+        createButton:Disable()
+        closeButton:Disable()
+    end
 end
+
+Meeting.CreatorFrame.UpdateActivity()
