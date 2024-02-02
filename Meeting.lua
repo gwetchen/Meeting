@@ -3,6 +3,7 @@ f:RegisterEvent("CHAT_MSG_HARDCORE")
 f:RegisterEvent("CHAT_MSG_CHANNEL")
 f:RegisterEvent("PLAYER_ENTERING_WORLD")
 f:RegisterEvent("PARTY_MEMBERS_CHANGED")
+f:RegisterEvent("PARTY_LEADER_CHANGED")
 f:RegisterEvent("RAID_ROSTER_UPDATE")
 f:SetScript("OnEvent", function()
     if event == "CHAT_MSG_CHANNEL" then
@@ -15,6 +16,12 @@ f:SetScript("OnEvent", function()
         end
     elseif event == "CHAT_MSG_HARDCORE" then
         isHC = true
+    elseif event == "PARTY_LEADER_CHANGED" then
+        if Meeting:GetMembers() > 1 and IsRaidLeader() ~= 1 then
+            if Meeting:FindActivity(Meeting.player) then
+                Meeting.Message.CloseActivity(Meeting.player)
+            end
+        end
     elseif event == "PARTY_MEMBERS_CHANGED" or event == "RAID_ROSTER_UPDATE" then
         local needUpdateBrowser = false
 
@@ -320,7 +327,7 @@ end
 
 function Meeting:OnClose(id)
     local activity = Meeting:DeleteActivity(id)
-    if activity.unitname == Meeting.player then
+    if activity and activity.unitname == Meeting.player then
         Meeting.CreatorFrame.UpdateActivity()
     end
 
