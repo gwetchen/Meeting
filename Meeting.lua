@@ -16,8 +16,11 @@ f:SetScript("OnEvent", function()
     elseif event == "CHAT_MSG_HARDCORE" then
         isHC = true
     elseif event == "PARTY_MEMBERS_CHANGED" or event == "RAID_ROSTER_UPDATE" then
+        local needUpdateBrowser = false
+
         local activity = Meeting:FindActivity(Meeting.player)
         if activity then
+            needUpdateBrowser = true
             for i, applicant in ipairs(activity.applicantList) do
                 if Meeting:IsInActivity(applicant.name) then
                     table.remove(activity.applicantList, i)
@@ -25,26 +28,30 @@ f:SetScript("OnEvent", function()
                     applicant.status = Meeting.APPLICANT_STATUS.None
                 end
             end
+
             local members = Meeting:GetMembers()
             activity.members = members
             local data = string.format("%s:%d", Meeting.player, members)
             Meeting.Message.SyncMembers(data)
-            Meeting.BrowserFrame:UpdateList()
             Meeting.CreatorFrame:UpdateList()
         end
 
         local joined = Meeting:FindJoinedActivity()
         if joined and joined.unitname ~= Meeting.player then
             joined.applicantStatus = Meeting.APPLICANT_STATUS.Joined
-            Meeting.BrowserFrame:UpdateList()
+            needUpdateBrowser = true
         end
 
         if Meeting.joinedActivity then
             local activity = Meeting:FindActivity(Meeting.joinedActivity.unitname)
             if activity then
                 activity.applicantStatus = Meeting.APPLICANT_STATUS.None
-                Meeting.BrowserFrame:UpdateList()
+                needUpdateBrowser = true
             end
+        end
+
+        if needUpdateBrowser then
+            Meeting.BrowserFrame:UpdateList()
         end
         Meeting.joinedActivity = joined
     elseif event == "PLAYER_ENTERING_WORLD" then
@@ -208,6 +215,24 @@ function Meeting:DeleteActivity(id)
     end
 end
 
+function Meeting.MoveActivityToFirst(id)
+    local index = -1
+    for i, item in ipairs(Meeting.activities) do
+        if item.unitname == id then
+            index = i
+            break
+        end
+    end
+    if index ~= -1 then
+        if index == 1 then
+            return
+        end
+        local activity = Meeting.activities[index]
+        table.remove(Meeting.activities, index)
+        table.insert(Meeting.activities, 1, activity)
+    end
+end
+
 local syncTimer = nil
 
 function Meeting:SyncActivity()
@@ -236,8 +261,9 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc)
         item.class = Meeting.NumberToClass(tonumber(class))
         item.members = tonumber(members)
         item.isHC = hc == "1"
+        Meeting.MoveActivityToFirst(id)
     else
-        table.insert(Meeting.activities, {
+        table.insert(Meeting.activities, 1, {
             unitname = id,
             category = category,
             comment = comment,
@@ -287,6 +313,7 @@ function Meeting:OnMembers(id, members)
     local activity = Meeting:FindActivity(id)
     if activity then
         activity.members = tonumber(members)
+        Meeting.MoveActivityToFirst(id)
         Meeting.BrowserFrame:UpdateList()
     end
 end
