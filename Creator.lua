@@ -147,7 +147,7 @@ local createButton = Meeting.GUI.CreateButton({
     },
     click = function()
         commentFrame:ClearFocus()
-        local data = string.format("%s:%s:%s:%d:%d:%d:%d", Meeting.player, Meeting.createInfo.category,
+        local data = string.format("%s:%s:%d:%d:%d:%d", Meeting.createInfo.category,
             string.isempty(Meeting.createInfo.comment) and "_" or Meeting.createInfo.comment, UnitLevel("player"),
             Meeting.ClassToNumber(Meeting.playerClass),
             Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0)
@@ -171,7 +171,7 @@ local closeButton = Meeting.GUI.CreateButton({
         y = 0
     },
     click = function()
-        Meeting.Message.CloseActivity(Meeting.player)
+        Meeting.Message.CloseActivity()
     end
 })
 closeButton:Disable()
@@ -434,7 +434,7 @@ function Meeting.CreatorFrame:UpdateList()
             end
             item.decline = function()
                 applicant.status = Meeting.APPLICANT_STATUS.Declined
-                Meeting.Message.Decline(string.format("%s:%s", Meeting.player, name))
+                Meeting.Message.Decline(string.format("%s", name))
                 table.remove(applicantList, idx)
                 Meeting.CreatorFrame:UpdateList()
             end

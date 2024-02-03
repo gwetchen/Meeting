@@ -462,7 +462,7 @@ function Meeting.BrowserFrame:UpdateList()
 
             local id = activity.unitname
             item.click = function()
-                local data = string.format("%s:%s:%d:%d:%d:%s", id, Meeting.player, UnitLevel("player"),
+                local data = string.format("%s:%d:%d:%d:%s", id, UnitLevel("player"),
                     Meeting.ClassToNumber(Meeting.playerClass), Meeting.GetPlayerScore(), "_")
                 Meeting.Message.Applicant(data)
                 activity.applicantStatus = Meeting.APPLICANT_STATUS.Invited

@@ -12,14 +12,14 @@ f:SetScript("OnEvent", function()
             _, name = GetChannelName(source)
         end
         if name == "LFT" and string.startswith(arg1, "Meeting:") then
-            Meeting.Message.OnRecv(arg1)
+            Meeting.Message.OnRecv(arg2, arg1)
         end
     elseif event == "CHAT_MSG_HARDCORE" then
         Meeting.playerIsHC = true
     elseif event == "PARTY_LEADER_CHANGED" then
         if Meeting:GetMembers() > 1 and IsRaidLeader() ~= 1 then
             if Meeting:FindActivity(Meeting.player) then
-                Meeting.Message.CloseActivity(Meeting.player)
+                Meeting.Message.CloseActivity()
             end
         end
         Meeting.CreatorFrame.UpdateActivity()
@@ -39,7 +39,7 @@ f:SetScript("OnEvent", function()
 
             local members = Meeting:GetMembers()
             activity.members = members
-            local data = string.format("%s:%d", Meeting.player, members)
+            local data = string.format("%d", members)
             Meeting.Message.SyncMembers(data)
             Meeting.CreatorFrame:UpdateList()
         end
@@ -250,7 +250,7 @@ function Meeting:SyncActivity()
     syncTimer = C_Timer.NewTicker(60, function()
         local activity = Meeting:FindActivity(Meeting.player)
         if activity then
-            local data = string.format("%s:%s:%s:%d:%d:%d:%d", Meeting.player, activity.category,
+            local data = string.format("%s:%s:%d:%d:%d:%d", activity.category,
                 string.isempty(activity.comment) and "_" or activity.comment, UnitLevel("player"),
                 Meeting.ClassToNumber(Meeting.playerClass), Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0)
             Meeting.Message.CreateActivity(data)
@@ -288,7 +288,7 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc)
     Meeting.BrowserFrame:UpdateList()
 end
 
-function Meeting:OnApplicant(id, name, level, class, score, comment)
+function Meeting:OnApplicant(name, id, level, class, score, comment)
     local item = Meeting:FindActivity(id)
     if item and item.unitname == Meeting.player then
         local applicant = {

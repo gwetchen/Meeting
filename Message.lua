@@ -22,26 +22,26 @@ local function stringsplit(str, delimiter)
     return unpack(fields)
 end
 
-function Message.OnRecv(data)
+function Message.OnRecv(playerName, data)
     print(data)
-    local _, event, arg1, arg2, arg3, arg4, arg5, arg6, arg7 = stringsplit(data, ":")
+    local _, event, arg1, arg2, arg3, arg4, arg5, arg6 = stringsplit(data, ":")
     if event == EVENTS.CREATE then
-        Meeting:OnCreate(arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+        Meeting:OnCreate(playerName, arg1, arg2, arg3, arg4, arg5, arg6)
     elseif event == EVENTS.APPLICANT then
-        Meeting:OnApplicant(arg1, arg2, arg3, arg4, arg5, arg6)
+        Meeting:OnApplicant(playerName, arg1, arg2, arg3, arg4, arg5)
     elseif event == EVENTS.DECLINE then
-        Meeting:OnDecline(arg1, arg2)
+        Meeting:OnDecline(playerName, arg1)
     elseif event == EVENTS.MEMBERS then
-        Meeting:OnMembers(arg1, arg2)
+        Meeting:OnMembers(playerName, arg1)
     elseif event == EVENTS.CLOSE then
-        Meeting:OnClose(arg1)
+        Meeting:OnClose(playerName)
     end
 end
 
 function Message.Send(event, msg)
-    local lft = GetChannelName("LFT")
-    if lft ~= 0 then
-        SendChatMessage("Meeting:" .. event .. ":" .. msg, "CHANNEL", nil, lft)
+    local channel = GetChannelName("LFT")
+    if channel ~= 0 then
+        SendChatMessage("Meeting:" .. event .. ":" .. msg, "CHANNEL", nil, channel)
     else
         print("LFT频道不存在，请先加入LFT频道")
     end
@@ -63,6 +63,6 @@ function Message.SyncMembers(data)
     Message.Send(EVENTS.MEMBERS, data)
 end
 
-function Message.CloseActivity(data)
-    Message.Send(EVENTS.CLOSE, data)
+function Message.CloseActivity()
+    Message.Send(EVENTS.CLOSE, "")
 end
