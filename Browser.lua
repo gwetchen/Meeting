@@ -303,7 +303,7 @@ local function CreateActivityItemFrame(i)
     end)
 
 
-    local nameText = Meeting.GUI.CreateText({
+    f.nameFrame = Meeting.GUI.CreateText({
         parent = f,
         text = "",
         fontSize = 14,
@@ -317,49 +317,49 @@ local function CreateActivityItemFrame(i)
         }
     })
 
-    local hcText = Meeting.GUI.CreateText({
+    f.hcFrame = Meeting.GUI.CreateText({
         parent = f,
         text = "",
         fontSize = 14,
         width = 60,
         anchor = {
             point = "TOPLEFT",
-            relative = nameText,
+            relative = f.nameFrame,
             relativePoint = "TOPRIGHT",
             x = 0,
             y = 0
         }
     })
 
-    local membersText = Meeting.GUI.CreateText({
+    f.membersFrame = Meeting.GUI.CreateText({
         parent = f,
         text = "",
         width = 110,
         fontSize = 14,
         anchor = {
             point = "TOPLEFT",
-            relative = hcText,
+            relative = f.hcFrame,
             relativePoint = "TOPRIGHT",
             x = 0,
             y = 0
         }
     })
 
-    local leaderText = Meeting.GUI.CreateText({
+    f.leaderFrame = Meeting.GUI.CreateText({
         parent = f,
         text = "",
         fontSize = 14,
         width = 110,
         anchor = {
             point = "TOPLEFT",
-            relative = membersText,
+            relative = f.membersFrame,
             relativePoint = "TOPRIGHT",
             x = 0,
             y = 0
         }
     })
 
-    local commentText = Meeting.GUI.CreateText({
+    f.commentFrame = Meeting.GUI.CreateText({
         parent = f,
         text = "",
         fontSize = 14,
@@ -367,45 +367,36 @@ local function CreateActivityItemFrame(i)
         height = 24,
         anchor = {
             point = "TOPLEFT",
-            relative = leaderText,
+            relative = f.leaderFrame,
             relativePoint = "TOPRIGHT",
             x = 0,
             y = 0
         }
     })
-    commentText:SetJustifyV("TOP")
+    f.commentFrame:SetJustifyV("TOP")
 
-    local item = {
-        frame = f,
-        nameText = nameText,
-        hcText = hcText,
-        leaderText = leaderText,
-        membersText = membersText,
-        commentText = commentText,
-    }
 
-    local requestButton = Meeting.GUI.CreateButton({
+    f.applicantButton = Meeting.GUI.CreateButton({
         parent = f,
         text = "申请",
         width = 34,
         height = 18,
         anchor = {
             point = "TOPLEFT",
-            relative = commentText,
+            relative = f.commentFrame,
             relativePoint = "TOPRIGHT",
             x = 0,
             y = 2
         },
         click = function()
-            item.click()
+            f.applicant()
             this:SetText("已申请")
             this:Disable()
         end
     })
-    item.requestButton = requestButton
 
-    item.frame:Hide()
-    table.insert(activityFramePool, item)
+    f:Hide()
+    table.insert(activityFramePool, f)
 end
 
 for i = 1, 10 do
@@ -430,57 +421,57 @@ function Meeting.BrowserFrame:UpdateList()
     local ll = table.getn(activityFramePool)
     if l < ll then
         for i = l + 1, ll do
-            activityFramePool[i].frame:Hide()
+            activityFramePool[i]:Hide()
         end
     end
 
     activityListFrame:Render(l, function(i, j)
-        local item = activityFramePool[i]
-        item.frame:Show()
+        local frame = activityFramePool[i]
+        frame:Show()
         local activity = activities[j]
         local category = Meeting.FindCaregoryByCode(activity.category)
-        item.nameText:SetText(category.name)
-        item.hcText:SetText(activity.isHC and "HC" or "FHC")
+        frame.nameFrame:SetText(category.name)
+        frame.hcFrame:SetText(activity.isHC and "HC" or "FHC")
         local rgb = Meeting.GetClassRGBColor(activity.class, activity.unitname)
-        item.leaderText:SetText(activity.unitname)
-        item.leaderText:SetTextColor(rgb.r, rgb.g, rgb.b)
-        item.membersText:SetText(activity.members .. "/" .. Meeting.GetActivityMaxMembers(activity.category))
-        item.commentText:SetText(activity.comment ~= "_" and activity.comment or "")
+        frame.leaderFrame:SetText(activity.unitname)
+        frame.leaderFrame:SetTextColor(rgb.r, rgb.g, rgb.b)
+        frame.membersFrame:SetText(activity.members .. "/" .. Meeting.GetActivityMaxMembers(activity.category))
+        frame.commentFrame:SetText(activity.comment ~= "_" and activity.comment or "")
 
         if activity.unitname == Meeting.player then
-            item.requestButton:Disable()
+            frame.applicantButton:Disable()
         else
-            item.requestButton:Enable()
+            frame.applicantButton:Enable()
         end
         if Meeting:IsInActivity(activity.unitname) then
-            item.requestButton:SetText("已加入")
-            item.requestButton:Disable()
+            frame.applicantButton:SetText("已加入")
+            frame.applicantButton:Disable()
         else
             if activity.applicantStatus == Meeting.APPLICANT_STATUS.Invited then
-                item.requestButton:SetText("已申请")
-                item.requestButton:Disable()
+                frame.applicantButton:SetText("已申请")
+                frame.applicantButton:Disable()
             elseif activity.applicantStatus == Meeting.APPLICANT_STATUS.Declined then
-                item.requestButton:SetText("已拒绝")
+                frame.applicantButton:SetText("已拒绝")
             elseif activity.applicantStatus == Meeting.APPLICANT_STATUS.Joined then
-                item.requestButton:SetText("已加入")
-                item.requestButton:Disable()
+                frame.applicantButton:SetText("已加入")
+                frame.applicantButton:Disable()
             else
-                item.requestButton:SetText("申请")
+                frame.applicantButton:SetText("申请")
             end
         end
 
         local id = activity.unitname
-        item.click = function()
+        frame.applicant = function()
             local data = string.format("%s:%d:%d:%d:%s", id, UnitLevel("player"),
                 Meeting.ClassToNumber(Meeting.playerClass), Meeting.GetPlayerScore(), "_")
             Meeting.Message.Applicant(data)
             activity.applicantStatus = Meeting.APPLICANT_STATUS.Invited
         end
-        item.frame.category = category.name
-        item.frame.leader = activity.unitname
-        item.frame.classColor = rgb
-        item.frame.level = activity.level
-        item.frame.comment = activity.comment
+        frame.category = category.name
+        frame.leader = activity.unitname
+        frame.classColor = rgb
+        frame.level = activity.level
+        frame.comment = activity.comment
     end)
 end
 
