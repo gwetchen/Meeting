@@ -14,6 +14,7 @@ local floatFrame = Meeting.GUI.CreateButton({
     end
 })
 floatFrame:SetFrameStrata("DIALOG")
+floatFrame:SetPoint("TOP", 0, -20)
 
 Meeting.FloatFrame = floatFrame
 

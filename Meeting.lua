@@ -132,6 +132,11 @@ local headerFrame = Meeting.GUI.CreateFrame({
         relativePoint = "TOP",
     }
 })
+local line = mainFrame:CreateTexture()
+line:SetWidth(818)
+line:SetHeight(0.5)
+line:SetTexture(1, 1, 1, 0.5)
+line:SetPoint("TOPLEFT", headerFrame, "BOTTOMLEFT", 0, 0)
 
 Meeting.GUI.CreateText({
     parent = headerFrame,
@@ -283,6 +288,7 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc)
             applicantList = {}
         })
     end
+
     Meeting.FloatFrame.Update()
     Meeting.CreatorFrame.UpdateActivity()
     Meeting.BrowserFrame:UpdateList()

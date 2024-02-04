@@ -145,3 +145,30 @@ function GUI.CreateBackground(frame, config)
     end
     frame:SetBackdropBorderColor(config.borderColor.r, config.borderColor.g, config.borderColor.b, 1)
 end
+
+function GUI.CreateListFrame(config)
+    local frame = CreateFrame("ScrollFrame", config.name, config.parent or UIParent,
+        "FauxScrollFrameTemplate")
+    frame:SetWidth(config.width)
+    frame:SetHeight(config.height)
+    if config.anchor then
+        frame:SetPoint(config.anchor.point, config.anchor.relative, config.anchor.relativePoint, config.anchor.x or 0,
+            config.anchor.y or 0)
+    end
+    frame:SetScript("OnVerticalScroll", function()
+        FauxScrollFrame_OnVerticalScroll(config.step, function()
+            this.scroll()
+        end)
+    end)
+    frame.Render = function(self, num, cb)
+        FauxScrollFrame_Update(self, num, config.display, config.step, nil, nil, nil, nil, config.width, config
+            .height)
+        for i = 1, config.display, 1 do
+            local j = i + FauxScrollFrame_GetOffset(self)
+            if j <= num then
+                cb(i, j)
+            end
+        end
+    end
+    return frame
+end

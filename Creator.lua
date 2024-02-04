@@ -26,6 +26,12 @@ local creatorInfoFrame = Meeting.GUI.CreateFrame({
     }
 })
 
+local line = creatorFrame:CreateTexture()
+line:SetWidth(0.5)
+line:SetHeight(390)
+line:SetTexture(1, 1, 1, 0.5)
+line:SetPoint("TOPLEFT", creatorInfoFrame, "TOPRIGHT", -18, 0)
+
 local categoryTextFrame = Meeting.GUI.CreateText({
     parent = creatorInfoFrame,
     text = "活动类型：",
@@ -35,7 +41,7 @@ local categoryTextFrame = Meeting.GUI.CreateText({
         relative = creatorInfoFrame,
         relativePoint = "TOPLEFT",
         x = 0,
-        y = 0
+        y = -18
     }
 })
 
@@ -58,7 +64,7 @@ for i, value in ipairs(Meeting.Categories) do
             get = function() return Meeting.createInfo.category == k end,
             set = function()
                 Meeting.createInfo.category = k
-                categoryTextFrame:SetText("活动类型：" .. name)
+                MeetingCreatorSelectButton:SetText(name)
                 Menu:Close()
                 Meeting.CreatorFrame.UpdateActivity()
             end,
@@ -76,15 +82,16 @@ end
 
 local selectButton = Meeting.GUI.CreateButton({
     parent = creatorInfoFrame,
+    name = "MeetingCreatorSelectButton",
     text = "选择活动",
-    width = 80,
+    width = 120,
     height = 24,
     anchor = {
         point = "TOPLEFT",
         relative = categoryTextFrame,
-        relativePoint = "BOTTOMLEFT",
-        x = 0,
-        y = -20
+        relativePoint = "TOPRIGHT",
+        x = 10,
+        y = 4
     },
     click = function()
         Menu:Open(this)
@@ -106,32 +113,42 @@ local commentTextFrame = Meeting.GUI.CreateText({
     fontSize = 16,
     anchor = {
         point = "TOPLEFT",
-        relative = selectButton,
+        relative = categoryTextFrame,
         relativePoint = "BOTTOMLEFT",
         x = 0,
         y = -22
     }
 })
 
-local scrollFrame = CreateFrame("ScrollFrame", "MeetingCreateScrollFrame", creatorInfoFrame, "UIPanelScrollFrameTemplate")
-scrollFrame:SetWidth(220)
-scrollFrame:SetHeight(140)
-scrollFrame:SetPoint("TOPLEFT", commentTextFrame, 0, -22)
+local commentButton = CreateFrame("Button", nil, creatorInfoFrame)
+commentButton:SetWidth(220)
+commentButton:SetHeight(140)
+commentButton:SetPoint("TOPLEFT", commentTextFrame, "BOTTOMLEFT", 0, -18)
+commentButton:SetScript("OnClick", function()
+    MeetingCreateEditBox:SetFocus()
+end)
+Meeting.GUI.CreateBackground(commentButton, { color = { 0, 0, 0, 0.5 } })
 
-local commentFrame = CreateFrame("EditBox", "MeetingCreateEditBox", scrollFrame)
+local commentFrame = CreateFrame("EditBox", "MeetingCreateEditBox", commentButton)
 commentFrame:SetWidth(220)
 commentFrame:SetHeight(140)
+commentFrame:SetPoint("TOPLEFT", commentButton, "TOPLEFT", 0, 0)
 commentFrame:SetMultiLine(true)
-commentFrame:SetMaxLetters(255)
+commentFrame:SetJustifyV("TOP")
+commentFrame:SetJustifyH("LEFT")
+commentFrame:SetMaxBytes(128)
 commentFrame:SetAutoFocus(false)
+commentFrame:SetFontObject("ChatFontNormal")
 commentFrame:SetScript("OnTextChanged", function(e)
-    Meeting.createInfo.comment = commentFrame:GetText()
+    local text = commentFrame:GetText()
+    text = string.gsub(text, "\n", "")
+    text = string.gsub(text, ":", "：")
+    commentFrame:SetText(text)
+    Meeting.createInfo.comment = text
 end)
 commentFrame:SetScript("OnEscapePressed", function()
     commentFrame:ClearFocus()
 end)
-commentFrame:SetFontObject("ChatFontNormal")
-scrollFrame:SetScrollChild(commentFrame)
 
 local createButton = Meeting.GUI.CreateButton({
     parent = creatorInfoFrame,
@@ -140,7 +157,7 @@ local createButton = Meeting.GUI.CreateButton({
     text = "创建活动",
     anchor = {
         point = "TOPLEFT",
-        relative = scrollFrame,
+        relative = commentButton,
         relativePoint = "BOTTOMLEFT",
         x = 0,
         y = -20
