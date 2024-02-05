@@ -4,7 +4,7 @@ Meeting.Message = Message
 
 local EVENTS = {
     CREATE = "C",
-    APPLICANT = "A",
+    REQUEST = "R",
     DECLINE = "D",
     MEMBERS = "M",
     CLOSE = "L",
@@ -27,8 +27,8 @@ function Message.OnRecv(playerName, data)
     local _, event, arg1, arg2, arg3, arg4, arg5, arg6 = stringsplit(data, ":")
     if event == EVENTS.CREATE then
         Meeting:OnCreate(playerName, arg1, arg2, arg3, arg4, arg5, arg6)
-    elseif event == EVENTS.APPLICANT then
-        Meeting:OnApplicant(playerName, arg1, arg2, arg3, arg4, arg5)
+    elseif event == EVENTS.REQUEST then
+        Meeting:OnRequest(playerName, arg1, arg2, arg3, arg4, arg5)
     elseif event == EVENTS.DECLINE then
         Meeting:OnDecline(playerName, arg1)
     elseif event == EVENTS.MEMBERS then
@@ -47,22 +47,49 @@ function Message.Send(event, msg)
     end
 end
 
-function Message.CreateActivity(data)
+function Message.CreateActivity(category, comment)
+    local data = string.format("%s:%s:%d:%d:%d:%d", category,
+        string.isempty(comment) and "_" or comment, UnitLevel("player"),
+        Meeting.ClassToNumber(Meeting.playerClass),
+        Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0)
+    MEETING_DB.activity = {
+        category = category,
+        comment = comment,
+        lastTime = time()
+    }
+    Message.InvokeSyncActivityTimer()
     Message.Send(EVENTS.CREATE, data)
 end
 
-function Message.Applicant(data)
-    Message.Send(EVENTS.APPLICANT, data)
+function Message.Request(id)
+    local data = string.format("%s:%d:%d:%d:%s", id, UnitLevel("player"),
+        Meeting.ClassToNumber(Meeting.playerClass), Meeting.GetPlayerScore(), "_")
+    Message.Send(EVENTS.REQUEST, data)
 end
 
-function Message.Decline(data)
-    Message.Send(EVENTS.DECLINE, data)
+function Message.Decline(name)
+    Message.Send(EVENTS.DECLINE, string.format("%s", name))
 end
 
-function Message.SyncMembers(data)
-    Message.Send(EVENTS.MEMBERS, data)
+function Message.SyncMembers(members)
+    Message.Send(EVENTS.MEMBERS, string.format("%d", members))
 end
 
 function Message.CloseActivity()
     Message.Send(EVENTS.CLOSE, "")
+end
+
+local syncTimer = nil
+
+function Message.InvokeSyncActivityTimer()
+    if syncTimer then
+        syncTimer:Cancel()
+    end
+
+    syncTimer = C_Timer.NewTicker(60, function()
+        local activity = Meeting:FindActivity(Meeting.player)
+        if activity then
+            Message.CreateActivity(activity.category, activity.comment)
+        end
+    end, -1)
 end

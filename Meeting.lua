@@ -40,8 +40,7 @@ f:SetScript("OnEvent", function()
 
             local members = Meeting:GetMembers()
             activity.members = members
-            local data = string.format("%d", members)
-            Meeting.Message.SyncMembers(data)
+            Meeting.Message.SyncMembers(members)
             Meeting.CreatorFrame:UpdateList()
         end
 
@@ -71,14 +70,9 @@ f:SetScript("OnEvent", function()
             if now - MEETING_DB.activity.lastTime < 120 then
                 MEETING_DB.activity.lastTime = now
                 Meeting.createInfo.category = MEETING_DB.activity.category
-                Meeting.createInfo.comment = MEETING_DB.activity.comment
+                Meeting.createInfo.comment = MEETING_DB.activity.comment == "_" and "" or MEETING_DB.activity.comment
                 Meeting.CreatorFrame.UpdateActivity()
-                local data = string.format("%s:%s:%d:%d:%d:%d", MEETING_DB.activity.category,
-                    string.isempty(MEETING_DB.activity.comment) and "_" or MEETING_DB.activity.comment,
-                    UnitLevel("player"),
-                    Meeting.ClassToNumber(Meeting.playerClass), Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0)
-                Meeting.Message.CreateActivity(data)
-                Meeting:SyncActivity()
+                Meeting.Message.CreateActivity(Meeting.createInfo.category, Meeting.createInfo.comment)
             end
         end
     elseif event == "PLAYER_LEAVING_WORLD" then
@@ -258,29 +252,6 @@ function Meeting:DeleteActivity(id)
     end
 end
 
-local syncTimer = nil
-
-function Meeting:SyncActivity()
-    if syncTimer then
-        syncTimer:Cancel()
-    end
-
-    syncTimer = C_Timer.NewTicker(60, function()
-        local activity = Meeting:FindActivity(Meeting.player)
-        if activity then
-            local data = string.format("%s:%s:%d:%d:%d:%d", activity.category,
-                string.isempty(activity.comment) and "_" or activity.comment, UnitLevel("player"),
-                Meeting.ClassToNumber(Meeting.playerClass), Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0)
-            Meeting.Message.CreateActivity(data)
-            MEETING_DB.activity = {
-                category = activity.category,
-                comment = activity.comment,
-                lastTime = time()
-            }
-        end
-    end, -1)
-end
-
 function Meeting:OnCreate(id, category, comment, level, class, members, hc)
     local item, index = Meeting:FindActivity(id)
     if item then
@@ -314,7 +285,7 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc)
     Meeting.BrowserFrame:UpdateList()
 end
 
-function Meeting:OnApplicant(name, id, level, class, score, comment)
+function Meeting:OnRequest(name, id, level, class, score, comment)
     local activity = Meeting:FindActivity(id)
     if activity and activity.unitname == Meeting.player then
         local i = -1
