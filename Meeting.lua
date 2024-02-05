@@ -82,6 +82,26 @@ f:SetScript("OnEvent", function()
     end
 end)
 
+local hoverState = false
+f:SetScript("OnUpdate", function()
+    if not Meeting.MainFrame:IsShown() or not Meeting.BrowserFrame:IsShown() then
+        return
+    end
+    local x, y = GetCursorPosition()
+    local scale = UIParent:GetEffectiveScale()
+    local t = Meeting.MainFrame:GetTop() * scale
+    local b = Meeting.MainFrame:GetBottom() * scale
+    local l = Meeting.MainFrame:GetLeft() * scale
+    local r = Meeting.MainFrame:GetRight() * scale
+    local cur = x >= l and x <= r and y >= b and y <= t
+    if cur ~= hoverState then
+        if not cur then
+            Meeting.BrowserFrame:UpdateList()
+        end
+    end
+    hoverState = cur
+end)
+
 function Meeting.CheckPlayerHCMode()
     local i = 1
     while true do

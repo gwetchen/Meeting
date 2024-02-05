@@ -50,9 +50,7 @@ local browserFrame = Meeting.GUI.CreateFrame({
     }
 })
 browserFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-browserFrame:SetScript("OnLeave", function()
-    Meeting.BrowserFrame.UpdateList()
-end)
+
 browserFrame:SetScript("OnEvent", function()
     if event == "PLAYER_ENTERING_WORLD" then
         CreateSyncTip()
