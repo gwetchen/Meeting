@@ -191,6 +191,7 @@ Menu:Register(selectButton,
 local refreshButton = Meeting.GUI.CreateButton({
     parent = browserFrame,
     text = "刷新",
+    type = Meeting.GUI.BUTTON_TYPE.SUCCESS,
     width = 80,
     height = 24,
     anchor = {
@@ -297,6 +298,12 @@ local actionText = Meeting.GUI.CreateText({
     }
 })
 
+local hoverBackgrop = {
+    edgeFile = "Interface\\BUTTONS\\WHITE8X8",
+    edgeSize = 24,
+    insets = { left = -1, right = -1, top = -1, bottom = -1 },
+}
+
 local activityListFrame = Meeting.GUI.CreateListFrame({
     name = "MeetingActivityListFrame",
     parent = browserFrame,
@@ -311,172 +318,147 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
     },
     step = 24,
     display = 10,
+    cell = function(f)
+        f:SetScript("OnEnter", function()
+            this:SetBackdropBorderColor(1, 1, 1, .2)
+
+            GameTooltip:SetOwner(this, "ANCHOR_RIGHT", 40)
+            GameTooltip:SetText(this.category, 1, 1, 1, 1)
+            GameTooltip:AddLine(this.leader, this.classColor.r, this.classColor.g, this.classColor.b, 1)
+
+            local color = GetDifficultyColor(this.level)
+            GameTooltip:AddLine(format('%s |cff%02x%02x%02x%s|r', LEVEL, color.r * 255, color.g * 255, color.b * 255,
+                this.level), 1, 1, 1)
+
+            if this.comment ~= "_" then
+                GameTooltip:AddLine(this.comment, 0.75, 0.75, 0.75, 1)
+            end
+            GameTooltip:AddLine(" ")
+            GameTooltip:AddLine("<双击>悄悄话", 1, 1, 1, 1)
+            GameTooltip:SetWidth(220)
+            GameTooltip:Show()
+        end)
+        f:SetScript("OnLeave", function()
+            this:SetBackdropBorderColor(1, 1, 1, .04)
+            GameTooltip:Hide()
+        end)
+        f:SetScript("OnDoubleClick", function()
+            if this.leader == Meeting.player then
+                return
+            end
+            ChatFrame_OpenChat("/w " .. this.leader, SELECTED_DOCK_FRAME or DEFAULT_CHAT_FRAME)
+        end)
+
+        f.nameFrame = Meeting.GUI.CreateText({
+            parent = f,
+            text = "",
+            fontSize = 14,
+            width = 145,
+            anchor = {
+                point = "TOPLEFT",
+                relative = f,
+                relativePoint = "TOPLEFT",
+                x = 0,
+                y = -6
+            }
+        })
+
+        f.hcFrame = Meeting.GUI.CreateText({
+            parent = f,
+            text = "",
+            fontSize = 14,
+            width = 60,
+            anchor = {
+                point = "TOPLEFT",
+                relative = f.nameFrame,
+                relativePoint = "TOPRIGHT",
+                x = 0,
+                y = 0
+            }
+        })
+
+        f.membersFrame = Meeting.GUI.CreateText({
+            parent = f,
+            text = "",
+            width = 110,
+            fontSize = 14,
+            anchor = {
+                point = "TOPLEFT",
+                relative = f.hcFrame,
+                relativePoint = "TOPRIGHT",
+                x = 0,
+                y = 0
+            }
+        })
+
+        f.leaderFrame = Meeting.GUI.CreateText({
+            parent = f,
+            text = "",
+            fontSize = 14,
+            width = 110,
+            anchor = {
+                point = "TOPLEFT",
+                relative = f.membersFrame,
+                relativePoint = "TOPRIGHT",
+                x = 0,
+                y = 0
+            }
+        })
+
+        f.commentFrame = Meeting.GUI.CreateText({
+            parent = f,
+            text = "",
+            fontSize = 14,
+            width = 280,
+            height = 24,
+            anchor = {
+                point = "TOPLEFT",
+                relative = f.leaderFrame,
+                relativePoint = "TOPRIGHT",
+                x = 0,
+                y = 0
+            }
+        })
+        f.commentFrame:SetJustifyV("TOP")
+
+        f.statusFrame = Meeting.GUI.CreateText({
+            parent = f,
+            text = "",
+            fontSize = 14,
+            color = { r = 0, g = 1, b = 0 },
+            anchor = {
+                point = "TOPLEFT",
+                relative = f.commentFrame,
+                relativePoint = "TOPRIGHT",
+                x = 0,
+                y = 0
+            }
+        })
+
+        f.applicantButton = Meeting.GUI.CreateButton({
+            parent = f,
+            text = "申请",
+            width = 34,
+            height = 18,
+            type = Meeting.GUI.BUTTON_TYPE.PRIMARY,
+            anchor = {
+                point = "TOPLEFT",
+                relative = f.commentFrame,
+                relativePoint = "TOPRIGHT",
+                x = 0,
+                y = 2
+            },
+            click = function()
+                local data = string.format("%s:%d:%d:%d:%s", f.id, UnitLevel("player"),
+                    Meeting.ClassToNumber(Meeting.playerClass), Meeting.GetPlayerScore(), "_")
+                Meeting.Message.Applicant(data)
+                local activity = Meeting:FindActivity(f.id)
+                activity.applicantStatus = Meeting.APPLICANT_STATUS.Invited
+                this:Disable()
+            end
+        })
+    end
 })
-
-local activityFramePool = {}
-
-local hoverBackgrop = {
-    edgeFile = "Interface\\BUTTONS\\WHITE8X8",
-    edgeSize = 24,
-    insets = { left = -1, right = -1, top = -1, bottom = -1 },
-}
-
-local function CreateActivityItemFrame(i)
-    local f = Meeting.GUI.CreateButton({
-        parent = browserFrame,
-        width = 746,
-        height = 24,
-    })
-    f:SetPoint("TOPLEFT", activityListHeaderFrame, "BOTTOMLEFT", 0, -24 * (i - 1))
-    f:SetBackdrop(hoverBackgrop)
-    f:SetBackdropBorderColor(1, 1, 1, .04)
-    f:EnableMouse(true)
-    f:SetScript("OnEnter", function()
-        this:SetBackdropBorderColor(1, 1, 1, .2)
-
-        GameTooltip:SetOwner(this, "ANCHOR_RIGHT", 40)
-        GameTooltip:SetText(this.category, 1, 1, 1, 1)
-        GameTooltip:AddLine(this.leader, this.classColor.r, this.classColor.g, this.classColor.b, 1)
-
-        local color = GetDifficultyColor(this.level)
-        GameTooltip:AddLine(format('%s |cff%02x%02x%02x%s|r', LEVEL, color.r * 255, color.g * 255, color.b * 255,
-            this.level), 1, 1, 1)
-
-        if this.comment ~= "_" then
-            GameTooltip:AddLine(this.comment, 0.75, 0.75, 0.75, 1)
-        end
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddLine("<双击>悄悄话", 1, 1, 1, 1)
-        GameTooltip:SetWidth(220)
-        GameTooltip:Show()
-    end)
-    f:SetScript("OnLeave", function()
-        this:SetBackdropBorderColor(1, 1, 1, .04)
-        GameTooltip:Hide()
-    end)
-    f:SetScript("OnDoubleClick", function()
-        if this.leader == Meeting.player then
-            return
-        end
-        ChatFrame_OpenChat("/w " .. this.leader, SELECTED_DOCK_FRAME or DEFAULT_CHAT_FRAME)
-    end)
-
-    f.nameFrame = Meeting.GUI.CreateText({
-        parent = f,
-        text = "",
-        fontSize = 14,
-        width = 145,
-        anchor = {
-            point = "TOPLEFT",
-            relative = f,
-            relativePoint = "TOPLEFT",
-            x = 0,
-            y = -6
-        }
-    })
-
-    f.hcFrame = Meeting.GUI.CreateText({
-        parent = f,
-        text = "",
-        fontSize = 14,
-        width = 60,
-        anchor = {
-            point = "TOPLEFT",
-            relative = f.nameFrame,
-            relativePoint = "TOPRIGHT",
-            x = 0,
-            y = 0
-        }
-    })
-
-    f.membersFrame = Meeting.GUI.CreateText({
-        parent = f,
-        text = "",
-        width = 110,
-        fontSize = 14,
-        anchor = {
-            point = "TOPLEFT",
-            relative = f.hcFrame,
-            relativePoint = "TOPRIGHT",
-            x = 0,
-            y = 0
-        }
-    })
-
-    f.leaderFrame = Meeting.GUI.CreateText({
-        parent = f,
-        text = "",
-        fontSize = 14,
-        width = 110,
-        anchor = {
-            point = "TOPLEFT",
-            relative = f.membersFrame,
-            relativePoint = "TOPRIGHT",
-            x = 0,
-            y = 0
-        }
-    })
-
-    f.commentFrame = Meeting.GUI.CreateText({
-        parent = f,
-        text = "",
-        fontSize = 14,
-        width = 280,
-        height = 24,
-        anchor = {
-            point = "TOPLEFT",
-            relative = f.leaderFrame,
-            relativePoint = "TOPRIGHT",
-            x = 0,
-            y = 0
-        }
-    })
-    f.commentFrame:SetJustifyV("TOP")
-
-    f.statusFrame = Meeting.GUI.CreateText({
-        parent = f,
-        text = "",
-        fontSize = 14,
-        color = { r = 0, g = 1, b = 0 },
-        anchor = {
-            point = "TOPLEFT",
-            relative = f.commentFrame,
-            relativePoint = "TOPRIGHT",
-            x = 0,
-            y = 0
-        }
-    })
-
-    f.applicantButton = Meeting.GUI.CreateButton({
-        parent = f,
-        text = "申请",
-        width = 34,
-        height = 18,
-        type = Meeting.GUI.BUTTON_TYPE.PRIMARY,
-        anchor = {
-            point = "TOPLEFT",
-            relative = f.commentFrame,
-            relativePoint = "TOPRIGHT",
-            x = 0,
-            y = 2
-        },
-        click = function()
-            local data = string.format("%s:%d:%d:%d:%s", f.id, UnitLevel("player"),
-                Meeting.ClassToNumber(Meeting.playerClass), Meeting.GetPlayerScore(), "_")
-            Meeting.Message.Applicant(data)
-            local activity = Meeting:FindActivity(f.id)
-            activity.applicantStatus = Meeting.APPLICANT_STATUS.Invited
-            this:Disable()
-        end
-    })
-
-    f:Hide()
-    table.insert(activityFramePool, f)
-end
-
-for i = 1, 10 do
-    CreateActivityItemFrame(i)
-end
 
 function Meeting.BrowserFrame:UpdateList(force)
     if not Meeting.BrowserFrame:IsShown() then
@@ -486,11 +468,11 @@ function Meeting.BrowserFrame:UpdateList(force)
     if not force then
         local isHover = MouseIsOver(Meeting.BrowserFrame)
         if isHover then
-            refreshButton:SetBackdropBorderColor(1, 0, 0, 1)
+            Meeting.GUI.SetBackground(refreshButton, Meeting.GUI.Theme.Red)
             return
         end
     end
-    refreshButton:SetBackdropBorderColor(1, 1, 1, 1)
+    Meeting.GUI.SetBackground(refreshButton, Meeting.GUI.Theme.Green)
 
     local activities = {}
     for i, activity in ipairs(Meeting.activities) do
@@ -501,25 +483,8 @@ function Meeting.BrowserFrame:UpdateList(force)
         end
     end
 
-    local l = table.getn(activities)
-    local ll = table.getn(activityFramePool)
-    if l < ll then
-        for i = l + 1, ll do
-            local frame = activityFramePool[i]
-            frame.id = nil
-            frame.category = nil
-            frame.leader = nil
-            frame.classColor = nil
-            frame.level = nil
-            frame.comment = nil
-            frame:Hide()
-        end
-    end
-
-    activityListFrame:Reload(l, function(i, j)
-        local frame = activityFramePool[i]
-        frame:Show()
-        local activity = activities[j]
+    activityListFrame:Reload(table.getn(activities), function(frame, index)
+        local activity = activities[index]
         local category = Meeting.FindCaregoryByCode(activity.category)
         frame.nameFrame:SetText(category.name)
         frame.hcFrame:SetText(activity.isHC and "HC" or "-")

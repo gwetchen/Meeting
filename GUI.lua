@@ -159,22 +159,52 @@ function GUI.CreateButton(config)
     return button
 end
 
+local hoverBackgrop = {
+    edgeFile = "Interface\\BUTTONS\\WHITE8X8",
+    edgeSize = 24,
+    insets = { left = -1, right = -1, top = -1, bottom = -1 },
+}
+
 function GUI.CreateListFrame(config)
     config.frameType = "ScrollFrame"
     config.template = "FauxScrollFrameTemplate"
     local frame = GUI.CreateFrame(config)
+    frame.pool = {}
+    for i = 1, config.display do
+        local cell = Meeting.GUI.CreateButton({
+            parent = config.parent,
+            width = config.width,
+            height = config.step,
+        })
+        cell:SetPoint("TOPLEFT", config.anchor.relative, "BOTTOMLEFT", 0, -config.step * (i - 1))
+        cell:SetBackdrop(hoverBackgrop)
+        cell:SetBackdropBorderColor(1, 1, 1, .04)
+        cell:EnableMouse(true)
+        cell:Hide()
+        table.insert(frame.pool, cell)
+        config.cell(cell)
+    end
     frame:SetScript("OnVerticalScroll", function()
         FauxScrollFrame_OnVerticalScroll(config.step, function()
             this.OnScroll(true)
         end)
     end)
     frame.Reload = function(self, num, cb)
+        if num < config.display then
+            for i = num + 1, config.display do
+                local cell = frame.pool[i]
+                cell:Hide()
+            end
+        end
+
         FauxScrollFrame_Update(self, num, config.display, config.step, nil, nil, nil, nil, config.width, config
             .height)
         for i = 1, config.display, 1 do
             local j = i + FauxScrollFrame_GetOffset(self)
             if j <= num then
-                cb(i, j)
+                local cell = frame.pool[i]
+                cell:Show()
+                cb(cell, j)
             end
         end
     end
