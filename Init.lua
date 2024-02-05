@@ -20,7 +20,6 @@ Meeting = {
 
     playerIsHC = false,
 
-    -- GUI_DEBUG = true
 }
 
 local classNameMap = {
@@ -161,19 +160,9 @@ Meeting.Categories = {
                 minLevel = 44,
             },
             {
-                key = "MARAPPURPLE",
-                name = "玛拉顿紫门",
+                key = "MARA",
+                name = "玛拉顿",
                 minLevel = 45,
-            },
-            {
-                key = "MARAORANGE",
-                name = "玛拉顿橙门",
-                minLevel = 47,
-            },
-            {
-                key = "MARAPRINCESS",
-                name = "玛拉顿公主",
-                minLevel = 47,
             },
             {
                 key = "ST",
@@ -188,11 +177,6 @@ Meeting.Categories = {
             {
                 key = "BRD",
                 name = "黑石深渊",
-                minLevel = 52,
-            },
-            {
-                key = "BRDARENA",
-                name = "黑石深渊竞技场",
                 minLevel = 52,
             },
             {
@@ -217,11 +201,6 @@ Meeting.Categories = {
                 minLevel = 57,
             },
             {
-                key = "DMT",
-                name = "厄运之槌完美贡品",
-                minLevel = 57,
-            },
-            {
                 key = "DMW",
                 name = "厄运之槌：西",
                 minLevel = 57,
@@ -230,16 +209,13 @@ Meeting.Categories = {
                 key = "SCHOLO",
                 name = "通灵学院",
                 minLevel = 58,
+                members = 10,
             },
             {
-                key = "STRATUD",
-                name = "斯坦索姆：DK区",
+                key = "STRAT",
+                name = "斯坦索姆",
                 minLevel = 58,
-            },
-            {
-                key = "STRATLIVE",
-                name = "斯坦索姆：血色区",
-                minLevel = 58,
+                members = 10,
             },
             {
                 key = "KC",
@@ -313,22 +289,22 @@ Meeting.Categories = {
             }
         }
     },
-    {
-        key = "QUEST",
-        name = "任务",
-        members = 5,
-        children = {
+    -- {
+    --     key = "QUEST",
+    --     name = "任务",
+    --     members = 5,
+    --     children = {
 
-        }
-    },
-    {
-        key = "BOSS",
-        name = "世界首领",
-        members = 40,
-        children = {
+    --     }
+    -- },
+    -- {
+    --     key = "BOSS",
+    --     name = "世界首领",
+    --     members = 40,
+    --     children = {
 
-        }
-    },
+    --     }
+    -- },
     {
         key = "PVP",
         name = "PvP",
@@ -365,12 +341,12 @@ Meeting.Categories = {
             },
         }
     },
-    {
-        key = "OTHER",
-        name = "其他",
-        members = 40,
-        children = {}
-    }
+    -- {
+    --     key = "OTHER",
+    --     name = "其他",
+    --     members = 40,
+    --     children = {}
+    -- }
 }
 
 local CategoryParentMap = {}
