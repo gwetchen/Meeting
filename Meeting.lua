@@ -2,6 +2,7 @@ local f = CreateFrame("Frame")
 f:RegisterEvent("CHAT_MSG_HARDCORE")
 f:RegisterEvent("CHAT_MSG_CHANNEL")
 f:RegisterEvent("PLAYER_ENTERING_WORLD")
+f:RegisterEvent("PLAYER_LEAVING_WORLD")
 f:RegisterEvent("PARTY_MEMBERS_CHANGED")
 f:RegisterEvent("PARTY_LEADER_CHANGED")
 f:RegisterEvent("RAID_ROSTER_UPDATE")
@@ -65,6 +66,22 @@ f:SetScript("OnEvent", function()
         Meeting.joinedActivity = joined
     elseif event == "PLAYER_ENTERING_WORLD" then
         Meeting.CheckPlayerHCMode()
+        if MEETING_DB.activity then
+            if time() - MEETING_DB.activity.lastTime < 60 then
+                Meeting.createInfo.category = MEETING_DB.activity.category
+                Meeting.createInfo.comment = MEETING_DB.activity.comment
+                Meeting.CreatorFrame.UpdateActivity()
+                local data = string.format("%s:%s:%d:%d:%d:%d", MEETING_DB.activity.category,
+                    string.isempty(MEETING_DB.activity.comment) and "_" or MEETING_DB.activity.comment,
+                    UnitLevel("player"),
+                    Meeting.ClassToNumber(Meeting.playerClass), Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0)
+                Meeting.Message.CreateActivity(data)
+            end
+        end
+    elseif event == "PLAYER_LEAVING_WORLD" then
+        if Meeting:FindActivity(Meeting.player) then
+            Meeting.Message.CloseActivity()
+        end
     end
 end)
 
@@ -117,7 +134,7 @@ mainFrame:SetBackdrop({
         bottom = 0
     }
 })
-mainFrame:SetBackdropColor(0, 0, 0, 1)
+mainFrame:SetBackdropColor(24 / 255, 20 / 255, 18 / 255, 1)
 mainFrame:Hide()
 tinsert(UISpecialFrames, "MeetingMainFrame");
 Meeting.MainFrame = mainFrame
@@ -164,42 +181,28 @@ Meeting.GUI.CreateText({
     }
 })
 
-local browserButton = Meeting.GUI.CreateButton({
+Meeting.GUI.CreateTabs({
     parent = mainFrame,
     width = 80,
     height = 34,
-    text = "浏览活动",
-    anchor = {
-        point = "TOPLEFT",
-        relative = mainFrame,
-        relativePoint = "BOTTOMLEFT",
-        x = 0,
-        y = 0
-    },
-    click = function()
-        Meeting.CreatorFrame:Hide()
-        Meeting.BrowserFrame:Show()
-        Meeting.BrowserFrame:UpdateList()
-    end
-})
-
-Meeting.GUI.CreateButton({
-    parent = mainFrame,
-    width = 80,
-    height = 34,
-    text = "创建活动",
-    anchor = {
-        point = "TOPLEFT",
-        relative = browserButton,
-        relativePoint = "TOPRIGHT",
-        x = 10,
-        y = 0
-    },
-    click = function()
-        Meeting.BrowserFrame:Hide()
-        Meeting.CreatorFrame:Show()
-        Meeting.CreatorFrame:UpdateList()
-    end
+    list = {
+        {
+            title = "浏览活动",
+            select = function()
+                Meeting.CreatorFrame:Hide()
+                Meeting.BrowserFrame:Show()
+                Meeting.BrowserFrame:UpdateList()
+            end
+        },
+        {
+            title = "管理活动",
+            select = function()
+                Meeting.BrowserFrame:Hide()
+                Meeting.CreatorFrame:Show()
+                Meeting.CreatorFrame:UpdateList()
+            end
+        },
+    }
 })
 
 function Meeting:Toggle()
@@ -208,7 +211,7 @@ function Meeting:Toggle()
     else
         mainFrame:Show()
         if Meeting.BrowserFrame:IsShown() then
-            Meeting.BrowserFrame:UpdateList()
+            Meeting.BrowserFrame:UpdateList(true)
         elseif Meeting.CreatorFrame:IsShown() then
             Meeting.CreatorFrame:UpdateList()
         end
@@ -259,6 +262,11 @@ function Meeting:SyncActivity()
                 string.isempty(activity.comment) and "_" or activity.comment, UnitLevel("player"),
                 Meeting.ClassToNumber(Meeting.playerClass), Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0)
             Meeting.Message.CreateActivity(data)
+            MEETING_DB.activity = {
+                category = activity.category,
+                comment = activity.comment,
+                lastTime = time()
+            }
         end
     end, -1)
 end
@@ -305,7 +313,7 @@ function Meeting:OnApplicant(name, id, level, class, score, comment)
             comment = comment,
             status = Meeting.APPLICANT_STATUS.Invited
         }
-
+        PlaySoundFile("Interface\\AddOns\\Meeting\\assets\\request.ogg")
         table.insert(item.applicantList, applicant)
 
         Meeting.CreatorFrame:UpdateList()

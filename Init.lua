@@ -1,5 +1,7 @@
-BINDING_HEADER_CS_MEETING_HEADER = "集合石";
-BINDING_NAME_CS_MEETING_NAME = "显示/隐藏";
+BINDING_HEADER_CS_MEETING_HEADER = "集合石"
+BINDING_NAME_CS_MEETING_NAME = "显示/隐藏"
+
+MEETING_DB = {}
 
 local _, class = UnitClass("player")
 

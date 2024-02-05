@@ -1,5 +1,42 @@
 local Menu = AceLibrary("Dewdrop-2.0")
 
+local function CreateSyncTip()
+    local tip = Meeting.GUI.CreateFrame({
+        parent = Meeting.BrowserFrame,
+        width = 200,
+        height = 24,
+        anchor = {
+            point = "BOTTOMLEFT",
+            relative = Meeting.BrowserFrame,
+            relativePoint = "BOTTOMLEFT",
+            x = 0,
+            y = 4
+        }
+    })
+    tip.text = Meeting.GUI.CreateText({
+        parent = tip,
+        text = "正在同步数据...",
+        fontSize = 10,
+        width = 200,
+        anchor = {
+            point = "TOPLEFT",
+            relative = tip,
+            relativePoint = "TOPLEFT",
+        }
+    })
+    tip:Show()
+
+    local i = 0
+    C_Timer.NewTicker(1, function()
+        i = i + 1
+        tip.text:SetText("正在同步数据..." .. (math.mod(i, 2) == 0 and "" or "..."))
+        if i >= 60 then
+            tip:Hide()
+            return
+        end
+    end, 60)
+end
+
 local browserFrame = Meeting.GUI.CreateFrame({
     parent = Meeting.MainFrame,
     width = 782,
@@ -12,6 +49,15 @@ local browserFrame = Meeting.GUI.CreateFrame({
         y = -34
     }
 })
+browserFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+browserFrame:SetScript("OnLeave", function()
+    Meeting.BrowserFrame.UpdateList()
+end)
+browserFrame:SetScript("OnEvent", function()
+    if event == "PLAYER_ENTERING_WORLD" then
+        CreateSyncTip()
+    end
+end)
 Meeting.BrowserFrame = browserFrame
 browserFrame:EnableMouse(true)
 browserFrame:EnableMouseWheel(true)
@@ -102,6 +148,7 @@ local selectButton = Meeting.GUI.CreateButton({
     name = "MeetingBworserSelectButton",
     parent = browserFrame,
     text = "选择活动",
+    type = Meeting.GUI.BUTTON_TYPE.PRIMARY,
     width = 120,
     height = 24,
     anchor = {
@@ -125,19 +172,36 @@ Menu:Register(selectButton,
     'dontHook', true
 )
 
-local searchButton = Meeting.GUI.CreateButton({
+-- local searchButton = Meeting.GUI.CreateButton({
+--     parent = browserFrame,
+--     text = "搜索",
+--     width = 80,
+--     height = 24,
+--     anchor = {
+--         point = "TOPLEFT",
+--         relative = selectButton,
+--         relativePoint = "TOPRIGHT",
+--         x = 20,
+--         y = 0
+--     },
+--     click = function()
+--     end
+-- })
+
+local refreshButton = Meeting.GUI.CreateButton({
     parent = browserFrame,
-    text = "搜索",
+    text = "刷新",
     width = 80,
     height = 24,
     anchor = {
-        point = "TOPLEFT",
-        relative = selectButton,
+        point = "TOPRIGHT",
+        relative = browserFrame,
         relativePoint = "TOPRIGHT",
-        x = 20,
-        y = 0
+        x = 0,
+        y = -18
     },
     click = function()
+        Meeting.BrowserFrame:UpdateList(true)
     end
 })
 
@@ -211,7 +275,7 @@ local commentText = Meeting.GUI.CreateText({
     parent = activityListHeaderFrame,
     text = "说明",
     fontSize = 14,
-    width = 290,
+    width = 280,
     height = 24,
     anchor = {
         point = "TOPLEFT",
@@ -363,7 +427,7 @@ local function CreateActivityItemFrame(i)
         parent = f,
         text = "",
         fontSize = 14,
-        width = 290,
+        width = 280,
         height = 24,
         anchor = {
             point = "TOPLEFT",
@@ -375,12 +439,26 @@ local function CreateActivityItemFrame(i)
     })
     f.commentFrame:SetJustifyV("TOP")
 
+    f.statusFrame = Meeting.GUI.CreateText({
+        parent = f,
+        text = "",
+        fontSize = 14,
+        color = { r = 0, g = 1, b = 0 },
+        anchor = {
+            point = "TOPLEFT",
+            relative = f.commentFrame,
+            relativePoint = "TOPRIGHT",
+            x = 0,
+            y = 0
+        }
+    })
 
     f.applicantButton = Meeting.GUI.CreateButton({
         parent = f,
         text = "申请",
         width = 34,
         height = 18,
+        type = Meeting.GUI.BUTTON_TYPE.PRIMARY,
         anchor = {
             point = "TOPLEFT",
             relative = f.commentFrame,
@@ -389,8 +467,11 @@ local function CreateActivityItemFrame(i)
             y = 2
         },
         click = function()
-            f.applicant()
-            this:SetText("已申请")
+            local data = string.format("%s:%d:%d:%d:%s", f.id, UnitLevel("player"),
+                Meeting.ClassToNumber(Meeting.playerClass), Meeting.GetPlayerScore(), "_")
+            Meeting.Message.Applicant(data)
+            local activity = Meeting:FindActivity(f.id)
+            activity.applicantStatus = Meeting.APPLICANT_STATUS.Invited
             this:Disable()
         end
     })
@@ -403,10 +484,19 @@ for i = 1, 10 do
     CreateActivityItemFrame(i)
 end
 
-function Meeting.BrowserFrame:UpdateList()
+function Meeting.BrowserFrame:UpdateList(force)
     if not Meeting.BrowserFrame:IsShown() then
         return
     end
+
+    if not force then
+        local isHover = MouseIsOver(Meeting.BrowserFrame)
+        if isHover then
+            refreshButton:SetBackdropBorderColor(1, 0, 0, 1)
+            return
+        end
+    end
+    refreshButton:SetBackdropBorderColor(1, 1, 1, 1)
 
     local activities = {}
     for i, activity in ipairs(Meeting.activities) do
@@ -421,7 +511,14 @@ function Meeting.BrowserFrame:UpdateList()
     local ll = table.getn(activityFramePool)
     if l < ll then
         for i = l + 1, ll do
-            activityFramePool[i]:Hide()
+            local frame = activityFramePool[i]
+            frame.id = nil
+            frame.category = nil
+            frame.leader = nil
+            frame.classColor = nil
+            frame.level = nil
+            frame.comment = nil
+            frame:Hide()
         end
     end
 
@@ -431,7 +528,7 @@ function Meeting.BrowserFrame:UpdateList()
         local activity = activities[j]
         local category = Meeting.FindCaregoryByCode(activity.category)
         frame.nameFrame:SetText(category.name)
-        frame.hcFrame:SetText(activity.isHC and "HC" or "FHC")
+        frame.hcFrame:SetText(activity.isHC and "HC" or "-")
         local rgb = Meeting.GetClassRGBColor(activity.class, activity.unitname)
         frame.leaderFrame:SetText(activity.unitname)
         frame.leaderFrame:SetTextColor(rgb.r, rgb.g, rgb.b)
@@ -443,30 +540,37 @@ function Meeting.BrowserFrame:UpdateList()
         else
             frame.applicantButton:Enable()
         end
-        if Meeting:IsInActivity(activity.unitname) then
-            frame.applicantButton:SetText("已加入")
-            frame.applicantButton:Disable()
+        
+        if activity.unitname == Meeting.player or Meeting:IsInActivity(activity.unitname) then
+            frame.statusFrame:SetText("已加入")
+            frame.statusFrame:SetTextColor(0, 1, 0)
+            frame.statusFrame:Show()
+            frame.applicantButton:Hide()
         else
             if activity.applicantStatus == Meeting.APPLICANT_STATUS.Invited then
-                frame.applicantButton:SetText("已申请")
-                frame.applicantButton:Disable()
+                frame.statusFrame:SetText("已申请")
+                frame.statusFrame:SetTextColor(0, 1, 0)
+                frame.statusFrame:Show()
+                frame.applicantButton:Hide()
             elseif activity.applicantStatus == Meeting.APPLICANT_STATUS.Declined then
-                frame.applicantButton:SetText("已拒绝")
+                frame.statusFrame:SetText("已拒绝")
+                frame.statusFrame:SetTextColor(1, 0, 0)
+                frame.statusFrame:Show()
+                frame.applicantButton:Hide()
             elseif activity.applicantStatus == Meeting.APPLICANT_STATUS.Joined then
-                frame.applicantButton:SetText("已加入")
-                frame.applicantButton:Disable()
+                frame.statusFrame:SetText("已加入")
+                frame.statusFrame:SetTextColor(0, 1, 0)
+                frame.statusFrame:Show()
+                frame.applicantButton:Hide()
             else
+                frame.statusFrame:Hide()
+                frame.applicantButton:Show()
+                frame.applicantButton:Enable()
                 frame.applicantButton:SetText("申请")
             end
         end
 
-        local id = activity.unitname
-        frame.applicant = function()
-            local data = string.format("%s:%d:%d:%d:%s", id, UnitLevel("player"),
-                Meeting.ClassToNumber(Meeting.playerClass), Meeting.GetPlayerScore(), "_")
-            Meeting.Message.Applicant(data)
-            activity.applicantStatus = Meeting.APPLICANT_STATUS.Invited
-        end
+        frame.id = activity.unitname
         frame.category = category.name
         frame.leader = activity.unitname
         frame.classColor = rgb

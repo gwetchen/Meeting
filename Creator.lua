@@ -86,6 +86,7 @@ local selectButton = Meeting.GUI.CreateButton({
     text = "选择活动",
     width = 120,
     height = 24,
+    type = Meeting.GUI.BUTTON_TYPE.PRIMARY,
     anchor = {
         point = "TOPLEFT",
         relative = categoryTextFrame,
@@ -155,6 +156,7 @@ local createButton = Meeting.GUI.CreateButton({
     width = 80,
     height = 24,
     text = "创建活动",
+    type = Meeting.GUI.BUTTON_TYPE.SUCCESS,
     anchor = {
         point = "TOPLEFT",
         relative = commentButton,
@@ -169,7 +171,11 @@ local createButton = Meeting.GUI.CreateButton({
             Meeting.ClassToNumber(Meeting.playerClass),
             Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0)
         Meeting.Message.CreateActivity(data)
-
+        MEETING_DB.activity = {
+            category = Meeting.createInfo.category,
+            comment = Meeting.createInfo.comment,
+            lastTime = time()
+        }
         Meeting:SyncActivity()
     end
 })
@@ -180,22 +186,22 @@ local closeButton = Meeting.GUI.CreateButton({
     width = 80,
     height = 24,
     text = "解散活动",
+    type = Meeting.GUI.BUTTON_TYPE.DANGER,
     anchor = {
-        point = "TOPLEFT",
+        point = "TOP",
         relative = createButton,
-        relativePoint = "TOPRIGHT",
-        x = 0,
-        y = 0
+        relativePoint = "TOP",
     },
     click = function()
         Meeting.Message.CloseActivity()
     end
 })
+closeButton:SetPoint("RIGHT", commentFrame, "RIGHT", 0, 0)
 closeButton:Disable()
 
 local applicantListHeaderFrame = Meeting.GUI.CreateFrame({
     parent = creatorFrame,
-    width = 558,
+    width = 504,
     height = 24,
     anchor = {
         point = "TOPLEFT",
@@ -223,7 +229,7 @@ local levelText = Meeting.GUI.CreateText({
     parent = applicantListHeaderFrame,
     text = "等级",
     fontSize = 14,
-    width = 60,
+    width = 40,
     height = 24,
     anchor = {
         point = "TOPLEFT",
@@ -236,7 +242,7 @@ local scoreText = Meeting.GUI.CreateText({
     parent = applicantListHeaderFrame,
     text = "装等",
     fontSize = 14,
-    width = 60,
+    width = 40,
     height = 24,
     anchor = {
         point = "TOPLEFT",
@@ -250,7 +256,7 @@ local commentText = Meeting.GUI.CreateText({
     parent = applicantListHeaderFrame,
     text = "说明",
     fontSize = 14,
-    width = 250,
+    width = 230,
     height = 24,
     anchor = {
         point = "TOPLEFT",
@@ -263,7 +269,7 @@ local actionText = Meeting.GUI.CreateText({
     parent = applicantListHeaderFrame,
     text = "操作",
     fontSize = 14,
-    width = 150,
+    width = 100,
     height = 24,
     anchor = {
         point = "TOPLEFT",
@@ -272,29 +278,43 @@ local actionText = Meeting.GUI.CreateText({
     }
 })
 
-local applicantListFrame = Meeting.GUI.CreateFrame({
+local applicantListFrame = Meeting.GUI.CreateListFrame({
+    name = "MeetingActivityListFrame",
     parent = creatorFrame,
-    width = 558,
-    height = 352,
+    width = 504,
+    height = 336,
     anchor = {
         point = "TOPLEFT",
         relative = applicantListHeaderFrame,
         relativePoint = "BOTTOMLEFT",
         x = 0,
         y = 0
-    }
+    },
+    step = 24,
+    display = 14,
+    scroll = Meeting.CreatorFrame.UpdateList
 })
 
 local applicantFramePool = {}
 
-local function CreateApplicantItemFrame()
-    local f = Meeting.GUI.CreateFrame({
-        parent = applicantListFrame,
-        width = 520,
-        height = 44,
-    })
+local hoverBackgrop = {
+    edgeFile = "Interface\\BUTTONS\\WHITE8X8",
+    edgeSize = 24,
+    insets = { left = -1, right = -1, top = -1, bottom = -1 },
+}
 
-    local nameText = Meeting.GUI.CreateText({
+local function CreateApplicantItemFrame(i)
+    local f = Meeting.GUI.CreateFrame({
+        parent = creatorFrame,
+        width = 504,
+        height = 24,
+    })
+    f:SetPoint("TOPLEFT", applicantListHeaderFrame, "BOTTOMLEFT", 0, -24 * (i - 1))
+    f:SetBackdrop(hoverBackgrop)
+    f:SetBackdropBorderColor(1, 1, 1, .04)
+    f:EnableMouse(true)
+
+    f.nameFrame = Meeting.GUI.CreateText({
         parent = f,
         text = "",
         fontSize = 14,
@@ -308,157 +328,155 @@ local function CreateApplicantItemFrame()
         }
     })
 
-    local levelText = Meeting.GUI.CreateText({
+    f.levelFrame = Meeting.GUI.CreateText({
         parent = f,
         text = "",
-        width = 60,
+        width = 40,
         fontSize = 14,
         anchor = {
             point = "TOPLEFT",
-            relative = nameText,
+            relative = f.nameFrame,
             relativePoint = "TOPRIGHT",
             x = 0,
             y = 0
         }
     })
 
-    local scoreText = Meeting.GUI.CreateText({
+    f.scoreFrame = Meeting.GUI.CreateText({
         parent = f,
         text = "",
         fontSize = 14,
-        width = 60,
+        width = 40,
         anchor = {
             point = "TOPLEFT",
-            relative = levelText,
+            relative = f.levelFrame,
             relativePoint = "TOPRIGHT",
             x = 0,
             y = 0
         }
     })
 
-    local commentText = Meeting.GUI.CreateText({
+    f.commentFrame = Meeting.GUI.CreateText({
         parent = f,
         text = "",
         fontSize = 14,
-        width = 250,
-        anchor = {
-            point = "TOPLEFT",
-            relative = scoreText,
-            relativePoint = "TOPRIGHT",
-            x = 0,
-            y = 0
-        }
-    })
-
-    local item = {
-        frame = f,
-        nameText = nameText,
-        levelText = levelText,
-        scoreText = scoreText,
-        commentText = commentText,
-    }
-
-    local acceptButton = Meeting.GUI.CreateButton({
-        parent = f,
-        text = "同意",
-        width = 44,
+        width = 230,
         height = 24,
         anchor = {
             point = "TOPLEFT",
-            relative = commentText,
+            relative = f.scoreFrame,
+            relativePoint = "TOPRIGHT",
+            x = 0,
+            y = 0
+        }
+    })
+
+    f.acceptButton = Meeting.GUI.CreateButton({
+        parent = f,
+        text = "同意",
+        type = Meeting.GUI.BUTTON_TYPE.SUCCESS,
+        width = 34,
+        height = 20,
+        anchor = {
+            point = "TOPLEFT",
+            relative = f.commentFrame,
             relativePoint = "TOPRIGHT",
             x = 0,
             y = 0
         },
         click = function()
-            item.accept()
+            f.accept()
             this:SetText("已同意")
             this:Disable()
         end
     })
 
-    local declineButton = Meeting.GUI.CreateButton({
+    f.declineButton = Meeting.GUI.CreateButton({
         parent = f,
         text = "拒绝",
-        width = 44,
-        height = 24,
+        type = Meeting.GUI.BUTTON_TYPE.DANGER,
+        width = 34,
+        height = 20,
         anchor = {
             point = "TOPLEFT",
-            relative = acceptButton,
+            relative = f.acceptButton,
             relativePoint = "TOPRIGHT",
-            x = 0,
+            x = 4,
             y = 0
         },
         click = function()
-            item.decline()
+            f.decline()
         end
     })
+    f:Hide()
 
-    item.acceptButton = acceptButton
-    item.declineButton = declineButton
-
-    table.insert(applicantFramePool, item)
+    table.insert(applicantFramePool, f)
 end
 
-for i = 1, 5 do
-    CreateApplicantItemFrame()
+for i = 1, 14 do
+    CreateApplicantItemFrame(i)
 end
 
 function Meeting.CreatorFrame:UpdateList()
     if not Meeting.CreatorFrame:IsShown() then
         return
     end
+
     local activity = Meeting:FindActivity(Meeting.player)
     if not activity then
+        for _, f in ipairs(applicantFramePool) do
+            f:Hide()
+        end
         return
     end
+
     local applicantList = activity.applicantList
 
-    if table.getn(applicantList) > table.getn(applicantFramePool) then
-        for i = table.getn(applicantFramePool) + 1, table.getn(applicantList) do
-            CreateApplicantItemFrame()
+    local l = table.getn(applicantList)
+    local ll = table.getn(applicantFramePool)
+    if l < ll then
+        for i = l + 1, ll do
+            applicantFramePool[i]:Hide()
         end
     end
 
-    for i, item in ipairs(applicantFramePool) do
-        if i > table.getn(applicantList) then
-            item.frame:Hide()
-        else
-            local applicant = applicantList[i]
-            local name = applicant.name
-            local idx = i
+    applicantListFrame:Render(l, function(i, j)
+        local frame = applicantFramePool[j]
+        frame:Show()
+        local applicant = applicantList[i]
+        local name = applicant.name
+        local idx = i
 
-            item.frame:SetPoint("TOPLEFT", applicantListFrame, "TOPLEFT", 0, -44 * (i - 1))
-            item.nameText:SetText(name)
-            local rgb = Meeting.GetClassRGBColor(applicant.class, name)
-            item.nameText:SetTextColor(rgb.r, rgb.g, rgb.b)
-            item.levelText:SetText(applicant.level)
-            item.scoreText:SetText(applicant.score)
-            item.commentText:SetText(applicant.comment ~= "_" and applicant.comment or "")
+        frame.nameFrame:SetText(name)
+        local rgb = Meeting.GetClassRGBColor(applicant.class, name)
+        frame.nameFrame:SetTextColor(rgb.r, rgb.g, rgb.b)
+        frame.levelFrame:SetText(applicant.level)
+        frame.scoreFrame:SetText(applicant.score)
+        frame.commentFrame:SetText(applicant.comment ~= "_" and applicant.comment or "")
 
-            if applicant.status == Meeting.APPLICANT_STATUS.Accepted then
-                item.acceptButton:SetText("已同意")
-                item.acceptButton:Disable()
-                item.declineButton:Hide()
-            elseif applicant.status == Meeting.APPLICANT_STATUS.None then
-                item.acceptButton:SetText("同意")
-                item.acceptButton:Enable()
-                item.declineButton:Show()
-            end
-            item.accept = function()
-                applicant.status = Meeting.APPLICANT_STATUS.Invited
-                InviteByName(name)
-            end
-            item.decline = function()
-                applicant.status = Meeting.APPLICANT_STATUS.Declined
-                Meeting.Message.Decline(string.format("%s", name))
-                table.remove(applicantList, idx)
-                Meeting.CreatorFrame:UpdateList()
-            end
-            item.frame:Show()
+        if applicant.status == Meeting.APPLICANT_STATUS.Accepted then
+            frame.acceptButton:SetText("已同意")
+            frame.acceptButton:Disable()
+            frame.declineButton:Hide()
+        elseif applicant.status == Meeting.APPLICANT_STATUS.None then
+            frame.acceptButton:SetText("同意")
+            frame.acceptButton:Enable()
+            frame.declineButton:Show()
         end
-    end
+        frame.accept = function()
+            applicant.status = Meeting.APPLICANT_STATUS.Invited
+            InviteByName(name)
+        end
+        frame.decline = function()
+            applicant.status = Meeting.APPLICANT_STATUS.Declined
+            Meeting.Message.Decline(string.format("%s", name))
+            table.remove(applicantList, idx)
+            Meeting.CreatorFrame:UpdateList()
+        end
+    end)
 end
+
+applicantListFrame.scroll = Meeting.CreatorFrame.UpdateList
 
 function Meeting.CreatorFrame.UpdateActivity()
     if Meeting:GetMembers() > 1 and IsRaidLeader() ~= 1 then
