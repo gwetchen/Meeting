@@ -514,6 +514,11 @@ end
 applicantListFrame.OnScroll = Meeting.CreatorFrame.UpdateList
 
 function Meeting.CreatorFrame.UpdateActivity()
+    if Meeting.createInfo.category then
+        selectButton:SetText(Meeting.FindCaregoryByCode(Meeting.createInfo.category).name)
+    end
+    commentFrame:SetText(Meeting.createInfo.comment or "")
+
     if Meeting:GetMembers() > 1 and IsRaidLeader() ~= 1 then
         createButton:Disable()
         closeButton:Disable()

@@ -67,7 +67,9 @@ f:SetScript("OnEvent", function()
     elseif event == "PLAYER_ENTERING_WORLD" then
         Meeting.CheckPlayerHCMode()
         if MEETING_DB.activity then
-            if time() - MEETING_DB.activity.lastTime < 60 then
+            local now = time()
+            if now - MEETING_DB.activity.lastTime < 120 then
+                MEETING_DB.activity.lastTime = now
                 Meeting.createInfo.category = MEETING_DB.activity.category
                 Meeting.createInfo.comment = MEETING_DB.activity.comment
                 Meeting.CreatorFrame.UpdateActivity()
@@ -76,6 +78,7 @@ f:SetScript("OnEvent", function()
                     UnitLevel("player"),
                     Meeting.ClassToNumber(Meeting.playerClass), Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0)
                 Meeting.Message.CreateActivity(data)
+                Meeting:SyncActivity()
             end
         end
     elseif event == "PLAYER_LEAVING_WORLD" then
@@ -288,6 +291,7 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc)
         item.class = Meeting.NumberToClass(tonumber(class))
         item.members = tonumber(members)
         item.isHC = hc == "1"
+        item.updated = time()
         table.remove(Meeting.activities, index)
         table.insert(Meeting.activities, 1, item)
     else
@@ -300,6 +304,7 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc)
             class = Meeting.NumberToClass(tonumber(class)),
             members = tonumber(members),
             isHC = hc == "1",
+            updated = time(),
             applicantList = {}
         })
     end
@@ -376,3 +381,14 @@ function Meeting:OnClose(id)
     Meeting.BrowserFrame:UpdateList()
     Meeting.FloatFrame.Update()
 end
+
+C_Timer.NewTicker(5, function()
+    local now = time()
+    for index, activity in ipairs(Meeting.activities) do
+        if activity.unitname ~= Meeting.player and activity.updated + 180 < now then
+            table.remove(Meeting.activities, index)
+            Meeting.BrowserFrame:UpdateList()
+            Meeting.FloatFrame.Update()
+        end
+    end
+end)
