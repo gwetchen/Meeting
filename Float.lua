@@ -3,6 +3,7 @@ local floatFrame = Meeting.GUI.CreateButton({
     width = 100,
     height = 34,
     text = "集合石 0/0",
+    type = Meeting.GUI.BUTTON_TYPE.NORMAL,
     anchor = {
         point = "TOP",
         x = 0,
@@ -13,9 +14,9 @@ local floatFrame = Meeting.GUI.CreateButton({
         Meeting:Toggle()
     end
 })
+Meeting.GUI.SetBackground(floatFrame, Meeting.GUI.Theme.Brown, Meeting.GUI.Theme.White)
 floatFrame:SetFrameStrata("DIALOG")
 floatFrame:SetPoint("TOP", 0, -20)
-Meeting.GUI.CreateBackground(floatFrame, {})
 floatFrame:SetScript("OnEnter", function()
     GameTooltip:SetOwner(this, "ANCHOR_BOTTOMLEFT", 85, -5)
     local activity = Meeting:FindActivity(Meeting.player)
@@ -29,7 +30,7 @@ end)
 
 Meeting.FloatFrame = floatFrame
 
-function Meeting.FloatFrame.Update()
+function floatFrame.Update()
     local activity = Meeting:FindActivity(Meeting.player)
     local n = activity and table.getn(activity.applicantList) or 0
     floatFrame:SetText("集合石 " .. n .. "/" .. table.getn(Meeting.activities))

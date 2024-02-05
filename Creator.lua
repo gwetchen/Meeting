@@ -128,7 +128,7 @@ commentButton:SetPoint("TOPLEFT", commentTextFrame, "BOTTOMLEFT", 0, -18)
 commentButton:SetScript("OnClick", function()
     MeetingCreateEditBox:SetFocus()
 end)
-Meeting.GUI.CreateBackground(commentButton, { color = { 0, 0, 0, 0.5 } })
+Meeting.GUI.SetBackground(commentButton,Meeting.GUI.Theme.Black, Meeting.GUI.Theme.White)
 
 local commentFrame = CreateFrame("EditBox", "MeetingCreateEditBox", commentButton)
 commentFrame:SetWidth(220)
@@ -440,7 +440,7 @@ function Meeting.CreatorFrame:UpdateList()
         end
     end
 
-    applicantListFrame:Render(l, function(i, j)
+    applicantListFrame:Reload(l, function(i, j)
         local frame = applicantFramePool[j]
         frame:Show()
         local applicant = applicantList[i]
@@ -476,7 +476,7 @@ function Meeting.CreatorFrame:UpdateList()
     end)
 end
 
-applicantListFrame.scroll = Meeting.CreatorFrame.UpdateList
+applicantListFrame.OnScroll = Meeting.CreatorFrame.UpdateList
 
 function Meeting.CreatorFrame.UpdateActivity()
     if Meeting:GetMembers() > 1 and IsRaidLeader() ~= 1 then

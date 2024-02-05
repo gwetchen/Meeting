@@ -185,6 +185,13 @@ Meeting.GUI.CreateTabs({
     parent = mainFrame,
     width = 80,
     height = 34,
+    anchor = {
+        point = "TOPLEFT",
+        relative = mainFrame,
+        relativePoint = "BOTTOMLEFT",
+        x = 0,
+        y = 0
+    },
     list = {
         {
             title = "浏览活动",

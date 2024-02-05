@@ -522,7 +522,7 @@ function Meeting.BrowserFrame:UpdateList(force)
         end
     end
 
-    activityListFrame:Render(l, function(i, j)
+    activityListFrame:Reload(l, function(i, j)
         local frame = activityFramePool[i]
         frame:Show()
         local activity = activities[j]
@@ -540,7 +540,7 @@ function Meeting.BrowserFrame:UpdateList(force)
         else
             frame.applicantButton:Enable()
         end
-        
+
         if activity.unitname == Meeting.player or Meeting:IsInActivity(activity.unitname) then
             frame.statusFrame:SetText("已加入")
             frame.statusFrame:SetTextColor(0, 1, 0)
@@ -579,4 +579,4 @@ function Meeting.BrowserFrame:UpdateList(force)
     end)
 end
 
-activityListFrame.scroll = Meeting.BrowserFrame.UpdateList
+activityListFrame.OnScroll = Meeting.BrowserFrame.UpdateList
