@@ -23,7 +23,6 @@ local function stringsplit(str, delimiter)
 end
 
 function Message.OnRecv(playerName, data)
-    print(data)
     local _, event, arg1, arg2, arg3, arg4, arg5, arg6 = stringsplit(data, ":")
     if event == EVENTS.CREATE then
         Meeting:OnCreate(playerName, arg1, arg2, arg3, arg4, arg5, arg6)

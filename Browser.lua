@@ -319,29 +319,28 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
     step = 24,
     display = 10,
     cell = function(f)
-        f:SetScript("OnEnter", function()
-            this:SetBackdropBorderColor(1, 1, 1, .2)
+        f.OnHover = function(this, isHover)
+            if isHover then
+                GameTooltip:SetOwner(this, "ANCHOR_RIGHT", 40)
+                GameTooltip:SetText(this.category, 1, 1, 1, 1)
+                GameTooltip:AddLine(this.leader, this.classColor.r, this.classColor.g, this.classColor.b, 1)
 
-            GameTooltip:SetOwner(this, "ANCHOR_RIGHT", 40)
-            GameTooltip:SetText(this.category, 1, 1, 1, 1)
-            GameTooltip:AddLine(this.leader, this.classColor.r, this.classColor.g, this.classColor.b, 1)
+                local color = GetDifficultyColor(this.level)
+                GameTooltip:AddLine(
+                    format('%s |cff%02x%02x%02x%s|r', LEVEL, color.r * 255, color.g * 255, color.b * 255,
+                        this.level), 1, 1, 1)
 
-            local color = GetDifficultyColor(this.level)
-            GameTooltip:AddLine(format('%s |cff%02x%02x%02x%s|r', LEVEL, color.r * 255, color.g * 255, color.b * 255,
-                this.level), 1, 1, 1)
-
-            if this.comment ~= "_" then
-                GameTooltip:AddLine(this.comment, 0.75, 0.75, 0.75, 1)
+                if this.comment ~= "_" then
+                    GameTooltip:AddLine(this.comment, 0.75, 0.75, 0.75, 1)
+                end
+                GameTooltip:AddLine(" ")
+                GameTooltip:AddLine("<双击>悄悄话", 1, 1, 1, 1)
+                GameTooltip:SetWidth(220)
+                GameTooltip:Show()
+            else
+                GameTooltip:Hide()
             end
-            GameTooltip:AddLine(" ")
-            GameTooltip:AddLine("<双击>悄悄话", 1, 1, 1, 1)
-            GameTooltip:SetWidth(220)
-            GameTooltip:Show()
-        end)
-        f:SetScript("OnLeave", function()
-            this:SetBackdropBorderColor(1, 1, 1, .04)
-            GameTooltip:Hide()
-        end)
+        end
         f:SetScript("OnDoubleClick", function()
             if this.leader == Meeting.player then
                 return
@@ -452,11 +451,64 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
                 Meeting.Message.Request(f.id)
                 local activity = Meeting:FindActivity(f.id)
                 activity.applicantStatus = Meeting.APPLICANT_STATUS.Invited
+                Meeting.BrowserFrame:UpdateActivity(activity)
                 this:Disable()
             end
         })
     end
 })
+
+local function ReloadCell(frame, activity)
+    local category = Meeting.FindCaregoryByCode(activity.category)
+    frame.nameFrame:SetText(category.name)
+    frame.hcFrame:SetText(activity.isHC and "HC" or "-")
+    local rgb = Meeting.GetClassRGBColor(activity.class, activity.unitname)
+    frame.leaderFrame:SetText(activity.unitname)
+    frame.leaderFrame:SetTextColor(rgb.r, rgb.g, rgb.b)
+    frame.membersFrame:SetText(activity.members .. "/" .. Meeting.GetActivityMaxMembers(activity.category))
+    frame.commentFrame:SetText(activity.comment ~= "_" and activity.comment or "")
+
+    if activity.unitname == Meeting.player or Meeting:IsInActivity(activity.unitname) then
+        frame.statusFrame:SetText("已加入")
+        frame.statusFrame:SetTextColor(Meeting.GUI.Theme.Green.r, Meeting.GUI.Theme.Green.g,
+            Meeting.GUI.Theme.Green.b)
+        frame.statusFrame:Show()
+        frame.requestButton:Hide()
+    else
+        if activity.applicantStatus == Meeting.APPLICANT_STATUS.Invited then
+            frame.statusFrame:SetText("已申请")
+            frame.statusFrame:SetTextColor(Meeting.GUI.Theme.Green.r, Meeting.GUI.Theme.Green.g,
+                Meeting.GUI.Theme.Green.b)
+            frame.statusFrame:Show()
+            frame.requestButton:Hide()
+        elseif activity.applicantStatus == Meeting.APPLICANT_STATUS.Declined then
+            frame.statusFrame:SetText("已拒绝")
+            frame.statusFrame:SetTextColor(Meeting.GUI.Theme.Red.r, Meeting.GUI.Theme.Red.g, Meeting.GUI.Theme.Red.b)
+            frame.statusFrame:Show()
+            frame.requestButton:Hide()
+        elseif activity.applicantStatus == Meeting.APPLICANT_STATUS.Joined then
+            frame.statusFrame:SetText("已加入")
+            frame.statusFrame:SetTextColor(Meeting.GUI.Theme.Green.r, Meeting.GUI.Theme.Green.g,
+                Meeting.GUI.Theme.Green.b)
+            frame.statusFrame:Show()
+            frame.requestButton:Hide()
+        else
+            frame.statusFrame:Hide()
+            frame.requestButton:Show()
+            frame.requestButton:Enable()
+            frame.requestButton:SetText("申请")
+        end
+    end
+
+    frame.id = activity.unitname
+    frame.category = category.name
+    frame.leader = activity.unitname
+    frame.classColor = rgb
+    frame.level = activity.level
+    frame.comment = activity.comment
+end
+
+local activities = {}
 
 function Meeting.BrowserFrame:UpdateList(force)
     if not Meeting.BrowserFrame:IsShown() then
@@ -472,7 +524,7 @@ function Meeting.BrowserFrame:UpdateList(force)
     end
     Meeting.GUI.SetBackground(refreshButton, Meeting.GUI.Theme.Green)
 
-    local activities = {}
+    activities = {}
     for i, activity in ipairs(Meeting.activities) do
         if Meeting.searchInfo.parent == "" or Meeting.searchInfo.parent == activity.parent then
             if Meeting.searchInfo.category == "" or Meeting.searchInfo.category == activity.category then
@@ -482,55 +534,29 @@ function Meeting.BrowserFrame:UpdateList(force)
     end
 
     activityListFrame:Reload(table.getn(activities), function(frame, index)
-        local activity = activities[index]
-        local category = Meeting.FindCaregoryByCode(activity.category)
-        frame.nameFrame:SetText(category.name)
-        frame.hcFrame:SetText(activity.isHC and "HC" or "-")
-        local rgb = Meeting.GetClassRGBColor(activity.class, activity.unitname)
-        frame.leaderFrame:SetText(activity.unitname)
-        frame.leaderFrame:SetTextColor(rgb.r, rgb.g, rgb.b)
-        frame.membersFrame:SetText(activity.members .. "/" .. Meeting.GetActivityMaxMembers(activity.category))
-        frame.commentFrame:SetText(activity.comment ~= "_" and activity.comment or "")
-
-        if activity.unitname == Meeting.player or Meeting:IsInActivity(activity.unitname) then
-            frame.statusFrame:SetText("已加入")
-            frame.statusFrame:SetTextColor(Meeting.GUI.Theme.Green.r, Meeting.GUI.Theme.Green.g,
-                Meeting.GUI.Theme.Green.b)
-            frame.statusFrame:Show()
-            frame.requestButton:Hide()
-        else
-            if activity.applicantStatus == Meeting.APPLICANT_STATUS.Invited then
-                frame.statusFrame:SetText("已申请")
-                frame.statusFrame:SetTextColor(Meeting.GUI.Theme.Green.r, Meeting.GUI.Theme.Green.g,
-                    Meeting.GUI.Theme.Green.b)
-                frame.statusFrame:Show()
-                frame.requestButton:Hide()
-            elseif activity.applicantStatus == Meeting.APPLICANT_STATUS.Declined then
-                frame.statusFrame:SetText("已拒绝")
-                frame.statusFrame:SetTextColor(Meeting.GUI.Theme.Red.r, Meeting.GUI.Theme.Red.g, Meeting.GUI.Theme.Red.b)
-                frame.statusFrame:Show()
-                frame.requestButton:Hide()
-            elseif activity.applicantStatus == Meeting.APPLICANT_STATUS.Joined then
-                frame.statusFrame:SetText("已加入")
-                frame.statusFrame:SetTextColor(Meeting.GUI.Theme.Green.r, Meeting.GUI.Theme.Green.g,
-                    Meeting.GUI.Theme.Green.b)
-                frame.statusFrame:Show()
-                frame.requestButton:Hide()
-            else
-                frame.statusFrame:Hide()
-                frame.requestButton:Show()
-                frame.requestButton:Enable()
-                frame.requestButton:SetText("申请")
-            end
-        end
-
-        frame.id = activity.unitname
-        frame.category = category.name
-        frame.leader = activity.unitname
-        frame.classColor = rgb
-        frame.level = activity.level
-        frame.comment = activity.comment
+        ReloadCell(frame, activities[index])
     end)
 end
 
 activityListFrame.OnScroll = Meeting.BrowserFrame.UpdateList
+
+function Meeting.BrowserFrame:UpdateActivity(activity)
+    local index = -1
+    for i, value in ipairs(activities) do
+        if value.unitname == activity.unitname then
+            index = i
+            break
+        end
+    end
+    if index == -1 then
+        return
+    end
+
+    local offset = FauxScrollFrame_GetOffset(activityListFrame) + 1
+    if index < offset or index > offset + table.getn(activityListFrame.pool) then
+        return
+    end
+
+    local frame = activityListFrame.pool[index - offset + 1]
+    ReloadCell(frame, activity)
+end

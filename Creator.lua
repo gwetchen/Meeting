@@ -285,31 +285,30 @@ local applicantListFrame = Meeting.GUI.CreateListFrame({
     step = 24,
     display = 14,
     cell = function(f)
-        f:SetScript("OnEnter", function()
-            this:SetBackdropBorderColor(1, 1, 1, .2)
+        f.OnHover = function(self, isHover)
+            if isHover then
+                GameTooltip:SetOwner(this, "ANCHOR_RIGHT", 40)
+                GameTooltip:SetText(this.applicant.name, this.classColor.r, this.classColor.g, this.classColor.b, 1)
+                if this.applicant.score > 0 then
+                    GameTooltip:AddLine("装等：" .. this.applicant.score)
+                end
 
-            GameTooltip:SetOwner(this, "ANCHOR_RIGHT", 40)
-            GameTooltip:SetText(this.applicant.name, this.classColor.r, this.classColor.g, this.classColor.b, 1)
-            if this.applicant.score > 0 then
-                GameTooltip:AddLine("装等：" .. this.applicant.score)
+                local color = GetDifficultyColor(this.applicant.level)
+                GameTooltip:AddLine(
+                    format('%s |cff%02x%02x%02x%s|r', LEVEL, color.r * 255, color.g * 255, color.b * 255,
+                        this.applicant.level), 1, 1, 1)
+
+                if this.applicant.comment ~= "_" then
+                    GameTooltip:AddLine(this.applicant.comment, 0.75, 0.75, 0.75, 1)
+                end
+                GameTooltip:AddLine(" ")
+                GameTooltip:AddLine("<双击>悄悄话", 1, 1, 1, 1)
+                GameTooltip:SetWidth(220)
+                GameTooltip:Show()
+            else
+                GameTooltip:Hide()
             end
-
-            local color = GetDifficultyColor(this.applicant.level)
-            GameTooltip:AddLine(format('%s |cff%02x%02x%02x%s|r', LEVEL, color.r * 255, color.g * 255, color.b * 255,
-                this.applicant.level), 1, 1, 1)
-
-            if this.applicant.comment ~= "_" then
-                GameTooltip:AddLine(this.applicant.comment, 0.75, 0.75, 0.75, 1)
-            end
-            GameTooltip:AddLine(" ")
-            GameTooltip:AddLine("<双击>悄悄话", 1, 1, 1, 1)
-            GameTooltip:SetWidth(220)
-            GameTooltip:Show()
-        end)
-        f:SetScript("OnLeave", function()
-            this:SetBackdropBorderColor(1, 1, 1, .04)
-            GameTooltip:Hide()
-        end)
+        end
         f:SetScript("OnDoubleClick", function()
             if this.applicant.name == Meeting.player then
                 return

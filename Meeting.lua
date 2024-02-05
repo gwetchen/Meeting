@@ -321,9 +321,10 @@ end
 
 function Meeting:OnDecline(id, name)
     if name == Meeting.player then
-        local item = Meeting:FindActivity(id)
-        if item then
-            item.applicantStatus = Meeting.APPLICANT_STATUS.Declined
+        local activity = Meeting:FindActivity(id)
+        if activity then
+            activity.applicantStatus = Meeting.APPLICANT_STATUS.Declined
+            Meeting.BrowserFrame:UpdateActivity(activity)
             Meeting.BrowserFrame:UpdateList()
         end
     end

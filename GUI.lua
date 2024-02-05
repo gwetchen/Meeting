@@ -180,6 +180,14 @@ function GUI.CreateListFrame(config)
         cell:SetBackdrop(hoverBackgrop)
         cell:SetBackdropBorderColor(1, 1, 1, .04)
         cell:EnableMouse(true)
+        cell:SetScript("OnEnter", function()
+            this:SetBackdropBorderColor(1, 1, 1, .2)
+            this:OnHover(true)
+        end)
+        cell:SetScript("OnLeave", function()
+            this:SetBackdropBorderColor(1, 1, 1, .04)
+            this:OnHover(false)
+        end)
         cell:Hide()
         table.insert(frame.pool, cell)
         config.cell(cell)
@@ -199,8 +207,9 @@ function GUI.CreateListFrame(config)
 
         FauxScrollFrame_Update(self, num, config.display, config.step, nil, nil, nil, nil, config.width, config
             .height)
+        local offset = FauxScrollFrame_GetOffset(self)
         for i = 1, config.display, 1 do
-            local j = i + FauxScrollFrame_GetOffset(self)
+            local j = i + offset
             if j <= num then
                 local cell = frame.pool[i]
                 cell:Show()
