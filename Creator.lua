@@ -128,7 +128,7 @@ commentButton:SetPoint("TOPLEFT", commentTextFrame, "BOTTOMLEFT", 0, -18)
 commentButton:SetScript("OnClick", function()
     MeetingCreateEditBox:SetFocus()
 end)
-Meeting.GUI.SetBackground(commentButton,Meeting.GUI.Theme.Black, Meeting.GUI.Theme.White)
+Meeting.GUI.SetBackground(commentButton, Meeting.GUI.Theme.Black, Meeting.GUI.Theme.White)
 
 local commentFrame = CreateFrame("EditBox", "MeetingCreateEditBox", commentButton)
 commentFrame:SetWidth(220)
@@ -256,7 +256,7 @@ local commentText = Meeting.GUI.CreateText({
     parent = applicantListHeaderFrame,
     text = "说明",
     fontSize = 14,
-    width = 230,
+    width = 290,
     height = 24,
     anchor = {
         point = "TOPLEFT",
@@ -292,7 +292,6 @@ local applicantListFrame = Meeting.GUI.CreateListFrame({
     },
     step = 24,
     display = 14,
-    scroll = Meeting.CreatorFrame.UpdateList
 })
 
 local applicantFramePool = {}
@@ -304,7 +303,7 @@ local hoverBackgrop = {
 }
 
 local function CreateApplicantItemFrame(i)
-    local f = Meeting.GUI.CreateFrame({
+    local f = Meeting.GUI.CreateButton({
         parent = creatorFrame,
         width = 504,
         height = 24,
@@ -313,6 +312,37 @@ local function CreateApplicantItemFrame(i)
     f:SetBackdrop(hoverBackgrop)
     f:SetBackdropBorderColor(1, 1, 1, .04)
     f:EnableMouse(true)
+    f:SetScript("OnEnter", function()
+        this:SetBackdropBorderColor(1, 1, 1, .2)
+
+        GameTooltip:SetOwner(this, "ANCHOR_RIGHT", 40)
+        GameTooltip:SetText(this.applicant.name, this.classColor.r, this.classColor.g, this.classColor.b, 1)
+        if this.applicant.score > 0 then
+            GameTooltip:AddLine("装等：" .. this.applicant.score)
+        end
+
+        local color = GetDifficultyColor(this.applicant.level)
+        GameTooltip:AddLine(format('%s |cff%02x%02x%02x%s|r', LEVEL, color.r * 255, color.g * 255, color.b * 255,
+            this.applicant.level), 1, 1, 1)
+
+        if this.applicant.comment ~= "_" then
+            GameTooltip:AddLine(this.applicant.comment, 0.75, 0.75, 0.75, 1)
+        end
+        GameTooltip:AddLine(" ")
+        GameTooltip:AddLine("<双击>悄悄话", 1, 1, 1, 1)
+        GameTooltip:SetWidth(220)
+        GameTooltip:Show()
+    end)
+    f:SetScript("OnLeave", function()
+        this:SetBackdropBorderColor(1, 1, 1, .04)
+        GameTooltip:Hide()
+    end)
+    f:SetScript("OnDoubleClick", function()
+        if this.applicant.name == Meeting.player then
+            return
+        end
+        ChatFrame_OpenChat("/w " .. this.applicant.name, SELECTED_DOCK_FRAME or DEFAULT_CHAT_FRAME)
+    end)
 
     f.nameFrame = Meeting.GUI.CreateText({
         parent = f,
@@ -324,7 +354,7 @@ local function CreateApplicantItemFrame(i)
             relative = f,
             relativePoint = "TOPLEFT",
             x = 0,
-            y = 0
+            y = -6
         }
     })
 
@@ -360,7 +390,7 @@ local function CreateApplicantItemFrame(i)
         parent = f,
         text = "",
         fontSize = 14,
-        width = 230,
+        width = 290,
         height = 24,
         anchor = {
             point = "TOPLEFT",
@@ -376,16 +406,17 @@ local function CreateApplicantItemFrame(i)
         text = "同意",
         type = Meeting.GUI.BUTTON_TYPE.SUCCESS,
         width = 34,
-        height = 20,
+        height = 18,
         anchor = {
             point = "TOPLEFT",
             relative = f.commentFrame,
             relativePoint = "TOPRIGHT",
             x = 0,
-            y = 0
+            y = 3
         },
         click = function()
-            f.accept()
+            f.applicant.status = Meeting.APPLICANT_STATUS.Invited
+            InviteByName(f.applicant.name)
             this:SetText("已同意")
             this:Disable()
         end
@@ -393,10 +424,10 @@ local function CreateApplicantItemFrame(i)
 
     f.declineButton = Meeting.GUI.CreateButton({
         parent = f,
-        text = "拒绝",
+        text = "x",
         type = Meeting.GUI.BUTTON_TYPE.DANGER,
-        width = 34,
-        height = 20,
+        width = 18,
+        height = 18,
         anchor = {
             point = "TOPLEFT",
             relative = f.acceptButton,
@@ -405,7 +436,20 @@ local function CreateApplicantItemFrame(i)
             y = 0
         },
         click = function()
-            f.decline()
+            f.applicant.status = Meeting.APPLICANT_STATUS.Declined
+            Meeting.Message.Decline(string.format("%s", f.applicant.name))
+            local activity = Meeting:FindActivity(Meeting.player)
+            if activity then
+                local i = -1
+                for index, value in ipairs(activity.applicantList) do
+                    if value.name == f.applicant.name then
+                        i = index
+                        break
+                    end
+                end
+                table.remove(activity.applicantList, i)
+                Meeting.CreatorFrame:UpdateList()
+            end
         end
     })
     f:Hide()
@@ -436,43 +480,34 @@ function Meeting.CreatorFrame:UpdateList()
     local ll = table.getn(applicantFramePool)
     if l < ll then
         for i = l + 1, ll do
-            applicantFramePool[i]:Hide()
+            local frame = applicantFramePool[i]
+            frame.applicant = nil
+            frame:Hide()
         end
     end
 
     applicantListFrame:Reload(l, function(i, j)
-        local frame = applicantFramePool[j]
+        local frame = applicantFramePool[i]
         frame:Show()
-        local applicant = applicantList[i]
+        local applicant = applicantList[j]
         local name = applicant.name
-        local idx = i
 
         frame.nameFrame:SetText(name)
         local rgb = Meeting.GetClassRGBColor(applicant.class, name)
         frame.nameFrame:SetTextColor(rgb.r, rgb.g, rgb.b)
         frame.levelFrame:SetText(applicant.level)
-        frame.scoreFrame:SetText(applicant.score)
+        frame.scoreFrame:SetText(applicant.score == 0 and "-" or applicant.score)
         frame.commentFrame:SetText(applicant.comment ~= "_" and applicant.comment or "")
 
         if applicant.status == Meeting.APPLICANT_STATUS.Accepted then
             frame.acceptButton:SetText("已同意")
             frame.acceptButton:Disable()
-            frame.declineButton:Hide()
         elseif applicant.status == Meeting.APPLICANT_STATUS.None then
             frame.acceptButton:SetText("同意")
             frame.acceptButton:Enable()
-            frame.declineButton:Show()
         end
-        frame.accept = function()
-            applicant.status = Meeting.APPLICANT_STATUS.Invited
-            InviteByName(name)
-        end
-        frame.decline = function()
-            applicant.status = Meeting.APPLICANT_STATUS.Declined
-            Meeting.Message.Decline(string.format("%s", name))
-            table.remove(applicantList, idx)
-            Meeting.CreatorFrame:UpdateList()
-        end
+        frame.applicant = applicant
+        frame.classColor = rgb
     end)
 end
 

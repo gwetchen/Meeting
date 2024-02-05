@@ -310,22 +310,37 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc)
 end
 
 function Meeting:OnApplicant(name, id, level, class, score, comment)
-    local item = Meeting:FindActivity(id)
-    if item and item.unitname == Meeting.player then
-        local applicant = {
-            name = name,
-            level = tonumber(level),
-            class = Meeting.NumberToClass(tonumber(class)),
-            score = tonumber(score),
-            comment = comment,
-            status = Meeting.APPLICANT_STATUS.Invited
-        }
+    local activity = Meeting:FindActivity(id)
+    if activity and activity.unitname == Meeting.player then
+        local i = -1
+        for index, value in ipairs(activity.applicantList) do
+            if value.name == name then
+                i = index
+                break
+            end
+        end
+        if i ~= -1 then
+            local applicant = activity.applicantList[i]
+            applicant.level = tonumber(level)
+            applicant.score = tonumber(score)
+            applicant.comment = comment
+            applicant.status = Meeting.APPLICANT_STATUS.None
+        else
+            local applicant = {
+                name = name,
+                level = tonumber(level),
+                class = Meeting.NumberToClass(tonumber(class)),
+                score = tonumber(score),
+                comment = comment,
+                status = Meeting.APPLICANT_STATUS.None
+            }
+            table.insert(activity.applicantList, applicant)
+        end
         PlaySoundFile("Interface\\AddOns\\Meeting\\assets\\request.ogg")
-        table.insert(item.applicantList, applicant)
 
         Meeting.CreatorFrame:UpdateList()
+        Meeting.FloatFrame.Update()
     end
-    Meeting.FloatFrame.Update()
 end
 
 function Meeting:OnDecline(id, name)

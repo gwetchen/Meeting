@@ -311,7 +311,6 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
     },
     step = 24,
     display = 10,
-    scroll = Meeting.BrowserFrame.UpdateList
 })
 
 local activityFramePool = {}
@@ -359,13 +358,8 @@ local function CreateActivityItemFrame(i)
         if this.leader == Meeting.player then
             return
         end
-        local chatFrame = SELECTED_DOCK_FRAME
-        if (not chatFrame) then
-            chatFrame = DEFAULT_CHAT_FRAME;
-        end
-        ChatFrame_OpenChat("/w " .. this.leader, chatFrame)
+        ChatFrame_OpenChat("/w " .. this.leader, SELECTED_DOCK_FRAME or DEFAULT_CHAT_FRAME)
     end)
-
 
     f.nameFrame = Meeting.GUI.CreateText({
         parent = f,
@@ -535,31 +529,28 @@ function Meeting.BrowserFrame:UpdateList(force)
         frame.membersFrame:SetText(activity.members .. "/" .. Meeting.GetActivityMaxMembers(activity.category))
         frame.commentFrame:SetText(activity.comment ~= "_" and activity.comment or "")
 
-        if activity.unitname == Meeting.player then
-            frame.applicantButton:Disable()
-        else
-            frame.applicantButton:Enable()
-        end
-
         if activity.unitname == Meeting.player or Meeting:IsInActivity(activity.unitname) then
             frame.statusFrame:SetText("已加入")
-            frame.statusFrame:SetTextColor(0, 1, 0)
+            frame.statusFrame:SetTextColor(Meeting.GUI.Theme.Green.r, Meeting.GUI.Theme.Green.g,
+                Meeting.GUI.Theme.Green.b)
             frame.statusFrame:Show()
             frame.applicantButton:Hide()
         else
             if activity.applicantStatus == Meeting.APPLICANT_STATUS.Invited then
                 frame.statusFrame:SetText("已申请")
-                frame.statusFrame:SetTextColor(0, 1, 0)
+                frame.statusFrame:SetTextColor(Meeting.GUI.Theme.Green.r, Meeting.GUI.Theme.Green.g,
+                    Meeting.GUI.Theme.Green.b)
                 frame.statusFrame:Show()
                 frame.applicantButton:Hide()
             elseif activity.applicantStatus == Meeting.APPLICANT_STATUS.Declined then
                 frame.statusFrame:SetText("已拒绝")
-                frame.statusFrame:SetTextColor(1, 0, 0)
+                frame.statusFrame:SetTextColor(Meeting.GUI.Theme.Red.r, Meeting.GUI.Theme.Red.g, Meeting.GUI.Theme.Red.b)
                 frame.statusFrame:Show()
                 frame.applicantButton:Hide()
             elseif activity.applicantStatus == Meeting.APPLICANT_STATUS.Joined then
                 frame.statusFrame:SetText("已加入")
-                frame.statusFrame:SetTextColor(0, 1, 0)
+                frame.statusFrame:SetTextColor(Meeting.GUI.Theme.Green.r, Meeting.GUI.Theme.Green.g,
+                    Meeting.GUI.Theme.Green.b)
                 frame.statusFrame:Show()
                 frame.applicantButton:Hide()
             else
