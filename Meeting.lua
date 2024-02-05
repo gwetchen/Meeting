@@ -47,6 +47,7 @@ f:SetScript("OnEvent", function()
         local joined = Meeting:FindJoinedActivity()
         if joined and joined.unitname ~= Meeting.player then
             joined.applicantStatus = Meeting.APPLICANT_STATUS.Joined
+            Meeting.BrowserFrame:UpdateActivity(joined)
             needUpdateBrowser = true
         end
 

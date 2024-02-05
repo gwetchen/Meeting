@@ -463,7 +463,8 @@ local function ReloadCell(frame, activity)
     local rgb = Meeting.GetClassRGBColor(activity.class, activity.unitname)
     frame.leaderFrame:SetText(activity.unitname)
     frame.leaderFrame:SetTextColor(rgb.r, rgb.g, rgb.b)
-    frame.membersFrame:SetText(activity.members .. "/" .. Meeting.GetActivityMaxMembers(activity.category))
+    local maxMambers = Meeting.GetActivityMaxMembers(activity.category)
+    frame.membersFrame:SetText(activity.members .. "/" .. maxMambers)
     frame.commentFrame:SetText(activity.comment ~= "_" and activity.comment or "")
 
     if activity.unitname == Meeting.player or Meeting:IsInActivity(activity.unitname) then
@@ -493,8 +494,13 @@ local function ReloadCell(frame, activity)
         else
             frame.statusFrame:Hide()
             frame.requestButton:Show()
-            frame.requestButton:Enable()
-            frame.requestButton:SetText("申请")
+            if activity.members >= maxMambers then
+                frame.requestButton:Disable()
+                frame.requestButton:SetText("满员")
+            else
+                frame.requestButton:Enable()
+                frame.requestButton:SetText("申请")
+            end
         end
     end
 
