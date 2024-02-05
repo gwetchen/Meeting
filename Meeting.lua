@@ -191,12 +191,30 @@ Meeting.GUI.CreateText({
     text = "问题和建议前往龟壳KOOK",
     fontSize = 10,
     anchor = {
+        point = "TOPLEFT",
+        relative = headerFrame,
+        relativePoint = "TOPLEFT",
+        x = 10,
+        y = -12
+    }
+})
+
+Meeting.GUI.CreateButton({
+    parent = headerFrame,
+    width = 14,
+    height = 14,
+    text = "X",
+    type = Meeting.GUI.BUTTON_TYPE.DANGER,
+    anchor = {
         point = "TOPRIGHT",
         relative = headerFrame,
         relativePoint = "TOPRIGHT",
         x = -10,
-        y = -12
-    }
+        y = -10
+    },
+    click = function()
+        Meeting:Toggle()
+    end
 })
 
 Meeting.GUI.CreateTabs({
