@@ -1,6 +1,7 @@
 local f = CreateFrame("Frame")
 f:RegisterEvent("CHAT_MSG_HARDCORE")
 f:RegisterEvent("CHAT_MSG_CHANNEL")
+f:RegisterEvent("CHAT_MSG_SYSTEM")
 f:RegisterEvent("PLAYER_ENTERING_WORLD")
 f:RegisterEvent("PLAYER_LEAVING_WORLD")
 f:RegisterEvent("PARTY_MEMBERS_CHANGED")
@@ -79,6 +80,21 @@ f:SetScript("OnEvent", function()
     elseif event == "PLAYER_LEAVING_WORLD" then
         if Meeting:FindActivity(Meeting.player) then
             Meeting.Message.CloseActivity()
+        end
+    elseif event == "CHAT_MSG_SYSTEM" then
+        local _, _, playerName = string.find(arg1, "^(.+)拒绝了你邀请其加入队伍的请求。")
+        if playerName then
+            local activity = Meeting:FindActivity(Meeting.player)
+            if activity then
+                for i, applicant in ipairs(activity.applicantList) do
+                    if applicant.name == playerName then
+                        table.remove(activity.applicantList, i)
+                        Meeting.CreatorFrame:UpdateList()
+                        Meeting.FloatFrame.Update()
+                        break
+                    end
+                end
+            end
         end
     end
 end)
@@ -390,6 +406,7 @@ function Meeting:OnClose(id)
         Meeting.joinedActivity = nil
     end
     Meeting.BrowserFrame:UpdateList()
+    Meeting.CreatorFrame:UpdateList()
     Meeting.FloatFrame.Update()
 end
 
