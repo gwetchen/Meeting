@@ -84,17 +84,7 @@ f:SetScript("OnEvent", function()
     elseif event == "CHAT_MSG_SYSTEM" then
         local _, _, playerName = string.find(arg1, "^(.+)拒绝了你邀请其加入队伍的请求。")
         if playerName then
-            local activity = Meeting:FindActivity(Meeting.player)
-            if activity then
-                for i, applicant in ipairs(activity.applicantList) do
-                    if applicant.name == playerName then
-                        table.remove(activity.applicantList, i)
-                        Meeting.CreatorFrame:UpdateList()
-                        Meeting.FloatFrame.Update()
-                        break
-                    end
-                end
-            end
+            Meeting.DeclinedInvite(playerName)
         end
     end
 end)
@@ -408,6 +398,20 @@ function Meeting:OnClose(id)
     Meeting.BrowserFrame:UpdateList()
     Meeting.CreatorFrame:UpdateList()
     Meeting.FloatFrame.Update()
+end
+
+function Meeting.DeclinedInvite(playerName)
+    local activity = Meeting:FindActivity(Meeting.player)
+    if activity then
+        for i, applicant in ipairs(activity.applicantList) do
+            if applicant.name == playerName then
+                applicant.status = Meeting.APPLICANT_STATUS.Declined
+                Meeting.CreatorFrame:UpdateList()
+                Meeting.FloatFrame.Update()
+                break
+            end
+        end
+    end
 end
 
 C_Timer.NewTicker(5, function()

@@ -450,6 +450,9 @@ function Meeting.CreatorFrame:UpdateList()
         elseif applicant.status == Meeting.APPLICANT_STATUS.None then
             frame.acceptButton:SetText("同意")
             frame.acceptButton:Enable()
+        elseif applicant.status == Meeting.APPLICANT_STATUS.Declined then
+            frame.acceptButton:SetText("已拒绝")
+            frame.acceptButton:Enable()
         end
         frame.applicant = applicant
         frame.classColor = rgb
