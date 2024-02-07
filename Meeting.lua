@@ -43,6 +43,9 @@ f:SetScript("OnEvent", function()
             activity.members = members
             Meeting.Message.SyncMembers(members)
             Meeting.CreatorFrame:UpdateList()
+            if members >= Meeting.GetActivityMaxMembers(activity.category) then
+                Meeting.Message.CloseActivity()
+            end
         end
 
         local joined = Meeting:FindJoinedActivity()
