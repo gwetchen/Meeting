@@ -372,6 +372,7 @@ local applicantListFrame = Meeting.GUI.CreateListFrame({
                 y = 0
             }
         })
+        f.commentFrame:SetJustifyV("TOP")
 
         f.acceptButton = Meeting.GUI.CreateButton({
             parent = f,

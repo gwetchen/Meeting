@@ -446,11 +446,25 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
                 y = 2
             },
             click = function()
-                Meeting.Message.Request(f.id)
-                local activity = Meeting:FindActivity(f.id)
-                activity.applicantStatus = Meeting.APPLICANT_STATUS.Invited
-                Meeting.BrowserFrame:UpdateActivity(activity)
-                this:Disable()
+                local frame = Meeting.GUI.CreatePrompt({
+                    parent = Meeting.BrowserFrame,
+                    anchor = {
+                        point = "CENTER",
+                        relative = Meeting.BrowserFrame,
+                        relativePoint = "CENTER",
+                        x = 0,
+                        y = 0
+                    },
+                    title = "申请加入说明：",
+                    confirm = function(text)
+                        Meeting.Message.Request(f.id, text)
+                        local activity = Meeting:FindActivity(f.id)
+                        activity.applicantStatus = Meeting.APPLICANT_STATUS.Invited
+                        Meeting.BrowserFrame:UpdateActivity(activity)
+                        f.requestButton:Disable()
+                    end
+                })
+                frame:SetPoint("TOP", Meeting.BrowserFrame, "TOP", 0, -50)
             end
         })
     end

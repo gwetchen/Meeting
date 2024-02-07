@@ -254,3 +254,77 @@ function GUI.CreateTabs(config)
 
     frame.tabs[config.default or 1]:SetBackdropColor(GUI.Theme.Brown.r, GUI.Theme.Brown.g, GUI.Theme.Brown.b, 1)
 end
+
+function GUI.CreatePrompt(config)
+    config.width = config.width or 300
+    config.height = config.height or 105
+    local parent = GUI.CreateFrame(config)
+    parent:SetFrameLevel(999)
+    GUI.SetBackground(parent, GUI.Theme.Brown, GUI.Theme.White)
+    local title = GUI.CreateText({
+        parent = parent,
+        width = config.width,
+        height = 20,
+        anchor = {
+            point = "TOP",
+            relative = parent,
+            relativePoint = "TOP",
+            x = 10,
+            y = -10
+        },
+        text = config.title,
+        color = GUI.Theme.White
+    })
+    local input = CreateFrame("EditBox", nil, parent)
+    input:SetMultiLine(false)
+    input:SetMaxBytes(128)
+    input:SetWidth(config.width - 20)
+    input:SetHeight(20)
+    input:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -10)
+    input:SetFontObject("ChatFontNormal")
+    input:SetScript("OnEscapePressed", function()
+        this:ClearFocus()
+    end)
+    input:SetAutoFocus(false)
+    GUI.SetBackground(input, GUI.Theme.Black, GUI.Theme.White)
+
+    GUI.CreateButton({
+        parent = parent,
+        width = 80,
+        height = 24,
+        text = "确定",
+        type = GUI.BUTTON_TYPE.PRIMARY,
+        anchor = {
+            point = "TOPRIGHT",
+            relative = input,
+            relativePoint = "BOTTOMRIGHT",
+            x = 0,
+            y = -10
+        },
+        click = function()
+            local text = input:GetText()
+            text = string.gsub(text, ":", "：")
+            config.confirm(text)
+            parent:Hide()
+        end
+    })
+
+    GUI.CreateButton({
+        parent = parent,
+        width = 80,
+        height = 24,
+        text = "取消",
+        type = GUI.BUTTON_TYPE.DANGER,
+        anchor = {
+            point = "TOPLEFT",
+            relative = input,
+            relativePoint = "BOTTOMLEFT",
+            x = 0,
+            y = -10
+        },
+        click = function()
+            parent:Hide()
+        end
+    })
+    return parent
+end

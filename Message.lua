@@ -60,9 +60,9 @@ function Message.CreateActivity(category, comment)
     Message.Send(EVENTS.CREATE, data)
 end
 
-function Message.Request(id)
+function Message.Request(id, comment)
     local data = string.format("%s:%d:%d:%d:%s", id, UnitLevel("player"),
-        Meeting.ClassToNumber(Meeting.playerClass), Meeting.GetPlayerScore(), "_")
+        Meeting.ClassToNumber(Meeting.playerClass), Meeting.GetPlayerScore(), string.isempty(comment) and "_" or comment)
     Message.Send(EVENTS.REQUEST, data)
 end
 
