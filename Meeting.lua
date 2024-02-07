@@ -69,6 +69,7 @@ f:SetScript("OnEvent", function()
         Meeting.CreatorFrame.UpdateActivity()
         Meeting.joinedActivity = joined
     elseif event == "PLAYER_ENTERING_WORLD" then
+        Meeting.CheckLFTChannel()
         Meeting.CheckPlayerHCMode()
         if MEETING_DB.activity then
             local now = time()
@@ -403,6 +404,19 @@ function Meeting.DeclinedInvite(playerName)
                 break
             end
         end
+    end
+end
+
+function Meeting.CheckLFTChannel()
+    local i = -1
+    for index, value in ipairs({ GetChannelList() }) do
+        if value == "LFT" then
+            i = index
+            break
+        end
+    end
+    if i == -1 then
+        JoinChannelByName("LFT")
     end
 end
 
