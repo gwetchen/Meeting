@@ -149,19 +149,7 @@ local mainFrame = Meeting.GUI.CreateFrame({
     },
 })
 mainFrame:SetFrameStrata("DIALOG")
-mainFrame:SetBackdrop({
-    bgFile = "Interface\\BUTTONS\\WHITE8X8",
-    tile = false,
-    tileSize = 0,
-    edgeSize = 0,
-    insets = {
-        left = 0,
-        right = 0,
-        top = 0,
-        bottom = 0
-    }
-})
-mainFrame:SetBackdropColor(24 / 255, 20 / 255, 18 / 255, 1)
+Meeting.GUI.SetBackground(mainFrame, Meeting.GUI.Theme.Brown)
 mainFrame:Hide()
 tinsert(UISpecialFrames, "MeetingMainFrame");
 Meeting.MainFrame = mainFrame
@@ -302,6 +290,7 @@ end
 
 function Meeting:OnCreate(id, category, comment, level, class, members, hc)
     local item, index = Meeting:FindActivity(id)
+    local category = (Meeting.FindCaregoryByCode(category) or Meeting.FindCaregoryByCode("OTHER")).key
     if item then
         item.parent = Meeting.GetCategoryParent(category).key
         item.category = category

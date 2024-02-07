@@ -341,23 +341,30 @@ Meeting.Categories = {
             },
         }
     },
-    -- {
-    --     key = "OTHER",
-    --     name = "其他",
-    --     members = 40,
-    --     children = {}
-    -- }
+    {
+        key = "OTHER",
+        name = "其它",
+        members = 40,
+        children = {
+            {
+                key = "OTHER",
+                name = "其它",
+                minLevel = 1,
+                members = 40
+            },
+        }
+    }
 }
 
-local CategoryParentMap = {}
+local categoryParentMap = {}
 for _, value in ipairs(Meeting.Categories) do
     for _, child in ipairs(value.children) do
-        CategoryParentMap[child.key] = { key = value.key, members = value.members }
+        categoryParentMap[child.key] = { key = value.key, members = value.members }
     end
 end
 
 function Meeting.GetCategoryParent(category)
-    return CategoryParentMap[category]
+    return categoryParentMap[category]
 end
 
 function Meeting.GetActivityMaxMembers(category)
@@ -374,10 +381,16 @@ function Meeting.GetActivityMaxMembers(category)
     return 40
 end
 
+local categoryMap = {}
+
 function Meeting.FindCaregoryByCode(code)
+    if categoryMap[code] then
+        return categoryMap[code]
+    end
     for _, value in pairs(Meeting.Categories) do
         for _, value in pairs(value.children) do
             if value.key == code then
+                categoryMap[code] = value
                 return value
             end
         end
