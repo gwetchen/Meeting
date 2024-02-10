@@ -191,7 +191,7 @@ Meeting.Categories = {
                 minLevel = 55,
             },
             {
-                key = "DM",
+                key = "DME",
                 name = "厄运之槌：东",
                 minLevel = 55,
             },
