@@ -275,6 +275,10 @@ function GUI.CreateInput(config)
 end
 
 function GUI.CreateDialog(config)
+    if Meeting.GUI.currentDialog then
+        Meeting.GUI.currentDialog:Hide()
+    end
+    
     config.width = config.width or 300
     config.height = config.height or 75
     local parent = GUI.CreateFrame(config)
@@ -316,6 +320,7 @@ function GUI.CreateDialog(config)
         click = function()
             config._confirm()
             parent:Hide()
+            Meeting.GUI.currentDialog = nil
         end
     })
 
@@ -334,8 +339,10 @@ function GUI.CreateDialog(config)
         },
         click = function()
             parent:Hide()
+            Meeting.GUI.currentDialog = nil
         end
     })
+    Meeting.GUI.currentDialog = parent
     return parent
 end
 
