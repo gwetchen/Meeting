@@ -156,6 +156,10 @@ function GUI.CreateButton(config)
         GUI.SetBackground(button, GUI.Theme.Red)
     end
 
+    if config.disabled then
+        button:Disable()
+    end
+
     return button
 end
 
@@ -255,9 +259,24 @@ function GUI.CreateTabs(config)
     frame.tabs[config.default or 1]:SetBackdropColor(GUI.Theme.Brown.r, GUI.Theme.Brown.g, GUI.Theme.Brown.b, 1)
 end
 
-function GUI.CreatePrompt(config)
+function GUI.CreateInput(config)
+    config.frameType = "EditBox"
+    local frame = GUI.CreateFrame(config)
+    frame:SetFontObject("ChatFontNormal")
+    if config.limit then
+        frame:SetMaxBytes(config.limit)
+    end
+    frame:SetScript("OnEscapePressed", function()
+        frame:ClearFocus()
+    end)
+    frame:SetAutoFocus(false)
+    frame:SetMultiLine(config.multiLine or false)
+    return frame
+end
+
+function GUI.CreateDialog(config)
     config.width = config.width or 300
-    config.height = config.height or 105
+    config.height = config.height or 75
     local parent = GUI.CreateFrame(config)
     parent:SetFrameLevel(999)
     GUI.SetBackground(parent, GUI.Theme.Brown, GUI.Theme.White)
@@ -275,18 +294,11 @@ function GUI.CreatePrompt(config)
         text = config.title,
         color = GUI.Theme.White
     })
-    local input = CreateFrame("EditBox", nil, parent)
-    input:SetMultiLine(false)
-    input:SetMaxBytes(128)
-    input:SetWidth(config.width - 20)
-    input:SetHeight(20)
-    input:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -10)
-    input:SetFontObject("ChatFontNormal")
-    input:SetScript("OnEscapePressed", function()
-        this:ClearFocus()
-    end)
-    input:SetAutoFocus(false)
-    GUI.SetBackground(input, GUI.Theme.Black, GUI.Theme.White)
+
+    local customFrame = nil
+    if config.onCustomFrame then
+        customFrame = config.onCustomFrame(parent, title)
+    end
 
     GUI.CreateButton({
         parent = parent,
@@ -296,15 +308,13 @@ function GUI.CreatePrompt(config)
         type = GUI.BUTTON_TYPE.PRIMARY,
         anchor = {
             point = "TOPRIGHT",
-            relative = input,
+            relative = customFrame or title,
             relativePoint = "BOTTOMRIGHT",
             x = 0,
             y = -10
         },
         click = function()
-            local text = input:GetText()
-            text = string.gsub(text, ":", "：")
-            config.confirm(text)
+            config._confirm()
             parent:Hide()
         end
     })
@@ -317,7 +327,7 @@ function GUI.CreatePrompt(config)
         type = GUI.BUTTON_TYPE.DANGER,
         anchor = {
             point = "TOPLEFT",
-            relative = input,
+            relative = customFrame or title,
             relativePoint = "BOTTOMLEFT",
             x = 0,
             y = -10
@@ -327,4 +337,175 @@ function GUI.CreatePrompt(config)
         end
     })
     return parent
+end
+
+function GUI.CreateRequestPrompt(config)
+    config.width = config.width or 300
+    config.height = 185
+
+    if not MEETING_DB.role or MEETING_DB.role == 0 then
+        MEETING_DB.role = Meeting.GetClassRole(Meeting.playerClass)
+    end
+
+    config.onCustomFrame = function(parent, anchor)
+        local frame = GUI.CreateFrame({
+            parent = parent,
+            width = config.width - 20,
+            height = 100,
+            anchor = {
+                point = "TOPLEFT",
+                relative = anchor,
+                relativePoint = "BOTTOMLEFT",
+                x = 0,
+                y = -10
+            }
+        })
+
+        local roleEnable = Meeting.GetClassRole(Meeting.playerClass)
+
+        local function createRole(role, anchor)
+            local enable = bit.band(roleEnable, role) == role
+            local ckecked = bit.band(MEETING_DB.role, role) == role
+
+            local roleFrame = GUI.CreateButton({
+                parent = frame,
+                width = 40,
+                height = 40,
+                anchor = anchor,
+                disabled = not enable,
+                click = function()
+                    local ckeck = this.checkButton:GetChecked()
+                    if bit.band(MEETING_DB.role, role) == role then
+                        MEETING_DB.role = bit.bxor(MEETING_DB.role, role)
+                    else
+                        MEETING_DB.role = bit.bor(MEETING_DB.role, role)
+                    end
+                    this.checkButton:SetChecked(not ckeck)
+                end
+            })
+
+            local tankTexture = roleFrame:CreateTexture()
+            local textureName = "damage"
+            if role == Meeting.Role.Tank then
+                textureName = "tank"
+            elseif role == Meeting.Role.Healer then
+                textureName = "healer"
+            end
+            tankTexture:SetTexture("Interface\\AddOns\\Meeting\\assets\\" .. textureName .. ".blp")
+            tankTexture:SetWidth(40)
+            tankTexture:SetHeight(40)
+            tankTexture:SetPoint("TOPLEFT", roleFrame, "TOPLEFT", 0, 0)
+            if not enable then
+                tankTexture:SetVertexColor(0.2, 0.2, 0.2, 1)
+            else
+                roleFrame.checkButton = GUI.CreateCheck({
+                    parent = roleFrame,
+                    width = 20,
+                    height = 20,
+                    anchor = {
+                        point = "BOTTOMRIGHT",
+                        relative = roleFrame,
+                        relativePoint = "BOTTOMRIGHT",
+                        x = 0,
+                        y = 0
+                    },
+                    checked = enable and ckecked,
+                    click = function(checked)
+                        if bit.band(MEETING_DB.role, role) == role then
+                            MEETING_DB.role = bit.bxor(MEETING_DB.role, role)
+                        else
+                            MEETING_DB.role = bit.bor(MEETING_DB.role, role)
+                        end
+                    end
+                })
+            end
+            return roleFrame
+        end
+
+        local tank = createRole(Meeting.Role.Tank, {
+            point = "TOPLEFT",
+            relative = frame,
+            relativePoint = "TOPLEFT",
+            x = 70,
+            y = 0
+        })
+
+        local healer = createRole(Meeting.Role.Healer, {
+            point = "TOPLEFT",
+            relative = tank,
+            relativePoint = "TOPRIGHT",
+            x = 10,
+            y = 0
+
+        })
+
+        local damage = createRole(Meeting.Role.Damage, {
+            point = "TOPLEFT",
+            relative = healer,
+            relativePoint = "TOPRIGHT",
+            x = 10,
+            y = 0
+        })
+
+        local commentFrame = GUI.CreateText({
+            parent = frame,
+            anchor = {
+                point = "TOPLEFT",
+                relative = tank,
+                relativePoint = "BOTTOMLEFT",
+                x = -70,
+                y = -5
+            },
+            text = "备注",
+        })
+
+        local input = GUI.CreateInput({
+            parent = frame,
+            width = config.width - 20,
+            height = 20,
+            anchor = {
+                point = "TOPLEFT",
+                relative = commentFrame,
+                relativePoint = "BOTTOMLEFT",
+                x = 0,
+                y = -10
+            },
+            limit = 128,
+            multiLine = false
+        })
+        GUI.SetBackground(input, GUI.Theme.Black, GUI.Theme.White)
+
+        config._confirm = function()
+            local text = input:GetText()
+            text = string.gsub(text, ":", "：")
+            config.confirm(text, MEETING_DB.role)
+        end
+
+        return frame
+    end
+
+
+    return GUI.CreateDialog(config)
+end
+
+function GUI.CreateCheck(config)
+    config.frameType = "CheckButton"
+    local c = CreateFrame("CheckButton", config.name, config.parent, "UICheckButtonTemplate")
+    c:SetWidth(config.width or 20)
+    c:SetHeight(config.height or 20)
+    if config.anchor then
+        c:SetPoint(config.anchor.point, config.anchor.relative, config.anchor.relativePoint, config.anchor.x or 0,
+            config.anchor.y or 0)
+    end
+    c:SetScript("OnClick", function()
+        if config.click then
+            config.click(this:GetChecked())
+        end
+    end)
+    if config.checked then
+        c:SetChecked(true)
+    else
+        c:SetChecked(false)
+    end
+    return c
 end

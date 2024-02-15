@@ -27,7 +27,7 @@ function Message.OnRecv(playerName, data)
     if event == EVENTS.CREATE then
         Meeting:OnCreate(playerName, arg1, arg2, arg3, arg4, arg5, arg6)
     elseif event == EVENTS.REQUEST then
-        Meeting:OnRequest(playerName, arg1, arg2, arg3, arg4, arg5)
+        Meeting:OnRequest(playerName, arg1, arg2, arg3, arg4, arg5, arg6)
     elseif event == EVENTS.DECLINE then
         Meeting:OnDecline(playerName, arg1)
     elseif event == EVENTS.MEMBERS then
@@ -60,9 +60,10 @@ function Message.CreateActivity(category, comment)
     Message.Send(EVENTS.CREATE, data)
 end
 
-function Message.Request(id, comment)
-    local data = string.format("%s:%d:%d:%d:%s", id, UnitLevel("player"),
-        Meeting.ClassToNumber(Meeting.playerClass), Meeting.GetPlayerScore(), string.isempty(comment) and "_" or comment)
+function Message.Request(id, comment, role)
+    local data = string.format("%s:%d:%d:%d:%s:%d", id, UnitLevel("player"),
+        Meeting.ClassToNumber(Meeting.playerClass), Meeting.GetPlayerScore(), string.isempty(comment) and "_" or comment,
+        role)
     Message.Send(EVENTS.REQUEST, data)
 end
 

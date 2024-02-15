@@ -446,7 +446,7 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
                 y = 2
             },
             click = function()
-                local frame = Meeting.GUI.CreatePrompt({
+                local frame = Meeting.GUI.CreateRequestPrompt({
                     parent = Meeting.BrowserFrame,
                     anchor = {
                         point = "CENTER",
@@ -455,9 +455,9 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
                         x = 0,
                         y = 0
                     },
-                    title = "申请加入说明：",
-                    confirm = function(text)
-                        Meeting.Message.Request(f.id, text)
+                    title = "申请加入" .. f.category,
+                    confirm = function(text, role)
+                        Meeting.Message.Request(f.id, text, role)
                         local activity = Meeting:FindActivity(f.id)
                         activity.applicantStatus = Meeting.APPLICANT_STATUS.Invited
                         Meeting.BrowserFrame:UpdateActivity(activity)

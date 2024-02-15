@@ -440,3 +440,26 @@ function Meeting.GetPlayerScore()
     end
     return 0
 end
+
+local Role = {
+    Tank = bit.lshift(1, 1),
+    Healer = bit.lshift(1, 2),
+    Damage = bit.lshift(1, 3)
+}
+Meeting.Role = Role
+
+local classRoleMap = {
+    ["WARLOCK"] = Role.Damage,
+    ["HUNTER"] = Role.Damage,
+    ["PRIEST"] = bit.bor(Role.Healer, Role.Damage),
+    ["PALADIN"] = bit.bor(Role.Tank, Role.Healer, Role.Damage),
+    ["MAGE"] = Role.Damage,
+    ["ROGUE"] = Role.Damage,
+    ["DRUID"] = bit.bor(Role.Tank, Role.Healer, Role.Damage),
+    ["SHAMAN"] = bit.bor(Role.Healer, Role.Damage),
+    ["WARRIOR"] = bit.bor(Role.Tank, Role.Damage),
+}
+
+function Meeting.GetClassRole(class)
+    return classRoleMap[class]
+end

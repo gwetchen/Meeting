@@ -228,6 +228,19 @@ local levelText = Meeting.GUI.CreateText({
     }
 })
 
+local roleText = Meeting.GUI.CreateText({
+    parent = applicantListHeaderFrame,
+    text = "职责",
+    fontSize = 14,
+    width = 40,
+    height = 24,
+    anchor = {
+        point = "TOPLEFT",
+        relative = levelText,
+        relativePoint = "TOPRIGHT",
+    }
+})
+
 local scoreText = Meeting.GUI.CreateText({
     parent = applicantListHeaderFrame,
     text = "装等",
@@ -236,7 +249,7 @@ local scoreText = Meeting.GUI.CreateText({
     height = 24,
     anchor = {
         point = "TOPLEFT",
-        relative = levelText,
+        relative = roleText,
         relativePoint = "TOPRIGHT",
 
     }
@@ -246,7 +259,7 @@ local commentText = Meeting.GUI.CreateText({
     parent = applicantListHeaderFrame,
     text = "说明",
     fontSize = 14,
-    width = 290,
+    width = 250,
     height = 24,
     anchor = {
         point = "TOPLEFT",
@@ -344,6 +357,37 @@ local applicantListFrame = Meeting.GUI.CreateListFrame({
             }
         })
 
+        f.roleFrame = Meeting.GUI.CreateFrame({
+            parent = f,
+            width = 40,
+            height = 24,
+            anchor = {
+                point = "TOPLEFT",
+                relative = f.levelFrame,
+                relativePoint = "TOPRIGHT",
+                x = 0,
+                y = 0
+            }
+        })
+
+        local tank = f:CreateTexture()
+        tank:SetTexture("Interface\\AddOns\\Meeting\\assets\\tank.blp")
+        tank:SetWidth(11)
+        tank:SetHeight(11)
+        f.roleFrame.tank = tank
+
+        local healer = f:CreateTexture()
+        healer:SetTexture("Interface\\AddOns\\Meeting\\assets\\healer.blp")
+        healer:SetWidth(11)
+        healer:SetHeight(11)
+        f.roleFrame.healer = healer
+
+        local damage = f:CreateTexture()
+        damage:SetTexture("Interface\\AddOns\\Meeting\\assets\\damage.blp")
+        damage:SetWidth(11)
+        damage:SetHeight(11)
+        f.roleFrame.damage = damage
+
         f.scoreFrame = Meeting.GUI.CreateText({
             parent = f,
             text = "",
@@ -351,7 +395,7 @@ local applicantListFrame = Meeting.GUI.CreateListFrame({
             width = 40,
             anchor = {
                 point = "TOPLEFT",
-                relative = f.levelFrame,
+                relative = f.roleFrame,
                 relativePoint = "TOPRIGHT",
                 x = 0,
                 y = 0
@@ -362,7 +406,7 @@ local applicantListFrame = Meeting.GUI.CreateListFrame({
             parent = f,
             text = "",
             fontSize = 14,
-            width = 290,
+            width = 250,
             height = 24,
             anchor = {
                 point = "TOPLEFT",
@@ -444,6 +488,36 @@ function Meeting.CreatorFrame:UpdateList()
         frame.levelFrame:SetText(applicant.level)
         frame.scoreFrame:SetText(applicant.score == 0 and "-" or applicant.score)
         frame.commentFrame:SetText(applicant.comment ~= "_" and applicant.comment or "")
+
+        frame.roleFrame.tank:Hide()
+        frame.roleFrame.healer:Hide()
+        frame.roleFrame.damage:Hide()
+
+        if applicant.role ~= 0 then
+            local prev = nil
+            if bit.band(applicant.role, Meeting.Role.Tank) == Meeting.Role.Tank then
+                prev = frame.roleFrame.tank
+                frame.roleFrame.tank:SetPoint("TOPLEFT", frame.roleFrame, "TOPLEFT", 0, 0)
+                frame.roleFrame.tank:Show()
+            end
+            if bit.band(applicant.role, Meeting.Role.Healer) == Meeting.Role.Healer then
+                if prev then
+                    frame.roleFrame.healer:SetPoint("TOPLEFT", prev, "TOPRIGHT", 1, 0)
+                else
+                    frame.roleFrame.healer:SetPoint("TOPLEFT", frame.roleFrame, "TOPLEFT", 0, 0)
+                end
+                prev = frame.roleFrame.healer
+                frame.roleFrame.healer:Show()
+            end
+            if bit.band(applicant.role, Meeting.Role.Damage) == Meeting.Role.Damage then
+                if prev then
+                    frame.roleFrame.damage:SetPoint("TOPLEFT", prev, "TOPRIGHT", 1, 0)
+                else
+                    frame.roleFrame.damage:SetPoint("TOPLEFT", frame.roleFrame, "TOPLEFT", 0, 0)
+                end
+                frame.roleFrame.damage:Show()
+            end
+        end
 
         if applicant.status == Meeting.APPLICANT_STATUS.Accepted then
             frame.acceptButton:SetText("已同意")

@@ -323,7 +323,7 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc)
     Meeting.BrowserFrame:UpdateList()
 end
 
-function Meeting:OnRequest(name, id, level, class, score, comment)
+function Meeting:OnRequest(name, id, level, class, score, comment, role)
     local activity = Meeting:FindActivity(id)
     if activity and activity.unitname == Meeting.player then
         local i = -1
@@ -339,6 +339,7 @@ function Meeting:OnRequest(name, id, level, class, score, comment)
             applicant.score = tonumber(score)
             applicant.comment = comment
             applicant.status = Meeting.APPLICANT_STATUS.None
+            applicant.role = role and tonumber(role) or 0
         else
             local applicant = {
                 name = name,
@@ -346,7 +347,8 @@ function Meeting:OnRequest(name, id, level, class, score, comment)
                 class = Meeting.NumberToClass(tonumber(class)),
                 score = tonumber(score),
                 comment = comment,
-                status = Meeting.APPLICANT_STATUS.None
+                status = Meeting.APPLICANT_STATUS.None,
+                role = role and tonumber(role) or 0
             }
             table.insert(activity.applicantList, applicant)
         end
