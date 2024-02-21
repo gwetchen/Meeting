@@ -61,7 +61,8 @@ end
 distinct = nil
 
 function Message.OnRecvFormChat(playerName, message)
-    if Meeting:FindActivity(playerName) then
+    local activity = Meeting:FindActivity(playerName)
+    if activity and activity.category ~= "WORLD" then
         return
     end
 
