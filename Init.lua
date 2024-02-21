@@ -20,6 +20,7 @@ Meeting = {
 
     playerIsHC = false,
 
+    channel = "LFT",
 }
 
 local classNameMap = {
@@ -56,14 +57,14 @@ end
 
 function Meeting.GetClassRGBColor(class, unitname)
     local rgb = RAID_CLASS_COLORS[class]
-    if not rgb then
+    if not class or not rgb then
         if SCCN_storage then
             local cache = SCCN_storage[unitname]
             if cache then
                 return Meeting.GetClassRGBColor(Meeting.NumberToClass(cache.c))
             end
         end
-        rgb = { r = 1, g = 1, b = 1 }
+        rgb = RAID_CLASS_COLORS[nil]
     end
     return rgb
 end
@@ -81,38 +82,45 @@ Meeting.Categories = {
             },
             {
                 key = "WC",
-                name = "哀号洞穴",
+                name = "哀嚎洞穴",
                 minLevel = 17,
+                match = { "哀嚎" }
             },
             {
                 key = "DM",
                 name = "死亡矿井",
                 minLevel = 17,
+                match = { "死矿" }
             },
             {
                 key = "SFK",
                 name = "影牙城堡",
                 minLevel = 22,
+                match = { "影牙" }
             },
             {
                 key = "STOCKS",
                 name = "暴风城：监狱",
                 minLevel = 22,
+                match = { "监狱" }
             },
             {
                 key = "BFD",
                 name = "黑暗深渊",
                 minLevel = 23,
+                match = { "黑暗深渊" }
             },
             {
                 key = "SMGY",
                 name = "血色修道院墓地",
                 minLevel = 27,
+                match = { "血色" }
             },
             {
                 key = "SMLIB",
                 name = "血色修道院图书馆",
                 minLevel = 28,
+                match = { "血色" }
             },
             {
                 key = "GNOMER",
@@ -133,21 +141,25 @@ Meeting.Categories = {
                 key = "SMARMORY",
                 name = "血色修道院军械库",
                 minLevel = 32,
+                match = { "血色" }
             },
             {
                 key = "SMCATH",
                 name = "血色修道院大教堂",
                 minLevel = 35,
+                match = { "血色" }
             },
             {
                 key = "RFD",
                 name = "剃刀高地",
                 minLevel = 36,
+                match = { "剃刀" }
             },
             {
                 key = "ULDA",
                 name = "奥达曼",
                 minLevel = 40,
+                match = { "奥达曼" }
             },
             {
                 key = "GILNEAS",
@@ -158,11 +170,13 @@ Meeting.Categories = {
                 key = "ZF",
                 name = "祖尔法拉克",
                 minLevel = 44,
+                match = { "祖尔", "zul" }
             },
             {
                 key = "MARA",
                 name = "玛拉顿",
                 minLevel = 45,
+                match = { "玛拉顿" }
             },
             {
                 key = "ST",
@@ -184,48 +198,58 @@ Meeting.Categories = {
                 name = "黑石塔上层",
                 minLevel = 55,
                 members = 10,
+                match = { "黑上" }
             },
             {
                 key = "LBRS",
                 name = "黑石塔下层",
                 minLevel = 55,
+                match = { "黑下" }
+
             },
             {
                 key = "DME",
                 name = "厄运之槌：东",
                 minLevel = 55,
+                match = { "厄运东" }
             },
             {
                 key = "DMN",
                 name = "厄运之槌：北",
                 minLevel = 57,
+                match = { "厄运北" }
             },
             {
                 key = "DMW",
                 name = "厄运之槌：西",
                 minLevel = 57,
+                match = { "厄运西" }
             },
             {
                 key = "SCHOLO",
                 name = "通灵学院",
                 minLevel = 58,
                 members = 10,
+                match = { "通灵", "tl" }
             },
             {
                 key = "STRAT",
                 name = "斯坦索姆",
                 minLevel = 58,
                 members = 10,
+                match = { "stsm" }
             },
             {
                 key = "KC",
                 name = "卡拉赞地穴",
                 minLevel = 58,
+                match = { "卡拉赞", "klz" }
             },
             {
                 key = "COTBM",
                 name = "时间之穴：黑色沼泽",
                 minLevel = 60,
+                match = { "时光" }
             },
             {
                 key = "SWV",
@@ -243,44 +267,52 @@ Meeting.Categories = {
                 key = "MC",
                 name = "熔火之心",
                 minLevel = 60,
+                match = { "mc" }
             },
             {
                 key = "ONY",
                 name = "奥妮克希亚的巢穴",
                 minLevel = 60,
+                match = { "黑龙" }
             },
             {
                 key = "BWL",
                 name = "黑翼之巢",
                 minLevel = 60,
+                match = { "黑翼", "bwl" }
             },
             {
                 key = "AQ40",
                 name = "安其拉神殿",
                 minLevel = 60,
+                match = { "安其拉", "taq" }
             },
             {
                 key = "NAXX",
                 name = "纳克萨玛斯",
                 minLevel = 60,
+                match = { "naxx" }
             },
             {
                 key = "ZUG",
                 name = "祖尔格拉布",
                 minLevel = 60,
                 members = 20,
+                match = { "祖格", "zug", "zg" }
             },
             {
                 key = "AQ20",
                 name = "安其拉废墟",
                 minLevel = 60,
                 members = 20,
+                match = { "废墟" }
             },
             {
                 key = "LKH",
                 name = "卡拉赞下层",
                 minLevel = 60,
                 members = 10,
+                match = { "卡拉赞", "klz" }
             },
             {
                 key = "ES",
@@ -347,10 +379,27 @@ Meeting.Categories = {
         members = 40,
         children = {
             {
+                key = "QUEST",
+                name = "任务",
+                minLevel = 1,
+            },
+            {
                 key = "OTHER",
                 name = "其它",
                 minLevel = 1,
-                members = 40
+            },
+        }
+    },
+    {
+        key = "CHAT",
+        name = "频道",
+        members = 40,
+        hide = true,
+        children = {
+            {
+                key = "WORLD",
+                name = "世界频道",
+                minLevel = 1,
             },
         }
     }

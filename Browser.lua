@@ -89,57 +89,59 @@ local options = {
                 Meeting.searchInfo.category = ""
                 Menu:Close()
                 MeetingBworserSelectButton:SetText("选择活动")
-                Meeting.BrowserFrame:UpdateList()
+                Meeting.BrowserFrame:UpdateList(true)
             end,
         }
     },
 }
 
 for i, value in ipairs(Meeting.Categories) do
-    local k = value.key
-    local name = value.name
-    local children = {
-        ALL = {
-            order = 1,
-            type = "toggle",
-            name = "全部",
-            desc = "全部",
-            get = function() return Meeting.searchInfo.parent == k and Meeting.searchInfo.category == "" end,
-            set = function()
-                Meeting.searchInfo.parent = k
-                Meeting.searchInfo.category = ""
-                Menu:Close()
-                MeetingBworserSelectButton:SetText("全部" .. name)
-                Meeting.BrowserFrame:UpdateList()
-            end,
+    if not value.hide then
+        local k = value.key
+        local name = value.name
+        local children = {
+            ALL = {
+                order = 1,
+                type = "toggle",
+                name = "全部",
+                desc = "全部",
+                get = function() return Meeting.searchInfo.parent == k and Meeting.searchInfo.category == "" end,
+                set = function()
+                    Meeting.searchInfo.parent = k
+                    Meeting.searchInfo.category = ""
+                    Menu:Close()
+                    MeetingBworserSelectButton:SetText("全部" .. name)
+                    Meeting.BrowserFrame:UpdateList(true)
+                end,
+            }
         }
-    }
 
-    for j, child in ipairs(value.children) do
-        local k = child.key
-        local name = child.name
-        children[k] = {
-            order = j + 1,
-            type = "toggle",
-            name = name,
-            desc = name,
-            get = function() return Meeting.searchInfo.category == k end,
-            set = function()
-                Meeting.searchInfo.category = k
-                Menu:Close()
-                MeetingBworserSelectButton:SetText(name)
-                Meeting.BrowserFrame:UpdateList()
-            end,
+        for j, child in ipairs(value.children) do
+            local k = child.key
+            local name = child.name
+            children[k] = {
+                order = j + 1,
+                type = "toggle",
+                name = name,
+                desc = name,
+                get = function() return Meeting.searchInfo.category == k end,
+                set = function()
+                    Meeting.searchInfo.category = k
+                    Menu:Close()
+                    MeetingBworserSelectButton:SetText(name)
+                    Meeting.BrowserFrame:UpdateList(true)
+                end,
+            }
+        end
+
+        options.args[value.key] = {
+            order = i + 1,
+            type = 'group',
+            name = value.name,
+            desc = value.name,
+            args = children,
         }
     end
-
-    options.args[value.key] = {
-        order = i + 1,
-        type = 'group',
-        name = value.name,
-        desc = value.name,
-        args = children,
-    }
 end
 
 local selectButton = Meeting.GUI.CreateButton({
@@ -323,10 +325,12 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
                 GameTooltip:SetText(this.category, 1, 1, 1, 1)
                 GameTooltip:AddLine(this.leader, this.classColor.r, this.classColor.g, this.classColor.b, 1)
 
-                local color = GetDifficultyColor(this.level)
-                GameTooltip:AddLine(
-                    format('%s |cff%02x%02x%02x%s|r', LEVEL, color.r * 255, color.g * 255, color.b * 255,
-                        this.level), 1, 1, 1)
+                if this.level > 0 then
+                    local color = GetDifficultyColor(this.level)
+                    GameTooltip:AddLine(
+                        format('%s |cff%02x%02x%02x%s|r', LEVEL, color.r * 255, color.g * 255, color.b * 255,
+                            this.level), 1, 1, 1)
+                end
 
                 if this.comment ~= "_" then
                     GameTooltip:AddLine(this.comment, 0.75, 0.75, 0.75, 1)
@@ -446,25 +450,29 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
                 y = 2
             },
             click = function()
-                local frame = Meeting.GUI.CreateRequestPrompt({
-                    parent = Meeting.BrowserFrame,
-                    anchor = {
-                        point = "CENTER",
-                        relative = Meeting.BrowserFrame,
-                        relativePoint = "CENTER",
-                        x = 0,
-                        y = 0
-                    },
-                    title = "申请加入" .. f.category,
-                    confirm = function(text, role)
-                        Meeting.Message.Request(f.id, text, role)
-                        local activity = Meeting:FindActivity(f.id)
-                        activity.applicantStatus = Meeting.APPLICANT_STATUS.Invited
-                        Meeting.BrowserFrame:UpdateActivity(activity)
-                        f.requestButton:Disable()
-                    end
-                })
-                frame:SetPoint("TOP", Meeting.BrowserFrame, "TOP", 0, -50)
+                if f.isChat then
+                    ChatFrame_OpenChat("/w " .. f.leader, SELECTED_DOCK_FRAME or DEFAULT_CHAT_FRAME)
+                else
+                    local frame = Meeting.GUI.CreateRequestPrompt({
+                        parent = Meeting.BrowserFrame,
+                        anchor = {
+                            point = "CENTER",
+                            relative = Meeting.BrowserFrame,
+                            relativePoint = "CENTER",
+                            x = 0,
+                            y = 0
+                        },
+                        title = "申请加入" .. f.category,
+                        confirm = function(text, role)
+                            Meeting.Message.Request(f.id, text, role)
+                            local activity = Meeting:FindActivity(f.id)
+                            activity.applicantStatus = Meeting.APPLICANT_STATUS.Invited
+                            Meeting.BrowserFrame:UpdateActivity(activity)
+                            f.requestButton:Disable()
+                        end
+                    })
+                    frame:SetPoint("TOP", Meeting.BrowserFrame, "TOP", 0, -50)
+                end
             end
         })
     end
@@ -478,7 +486,13 @@ local function ReloadCell(frame, activity)
     frame.leaderFrame:SetText(activity.unitname)
     frame.leaderFrame:SetTextColor(rgb.r, rgb.g, rgb.b)
     local maxMambers = Meeting.GetActivityMaxMembers(activity.category)
-    frame.membersFrame:SetText(activity.members .. "/" .. maxMambers)
+    local isChat = activity.category == "WORLD"
+    if isChat then
+        frame.membersFrame:SetText("-")
+    else
+        frame.membersFrame:SetText(activity.members .. "/" .. maxMambers)
+    end
+
     frame.commentFrame:SetText(activity.comment ~= "_" and activity.comment or "")
 
     if activity.unitname == Meeting.player or Meeting:IsInActivity(activity.unitname) then
@@ -513,13 +527,18 @@ local function ReloadCell(frame, activity)
                 frame.requestButton:SetText("满员")
             else
                 frame.requestButton:Enable()
-                frame.requestButton:SetText("申请")
+                if isChat then
+                    frame.requestButton:SetText("密语")
+                else
+                    frame.requestButton:SetText("申请")
+                end
             end
         end
     end
 
     frame.id = activity.unitname
     frame.category = category.name
+    frame.isChat = isChat
     frame.leader = activity.unitname
     frame.classColor = rgb
     frame.level = activity.level
@@ -528,25 +547,48 @@ end
 
 local activities = {}
 
-function Meeting.BrowserFrame:UpdateList(force)
+function Meeting.BrowserFrame:UpdateList(force, scroll)
     if not Meeting.BrowserFrame:IsShown() then
         return
     end
 
-    if not force then
-        local isHover = MouseIsOver(Meeting.BrowserFrame)
-        if isHover then
-            Meeting.GUI.SetBackground(refreshButton, Meeting.GUI.Theme.Red)
-            return
+    if not scroll then
+        if not force then
+            if Meeting.isHover then
+                Meeting.GUI.SetBackground(refreshButton, Meeting.GUI.Theme.Red)
+                return
+            end
         end
-    end
-    Meeting.GUI.SetBackground(refreshButton, Meeting.GUI.Theme.Green)
+        Meeting.GUI.SetBackground(refreshButton, Meeting.GUI.Theme.Green)
 
-    activities = {}
-    for i, activity in ipairs(Meeting.activities) do
-        if Meeting.searchInfo.parent == "" or Meeting.searchInfo.parent == activity.parent then
-            if Meeting.searchInfo.category == "" or Meeting.searchInfo.category == activity.category then
-                table.insert(activities, activity)
+        activities = {}
+
+        local function search(activity)
+            if Meeting.searchInfo.parent == "" or Meeting.searchInfo.parent == activity.parent then
+                if Meeting.searchInfo.category == "" or Meeting.searchInfo.category == activity.category then
+                    table.insert(activities, activity)
+                end
+            end
+        end
+
+        for _, activity in ipairs(Meeting.activities) do
+            if activity.category == "WORLD" then
+                if Meeting.searchInfo.category ~= "" then
+                    local lower = string.lower(activity.comment)
+                    local category = Meeting.FindCaregoryByCode(Meeting.searchInfo.category)
+                    if category.match then
+                        for _, v in ipairs(category.match) do
+                            if string.find(lower, v) then
+                                table.insert(activities, activity)
+                                break
+                            end
+                        end
+                    end
+                else
+                    search(activity)
+                end
+            else
+                search(activity)
             end
         end
     end

@@ -51,33 +51,35 @@ local options = {
 }
 
 for i, value in ipairs(Meeting.Categories) do
-    local children = {}
+    if not value.hide then
+        local children = {}
 
-    for j, child in ipairs(value.children) do
-        local k = child.key
-        local name = child.name
-        children[k] = {
-            order = j,
-            type = "toggle",
-            name = name,
-            desc = name,
-            get = function() return Meeting.createInfo.category == k end,
-            set = function()
-                Meeting.createInfo.category = k
-                MeetingCreatorSelectButton:SetText(name)
-                Menu:Close()
-                Meeting.CreatorFrame.UpdateActivity()
-            end,
+        for j, child in ipairs(value.children) do
+            local k = child.key
+            local name = child.name
+            children[k] = {
+                order = j,
+                type = "toggle",
+                name = name,
+                desc = name,
+                get = function() return Meeting.createInfo.category == k end,
+                set = function()
+                    Meeting.createInfo.category = k
+                    MeetingCreatorSelectButton:SetText(name)
+                    Menu:Close()
+                    Meeting.CreatorFrame.UpdateActivity()
+                end,
+            }
+        end
+
+        options.args[value.key] = {
+            order = i,
+            type = 'group',
+            name = value.name,
+            desc = value.name,
+            args = children,
         }
     end
-
-    options.args[value.key] = {
-        order = i,
-        type = 'group',
-        name = value.name,
-        desc = value.name,
-        args = children,
-    }
 end
 
 local selectButton = Meeting.GUI.CreateButton({
@@ -281,10 +283,8 @@ local actionText = Meeting.GUI.CreateText({
     }
 })
 
-
-
 local applicantListFrame = Meeting.GUI.CreateListFrame({
-    name = "MeetingActivityListFrame",
+    name = "MeetingApplicantListFrame",
     parent = creatorFrame,
     width = 504,
     height = 336,

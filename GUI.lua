@@ -198,7 +198,7 @@ function GUI.CreateListFrame(config)
     end
     frame:SetScript("OnVerticalScroll", function()
         FauxScrollFrame_OnVerticalScroll(config.step, function()
-            this.OnScroll(true)
+            this.OnScroll(this, true, true)
         end)
     end)
     frame.Reload = function(self, num, cb)
@@ -278,7 +278,7 @@ function GUI.CreateDialog(config)
     if Meeting.GUI.currentDialog then
         Meeting.GUI.currentDialog:Hide()
     end
-    
+
     config.width = config.width or 300
     config.height = config.height or 75
     local parent = GUI.CreateFrame(config)

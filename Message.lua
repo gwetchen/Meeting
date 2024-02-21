@@ -37,12 +37,49 @@ function Message.OnRecv(playerName, data)
     end
 end
 
+local matchText = {}
+for _, parent in ipairs(Meeting.Categories) do
+    for _, value in ipairs(parent.children) do
+        if value.match then
+            for _, match in ipairs(value.match) do
+                table.insert(matchText, match)
+            end
+        end
+    end
+end
+
+local distinct = {}
+for _, v in ipairs(matchText) do
+    if not distinct[v] then
+        distinct[v] = true
+    end
+end
+matchText = {}
+for k, _ in pairs(distinct) do
+    table.insert(matchText, k)
+end
+distinct = nil
+
+function Message.OnRecvFormChat(playerName, message)
+    if Meeting:FindActivity(playerName) then
+        return
+    end
+
+    local lowerMessage = string.lower(message)
+    for _, v in ipairs(matchText) do
+        if string.find(lowerMessage, v) then
+            Meeting:OnCreate(playerName, "WORLD", message, "0", "0", "0", "0")
+            return
+        end
+    end
+end
+
 function Message.Send(event, msg)
-    local channel = GetChannelName("LFT")
+    local channel = GetChannelName(Meeting.channel)
     if channel ~= 0 then
         SendChatMessage("Meeting:" .. event .. ":" .. msg, "CHANNEL", nil, channel)
     else
-        print("LFT频道不存在，请先加入LFT频道")
+        print("请先加入" .. Meeting.channel .. "频道")
     end
 end
 

@@ -13,8 +13,10 @@ f:SetScript("OnEvent", function()
         if source then
             _, name = GetChannelName(source)
         end
-        if name == "LFT" and string.startswith(arg1, "Meeting:") then
+        if name == Meeting.channel and string.startswith(arg1, "Meeting:") then
             Meeting.Message.OnRecv(arg2, arg1)
+        elseif name == "World" then
+            Meeting.Message.OnRecvFormChat(arg2, arg1)
         end
     elseif event == "CHAT_MSG_HARDCORE" then
         Meeting.playerIsHC = true
@@ -93,7 +95,7 @@ f:SetScript("OnEvent", function()
     end
 end)
 
-local hoverState = false
+Meeting.isHover = false
 f:SetScript("OnUpdate", function()
     if not Meeting.MainFrame:IsShown() or not Meeting.BrowserFrame:IsShown() then
         return
@@ -105,12 +107,12 @@ f:SetScript("OnUpdate", function()
     local l = Meeting.MainFrame:GetLeft() * scale
     local r = Meeting.MainFrame:GetRight() * scale
     local cur = x >= l and x <= r and y >= b and y <= t
-    if cur ~= hoverState then
+    if cur ~= Meeting.isHover then
+        Meeting.isHover = cur
         if not cur then
             Meeting.BrowserFrame:UpdateList()
         end
     end
-    hoverState = cur
 end)
 
 function Meeting.CheckPlayerHCMode()
@@ -314,7 +316,7 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc)
             members = tonumber(members),
             isHC = hc == "1",
             updated = time(),
-            applicantList = {}
+            applicantList = {},
         })
     end
 
@@ -412,13 +414,13 @@ end
 function Meeting.CheckLFTChannel()
     local i = -1
     for index, value in ipairs({ GetChannelList() }) do
-        if value == "LFT" then
+        if value == Meeting.channel then
             i = index
             break
         end
     end
     if i == -1 then
-        JoinChannelByName("LFT")
+        JoinChannelByName(Meeting.channel)
     end
 end
 
