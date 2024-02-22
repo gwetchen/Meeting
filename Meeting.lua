@@ -15,7 +15,7 @@ f:SetScript("OnEvent", function()
         end
         if name == Meeting.channel and string.startswith(arg1, "Meeting:") then
             Meeting.Message.OnRecv(arg2, arg1)
-        elseif name == "World" then
+        elseif string.lower(name) == "world" then
             Meeting.Message.OnRecvFormChat(arg2, arg1)
         end
     elseif event == "CHAT_MSG_HARDCORE" then
