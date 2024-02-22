@@ -79,6 +79,7 @@ Meeting.Categories = {
                 key = "RFC",
                 name = "怒焰裂谷",
                 minLevel = 13,
+                match = { "怒焰" }
             },
             {
                 key = "WC",
@@ -249,7 +250,7 @@ Meeting.Categories = {
                 key = "COTBM",
                 name = "时间之穴：黑色沼泽",
                 minLevel = 60,
-                match = { "时光" }
+                match = { "时光", "沼泽" }
             },
             {
                 key = "SWV",
@@ -305,7 +306,7 @@ Meeting.Categories = {
                 name = "安其拉废墟",
                 minLevel = 60,
                 members = 20,
-                match = { "废墟" }
+                match = { "废墟", "fx" }
             },
             {
                 key = "LKH",
