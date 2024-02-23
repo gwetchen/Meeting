@@ -10,13 +10,16 @@ f:RegisterEvent("RAID_ROSTER_UPDATE")
 f:SetScript("OnEvent", function()
     if event == "CHAT_MSG_CHANNEL" then
         local _, _, source = string.find(arg4, "(%d+)%.")
+        local name = nil
         if source then
             _, name = GetChannelName(source)
         end
-        if name == Meeting.channel and string.startswith(arg1, "Meeting:") then
-            Meeting.Message.OnRecv(arg2, arg1)
-        elseif string.lower(name) == "world" then
-            Meeting.Message.OnRecvFormChat(arg2, arg1)
+        if name then
+            if name == Meeting.channel and string.startswith(arg1, "Meeting:") then
+                Meeting.Message.OnRecv(arg2, arg1)
+            elseif string.lower(name) == "world" then
+                Meeting.Message.OnRecvFormChat(arg2, arg1)
+            end
         end
     elseif event == "CHAT_MSG_HARDCORE" then
         Meeting.playerIsHC = true
