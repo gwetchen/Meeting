@@ -486,7 +486,7 @@ local function ReloadCell(frame, activity)
     frame.leaderFrame:SetText(activity.unitname)
     frame.leaderFrame:SetTextColor(rgb.r, rgb.g, rgb.b)
     local maxMambers = Meeting.GetActivityMaxMembers(activity.category)
-    local isChat = activity.category == "WORLD"
+    local isChat = activity:IsChat()
     if isChat then
         frame.membersFrame:SetText("-")
     else
@@ -572,7 +572,7 @@ function Meeting.BrowserFrame:UpdateList(force, scroll)
         end
 
         for _, activity in ipairs(Meeting.activities) do
-            if activity.category == "WORLD" then
+            if activity:IsChat() then
                 if Meeting.searchInfo.category ~= "" then
                     local lower = string.lower(activity.comment)
                     local category = Meeting.FindCaregoryByCode(Meeting.searchInfo.category)

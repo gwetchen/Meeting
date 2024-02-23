@@ -44,12 +44,14 @@ f:SetScript("OnEvent", function()
                 end
             end
 
-            local members = Meeting:GetMembers()
-            activity.members = members
-            Meeting.Message.SyncMembers(members)
-            Meeting.CreatorFrame:UpdateList()
-            if members >= Meeting.GetActivityMaxMembers(activity.category) then
-                Meeting.Message.CloseActivity()
+            if not activity:IsChat() then
+                local members = Meeting:GetMembers()
+                activity.members = members
+                Meeting.Message.SyncMembers(members)
+                Meeting.CreatorFrame:UpdateList()
+                if members >= Meeting.GetActivityMaxMembers(activity.category) then
+                    Meeting.Message.CloseActivity()
+                end
             end
         end
 
@@ -320,6 +322,9 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc)
             isHC = hc == "1",
             updated = time(),
             applicantList = {},
+            IsChat = function(self)
+                return self.parent == "CHAT"
+            end
         })
     end
 
