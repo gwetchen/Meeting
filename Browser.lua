@@ -522,16 +522,15 @@ local function ReloadCell(frame, activity)
         else
             frame.statusFrame:Hide()
             frame.requestButton:Show()
-            if activity.members >= maxMambers then
+            if isChat then
+                frame.requestButton:Enable()
+                frame.requestButton:SetText("密语")
+            elseif activity.members >= maxMambers then
                 frame.requestButton:Disable()
                 frame.requestButton:SetText("满员")
             else
                 frame.requestButton:Enable()
-                if isChat then
-                    frame.requestButton:SetText("密语")
-                else
-                    frame.requestButton:SetText("申请")
-                end
+                frame.requestButton:SetText("申请")
             end
         end
     end

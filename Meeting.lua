@@ -434,11 +434,25 @@ end
 
 C_Timer.NewTicker(5, function()
     local now = time()
+    local update = false
     for index, activity in ipairs(Meeting.activities) do
-        if activity.unitname ~= Meeting.player and activity.updated + 180 < now then
-            table.remove(Meeting.activities, index)
-            Meeting.BrowserFrame:UpdateList()
-            Meeting.FloatFrame.Update()
+        if activity.unitname ~= Meeting.player then
+            local rm = false
+            if activity:IsChat() then
+                rm = activity.updated + 60 < now
+            else
+                rm = activity.updated + 120 < now
+            end
+            
+            if rm then
+                update = true
+                table.remove(Meeting.activities, index)
+            end
         end
+    end
+
+    if update then
+        Meeting.BrowserFrame:UpdateList()
+        Meeting.FloatFrame.Update()
     end
 end)
