@@ -23,15 +23,15 @@ local function stringsplit(str, delimiter)
 end
 
 function Message.OnRecv(playerName, data)
-    local _, event, arg1, arg2, arg3, arg4, arg5, arg6 = stringsplit(data, ":")
+    local _, event, arg1, arg2, arg3, arg4, arg5, arg6, arg7 = stringsplit(data, ":")
     if event == EVENTS.CREATE then
-        Meeting:OnCreate(playerName, arg1, arg2, arg3, arg4, arg5, arg6)
+        Meeting:OnCreate(playerName, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
     elseif event == EVENTS.REQUEST then
         Meeting:OnRequest(playerName, arg1, arg2, arg3, arg4, arg5, arg6)
     elseif event == EVENTS.DECLINE then
         Meeting:OnDecline(playerName, arg1)
     elseif event == EVENTS.MEMBERS then
-        Meeting:OnMembers(playerName, arg1)
+        Meeting:OnMembers(playerName, arg1, arg2)
     elseif event == EVENTS.CLOSE then
         Meeting:OnClose(playerName)
     end
@@ -89,10 +89,10 @@ function Message.Send(event, msg)
 end
 
 function Message.CreateActivity(category, comment)
-    local data = string.format("%s:%s:%d:%d:%d:%d", category,
+    local data = string.format("%s:%s:%d:%d:%d:%d:%s", category,
         string.isempty(comment) and "_" or comment, UnitLevel("player"),
         Meeting.ClassToNumber(Meeting.playerClass),
-        Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0)
+        Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0, Meeting.EncodeGroupClass())
     MEETING_DB.activity = {
         category = category,
         comment = comment,
@@ -114,7 +114,7 @@ function Message.Decline(name)
 end
 
 function Message.SyncMembers(members)
-    Message.Send(EVENTS.MEMBERS, string.format("%d", members))
+    Message.Send(EVENTS.MEMBERS, string.format("%d:%s", members, Meeting.EncodeGroupClass()))
 end
 
 function Message.CloseActivity()

@@ -47,6 +47,18 @@ local classNumberMap = {
     ["WARRIOR"] = 9,
 }
 
+local classChineseNameMap = {
+    [1] = "术士",
+    [2] = "猎人",
+    [3] = "牧师",
+    [4] = "圣骑士",
+    [5] = "法师",
+    [6] = "盗贼",
+    [7] = "德鲁伊",
+    [8] = "萨满",
+    [9] = "战士",
+}
+
 function Meeting.NumberToClass(n)
     return classNameMap[n]
 end
@@ -512,4 +524,78 @@ local classRoleMap = {
 
 function Meeting.GetClassRole(class)
     return classRoleMap[class]
+end
+
+local fortyone = { "0",
+    "1", "2", "3", "4", "5",
+    "6", "7", "8", "9", "a",
+    "b", "c", "d", "e", "f",
+    "g", "h", "i", "j", "k",
+    "l", "m", "n", "o", "p",
+    "q", "r", "s", "t", "u",
+    "v", "w", "x", "y", "z",
+    "A", "B", "C", "D", "E" }
+local fortyoneIndexes = {}
+for index, value in ipairs(fortyone) do
+    fortyoneIndexes[value] = index - 1
+end
+
+function Meeting.EncodeGroupClass()
+    local raid = false
+    local arr = {}
+    for _, value in ipairs(classNameMap) do
+        if value == Meeting.playerClass then
+            arr[value] = 1
+        else
+            arr[value] = 0
+        end
+    end
+
+    for i = 1, GetNumRaidMembers() do
+        raid = true
+        local _, class = UnitClass("raid" .. i)
+        arr[class] = arr[class] + 1
+    end
+
+    if not raid then
+        for i = 1, GetNumPartyMembers() do
+            local _, class = UnitClass("party" .. i)
+            arr[class] = arr[class] + 1
+        end
+    end
+
+    local result = ""
+    for _, v in ipairs(classNameMap) do
+        local num = arr[v]
+        result = result .. fortyone[num + 1]
+    end
+    return result
+end
+
+function Meeting.DecodeGroupClass(str)
+    if not str then
+        return
+    end
+    local arr = {}
+    for i = 1, string.len(str) do
+        local c = string.sub(str, i, i)
+        local num = fortyoneIndexes[c]
+        if num > 0 then
+            arr[i] = num
+        end
+    end
+    return arr
+end
+
+local colorCache = {}
+
+function Meeting.GetClassLocaleName(i)
+    if colorCache[i] then
+        return colorCache[i]
+    end
+    local color = Meeting.GetClassRGBColor(Meeting.NumberToClass(i))
+    local str = string.format("|cff%02x%02x%02x%s|r", color.r * 255, color.g * 255, color.b * 255, classChineseNameMap
+    [i])
+    colorCache[i] = str
+    return str
 end

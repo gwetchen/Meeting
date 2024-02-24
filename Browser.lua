@@ -335,6 +335,15 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
                 if this.comment ~= "_" then
                     GameTooltip:AddLine(this.comment, 0.75, 0.75, 0.75, 1)
                 end
+
+                if this.classMap then
+                    GameTooltip:AddLine(" ")
+                    GameTooltip:AddLine("-- 成员 --", 0.75, 0.75, 0.75, 1)
+                    for k, v in pairs(this.classMap) do
+                        local clsname = Meeting.GetClassLocaleName(k)
+                        GameTooltip:AddLine(clsname .. " " .. v .. "个", 1, 1, 1, 1)
+                    end
+                end
                 GameTooltip:AddLine(" ")
                 GameTooltip:AddLine("<双击>悄悄话", 1, 1, 1, 1)
                 GameTooltip:SetWidth(220)
@@ -542,6 +551,7 @@ local function ReloadCell(frame, activity)
     frame.classColor = rgb
     frame.level = activity.level
     frame.comment = activity.comment
+    frame.classMap = activity.classMap
 end
 
 local activities = {}

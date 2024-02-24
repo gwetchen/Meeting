@@ -296,18 +296,21 @@ function Meeting:DeleteActivity(id)
     end
 end
 
-function Meeting:OnCreate(id, category, comment, level, class, members, hc)
+function Meeting:OnCreate(id, category, comment, level, class, members, hc, classnum)
     local item, index = Meeting:FindActivity(id)
     local category = (Meeting.FindCaregoryByCode(category) or Meeting.FindCaregoryByCode("OTHER")).key
+    local classMap = Meeting.DecodeGroupClass(classnum)
+    local class = Meeting.NumberToClass(tonumber(class))
     if item then
         item.parent = Meeting.GetCategoryParent(category).key
         item.category = category
         item.comment = comment
         item.level = tonumber(level)
-        item.class = Meeting.NumberToClass(tonumber(class))
+        item.class = class
         item.members = tonumber(members)
         item.isHC = hc == "1"
         item.updated = time()
+        item.classMap = classMap
         table.remove(Meeting.activities, index)
         table.insert(Meeting.activities, 1, item)
     else
@@ -317,11 +320,12 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc)
             category = category,
             comment = comment,
             level = tonumber(level),
-            class = Meeting.NumberToClass(tonumber(class)),
+            class = class,
             members = tonumber(members),
             isHC = hc == "1",
             updated = time(),
             applicantList = {},
+            classMap = classMap,
             IsChat = function(self)
                 return self.parent == "CHAT"
             end
@@ -381,10 +385,12 @@ function Meeting:OnDecline(id, name)
     Meeting.FloatFrame.Update()
 end
 
-function Meeting:OnMembers(id, members)
+function Meeting:OnMembers(id, members, classnum)
     local activity, index = Meeting:FindActivity(id)
     if activity then
         activity.members = tonumber(members)
+        local classMap = Meeting.DecodeGroupClass(classnum)
+        activity.classMap = classMap
         table.remove(Meeting.activities, index)
         table.insert(Meeting.activities, 1, activity)
         Meeting.BrowserFrame:UpdateList()
@@ -443,7 +449,7 @@ C_Timer.NewTicker(5, function()
             else
                 rm = activity.updated + 120 < now
             end
-            
+
             if rm then
                 update = true
                 table.remove(Meeting.activities, index)
