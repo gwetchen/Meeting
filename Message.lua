@@ -66,6 +66,10 @@ function Message.OnRecvFormChat(playerName, message)
         return
     end
 
+    if string.find(message, "求组") then
+        return
+    end
+
     local lowerMessage = string.lower(message)
     for _, v in ipairs(matchText) do
         if string.find(lowerMessage, v) then
