@@ -44,11 +44,11 @@ f:SetScript("OnEvent", function()
                 end
             end
 
+            local members = Meeting:GetMembers()
+            activity.members = members
+            Meeting.Message.SyncMembers(members)
+            Meeting.CreatorFrame:UpdateList()
             if not activity:IsChat() then
-                local members = Meeting:GetMembers()
-                activity.members = members
-                Meeting.Message.SyncMembers(members)
-                Meeting.CreatorFrame:UpdateList()
                 if members >= Meeting.GetActivityMaxMembers(activity.code) then
                     Meeting.Message.CloseActivity()
                 end
