@@ -144,6 +144,7 @@ Meeting.Categories = {
                 key = "RFK",
                 name = "剃刀沼泽",
                 minLevel = 29,
+                match = { "剃刀" }
             },
             {
                 key = "TCG",
@@ -201,6 +202,7 @@ Meeting.Categories = {
                 key = "HFQ",
                 name = "仇恨熔炉采石场",
                 minLevel = 50,
+                match = { "采石场" }
             },
             {
                 key = "BRD",
@@ -312,7 +314,7 @@ Meeting.Categories = {
                 name = "祖尔格拉布",
                 minLevel = 60,
                 members = 20,
-                match = { "祖格", "zug", "zg" }
+                match = { "祖格", "zug", "zg", "龙虎金" }
             },
             {
                 key = "AQ20",

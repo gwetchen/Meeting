@@ -119,6 +119,7 @@ end
 
 function Message.CloseActivity()
     Message.Send(EVENTS.CLOSE, "")
+    MEETING_DB.activity = nil
 end
 
 local syncTimer = nil
