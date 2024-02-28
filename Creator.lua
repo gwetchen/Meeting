@@ -32,7 +32,7 @@ line:SetHeight(390)
 line:SetTexture(1, 1, 1, 0.5)
 line:SetPoint("TOPLEFT", creatorInfoFrame, "TOPRIGHT", -18, 0)
 
-local categoryTextFrame = Meeting.GUI.CreateText({
+local activityTypeTextFrame = Meeting.GUI.CreateText({
     parent = creatorInfoFrame,
     text = "活动类型：",
     fontSize = 16,
@@ -62,9 +62,9 @@ for i, value in ipairs(Meeting.Categories) do
                 type = "toggle",
                 name = name,
                 desc = name,
-                get = function() return Meeting.createInfo.category == k end,
+                get = function() return Meeting.createInfo.code == k end,
                 set = function()
-                    Meeting.createInfo.category = k
+                    Meeting.createInfo.code = k
                     MeetingCreatorSelectButton:SetText(name)
                     Menu:Close()
                     Meeting.CreatorFrame.UpdateActivity()
@@ -91,7 +91,7 @@ local selectButton = Meeting.GUI.CreateButton({
     type = Meeting.GUI.BUTTON_TYPE.PRIMARY,
     anchor = {
         point = "TOPLEFT",
-        relative = categoryTextFrame,
+        relative = activityTypeTextFrame,
         relativePoint = "TOPRIGHT",
         x = 10,
         y = 4
@@ -116,7 +116,7 @@ local commentTextFrame = Meeting.GUI.CreateText({
     fontSize = 16,
     anchor = {
         point = "TOPLEFT",
-        relative = categoryTextFrame,
+        relative = activityTypeTextFrame,
         relativePoint = "BOTTOMLEFT",
         x = 0,
         y = -22
@@ -168,7 +168,7 @@ local createButton = Meeting.GUI.CreateButton({
     },
     click = function()
         commentFrame:ClearFocus()
-        Meeting.Message.CreateActivity(Meeting.createInfo.category, Meeting.createInfo.comment)
+        Meeting.Message.CreateActivity(Meeting.createInfo.code, Meeting.createInfo.comment)
     end
 })
 createButton:Disable()
@@ -537,8 +537,8 @@ end
 applicantListFrame.OnScroll = Meeting.CreatorFrame.UpdateList
 
 function Meeting.CreatorFrame.UpdateActivity()
-    if Meeting.createInfo.category then
-        selectButton:SetText(Meeting.FindCaregoryByCode(Meeting.createInfo.category).name)
+    if Meeting.createInfo.code then
+        selectButton:SetText(Meeting.GetActivityInfo(Meeting.createInfo.code).name)
     end
     commentFrame:SetText(Meeting.createInfo.comment or "")
 
@@ -553,7 +553,7 @@ function Meeting.CreatorFrame.UpdateActivity()
             createButton:SetText("创建活动")
         end
 
-        if string.isempty(Meeting.createInfo.category) then
+        if string.isempty(Meeting.createInfo.code) then
             createButton:Disable()
         else
             createButton:Enable()

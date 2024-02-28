@@ -38,8 +38,8 @@ function Message.OnRecv(playerName, data)
 end
 
 local matchText = {}
-for _, parent in ipairs(Meeting.Categories) do
-    for _, value in ipairs(parent.children) do
+for _, category in ipairs(Meeting.Categories) do
+    for _, value in ipairs(category.children) do
         if value.match then
             for _, match in ipairs(value.match) do
                 table.insert(matchText, match)
@@ -88,13 +88,13 @@ function Message.Send(event, msg)
     end
 end
 
-function Message.CreateActivity(category, comment)
-    local data = string.format("%s:%s:%d:%d:%d:%d:%s", category,
+function Message.CreateActivity(code, comment)
+    local data = string.format("%s:%s:%d:%d:%d:%d:%s", code,
         string.isempty(comment) and "_" or comment, UnitLevel("player"),
         Meeting.ClassToNumber(Meeting.playerClass),
         Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0, Meeting.EncodeGroupClass())
     MEETING_DB.activity = {
-        category = category,
+        code = code,
         comment = comment,
         lastTime = time()
     }
@@ -132,7 +132,7 @@ function Message.InvokeSyncActivityTimer()
     syncTimer = C_Timer.NewTicker(60, function()
         local activity = Meeting:FindActivity(Meeting.player)
         if activity then
-            Message.CreateActivity(activity.category, activity.comment)
+            Message.CreateActivity(activity.code, activity.comment)
         end
     end, -1)
 end

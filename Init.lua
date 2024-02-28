@@ -422,45 +422,49 @@ Meeting.Categories = {
     }
 }
 
-local categoryParentMap = {}
+local activityCategoryMap = {}
+
 for _, value in ipairs(Meeting.Categories) do
     for _, child in ipairs(value.children) do
-        categoryParentMap[child.key] = { key = value.key, members = value.members }
+        activityCategoryMap[child.key] = { key = value.key, members = value.members }
     end
 end
 
-function Meeting.GetCategoryParent(category)
-    return categoryParentMap[category]
+function Meeting.GetActivityCategory(code)
+    return activityCategoryMap[code]
 end
 
-function Meeting.GetActivityMaxMembers(category)
-    local info = Meeting.FindCaregoryByCode(category)
+function Meeting.GetActivityMaxMembers(code)
+    local info = Meeting.GetActivityInfo(code)
     if info and info.members then
         return info.members
     end
 
-    local parent = Meeting.GetCategoryParent(category)
-    if parent then
-        return parent.members
+    local category = Meeting.GetActivityCategory(code)
+    if category then
+        return category.members
     end
 
     return 40
 end
 
-local categoryMap = {}
+local activityInfoMap = {}
 
-function Meeting.FindCaregoryByCode(code)
-    if categoryMap[code] then
-        return categoryMap[code]
+function Meeting.GetActivityInfo(code)
+    if activityInfoMap[code] then
+        return activityInfoMap[code]
     end
     for _, value in pairs(Meeting.Categories) do
         for _, value in pairs(value.children) do
             if value.key == code then
-                categoryMap[code] = value
+                activityInfoMap[code] = value
                 return value
             end
         end
     end
+    local other = Meeting.GetActivityInfo("OTHER")
+    activityInfoMap[code] = other
+    return other
 end
 
 function Meeting:GetMembers()

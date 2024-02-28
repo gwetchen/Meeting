@@ -60,7 +60,7 @@ Meeting.BrowserFrame = browserFrame
 browserFrame:EnableMouse(true)
 browserFrame:EnableMouseWheel(true)
 
-local categoryTextFrame = Meeting.GUI.CreateText({
+local activityTypeTextFrame = Meeting.GUI.CreateText({
     parent = browserFrame,
     text = "活动类型：",
     fontSize = 16,
@@ -72,8 +72,8 @@ local categoryTextFrame = Meeting.GUI.CreateText({
     }
 })
 
-Meeting.searchInfo.parent = ""
 Meeting.searchInfo.category = ""
+Meeting.searchInfo.code = ""
 
 local options = {
     type = 'group',
@@ -83,10 +83,10 @@ local options = {
             type = "toggle",
             name = "全部",
             desc = "全部",
-            get = function() return Meeting.searchInfo.parent == "" end,
+            get = function() return Meeting.searchInfo.category == "" end,
             set = function()
-                Meeting.searchInfo.parent = ""
                 Meeting.searchInfo.category = ""
+                Meeting.searchInfo.code = ""
                 Menu:Close()
                 MeetingBworserSelectButton:SetText("选择活动")
                 Meeting.BrowserFrame:UpdateList(true)
@@ -105,10 +105,10 @@ for i, value in ipairs(Meeting.Categories) do
                 type = "toggle",
                 name = "全部",
                 desc = "全部",
-                get = function() return Meeting.searchInfo.parent == k and Meeting.searchInfo.category == "" end,
+                get = function() return Meeting.searchInfo.category == k and Meeting.searchInfo.code == "" end,
                 set = function()
-                    Meeting.searchInfo.parent = k
-                    Meeting.searchInfo.category = ""
+                    Meeting.searchInfo.category = k
+                    Meeting.searchInfo.code = ""
                     Menu:Close()
                     MeetingBworserSelectButton:SetText("全部" .. name)
                     Meeting.BrowserFrame:UpdateList(true)
@@ -124,9 +124,9 @@ for i, value in ipairs(Meeting.Categories) do
                 type = "toggle",
                 name = name,
                 desc = name,
-                get = function() return Meeting.searchInfo.category == k end,
+                get = function() return Meeting.searchInfo.code == k end,
                 set = function()
-                    Meeting.searchInfo.category = k
+                    Meeting.searchInfo.code = k
                     Menu:Close()
                     MeetingBworserSelectButton:SetText(name)
                     Meeting.BrowserFrame:UpdateList(true)
@@ -153,7 +153,7 @@ local selectButton = Meeting.GUI.CreateButton({
     height = 24,
     anchor = {
         point = "TOPLEFT",
-        relative = categoryTextFrame,
+        relative = activityTypeTextFrame,
         relativePoint = "TOPRIGHT",
         x = 10,
         y = 4
@@ -219,7 +219,7 @@ local activityListHeaderFrame = Meeting.GUI.CreateFrame({
     }
 })
 
-local categoryText = Meeting.GUI.CreateText({
+local activityTypeText = Meeting.GUI.CreateText({
     parent = activityListHeaderFrame,
     text = "活动类型",
     fontSize = 14,
@@ -240,7 +240,7 @@ local modeText = Meeting.GUI.CreateText({
     height = 24,
     anchor = {
         point = "TOPLEFT",
-        relative = categoryText,
+        relative = activityTypeText,
         relativePoint = "TOPRIGHT",
     }
 })
@@ -304,6 +304,154 @@ local hoverBackgrop = {
     insets = { left = -1, right = -1, top = -1, bottom = -1 },
 }
 
+local function CreateRequestPrompt(config)
+    config.width = config.width or 300
+    config.height = 185
+
+    if not MEETING_DB.role or MEETING_DB.role == 0 then
+        MEETING_DB.role = Meeting.GetClassRole(Meeting.playerClass)
+    end
+
+    config.onCustomFrame = function(parent, anchor)
+        local frame = Meeting.GUI.CreateFrame({
+            parent = parent,
+            width = config.width - 20,
+            height = 100,
+            anchor = {
+                point = "TOPLEFT",
+                relative = anchor,
+                relativePoint = "BOTTOMLEFT",
+                x = 0,
+                y = -10
+            }
+        })
+
+        local roleEnable = Meeting.GetClassRole(Meeting.playerClass)
+
+        local function createRole(role, anchor)
+            local enable = bit.band(roleEnable, role) == role
+            local ckecked = bit.band(MEETING_DB.role, role) == role
+
+            local roleFrame = Meeting.GUI.CreateButton({
+                parent = frame,
+                width = 40,
+                height = 40,
+                anchor = anchor,
+                disabled = not enable,
+                click = function()
+                    local ckeck = this.checkButton:GetChecked()
+                    if bit.band(MEETING_DB.role, role) == role then
+                        MEETING_DB.role = bit.bxor(MEETING_DB.role, role)
+                    else
+                        MEETING_DB.role = bit.bor(MEETING_DB.role, role)
+                    end
+                    this.checkButton:SetChecked(not ckeck)
+                end
+            })
+
+            local tankTexture = roleFrame:CreateTexture()
+            local textureName = "damage"
+            if role == Meeting.Role.Tank then
+                textureName = "tank"
+            elseif role == Meeting.Role.Healer then
+                textureName = "healer"
+            end
+            tankTexture:SetTexture("Interface\\AddOns\\Meeting\\assets\\" .. textureName .. ".blp")
+            tankTexture:SetWidth(40)
+            tankTexture:SetHeight(40)
+            tankTexture:SetPoint("TOPLEFT", roleFrame, "TOPLEFT", 0, 0)
+            if not enable then
+                tankTexture:SetVertexColor(0.2, 0.2, 0.2, 1)
+            else
+                roleFrame.checkButton = Meeting.GUI.CreateCheck({
+                    parent = roleFrame,
+                    width = 20,
+                    height = 20,
+                    anchor = {
+                        point = "BOTTOMRIGHT",
+                        relative = roleFrame,
+                        relativePoint = "BOTTOMRIGHT",
+                        x = 0,
+                        y = 0
+                    },
+                    checked = enable and ckecked,
+                    click = function(checked)
+                        if bit.band(MEETING_DB.role, role) == role then
+                            MEETING_DB.role = bit.bxor(MEETING_DB.role, role)
+                        else
+                            MEETING_DB.role = bit.bor(MEETING_DB.role, role)
+                        end
+                    end
+                })
+            end
+            return roleFrame
+        end
+
+        local tank = createRole(Meeting.Role.Tank, {
+            point = "TOPLEFT",
+            relative = frame,
+            relativePoint = "TOPLEFT",
+            x = 70,
+            y = 0
+        })
+
+        local healer = createRole(Meeting.Role.Healer, {
+            point = "TOPLEFT",
+            relative = tank,
+            relativePoint = "TOPRIGHT",
+            x = 10,
+            y = 0
+
+        })
+
+        local damage = createRole(Meeting.Role.Damage, {
+            point = "TOPLEFT",
+            relative = healer,
+            relativePoint = "TOPRIGHT",
+            x = 10,
+            y = 0
+        })
+
+        local commentFrame = Meeting.GUI.CreateText({
+            parent = frame,
+            anchor = {
+                point = "TOPLEFT",
+                relative = tank,
+                relativePoint = "BOTTOMLEFT",
+                x = -70,
+                y = -5
+            },
+            text = "备注",
+        })
+
+        local input = Meeting.GUI.CreateInput({
+            parent = frame,
+            width = config.width - 20,
+            height = 20,
+            anchor = {
+                point = "TOPLEFT",
+                relative = commentFrame,
+                relativePoint = "BOTTOMLEFT",
+                x = 0,
+                y = -10
+            },
+            limit = 128,
+            multiLine = false
+        })
+        Meeting.GUI.SetBackground(input, Meeting.GUI.Theme.Black, Meeting.GUI.Theme.White)
+
+        config._confirm = function()
+            local text = input:GetText()
+            text = string.gsub(text, ":", "：")
+            config.confirm(text, MEETING_DB.role)
+        end
+
+        return frame
+    end
+
+    return Meeting.GUI.CreateDialog(config)
+end
+
 local activityListFrame = Meeting.GUI.CreateListFrame({
     name = "MeetingActivityListFrame",
     parent = browserFrame,
@@ -322,7 +470,7 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
         f.OnHover = function(this, isHover)
             if isHover then
                 GameTooltip:SetOwner(this, "ANCHOR_RIGHT", 40)
-                GameTooltip:SetText(this.category, 1, 1, 1, 1)
+                GameTooltip:SetText(this.name, 1, 1, 1, 1)
                 GameTooltip:AddLine(this.leader, this.classColor.r, this.classColor.g, this.classColor.b, 1)
 
                 if this.level > 0 then
@@ -462,7 +610,7 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
                 if f.isChat then
                     ChatFrame_OpenChat("/w " .. f.leader, SELECTED_DOCK_FRAME or DEFAULT_CHAT_FRAME)
                 else
-                    local frame = Meeting.GUI.CreateRequestPrompt({
+                    local frame = CreateRequestPrompt({
                         parent = Meeting.BrowserFrame,
                         anchor = {
                             point = "CENTER",
@@ -471,7 +619,7 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
                             x = 0,
                             y = 0
                         },
-                        title = "申请加入" .. f.category,
+                        title = "申请加入" .. f.name,
                         confirm = function(text, role)
                             Meeting.Message.Request(f.id, text, role)
                             local activity = Meeting:FindActivity(f.id)
@@ -488,13 +636,13 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
 })
 
 local function ReloadCell(frame, activity)
-    local category = Meeting.FindCaregoryByCode(activity.category)
-    frame.nameFrame:SetText(category.name)
+    local info = Meeting.GetActivityInfo(activity.code)
+    frame.nameFrame:SetText(info.name)
     frame.hcFrame:SetText(activity.isHC and "HC" or "")
     local rgb = Meeting.GetClassRGBColor(activity.class, activity.unitname)
     frame.leaderFrame:SetText(activity.unitname)
     frame.leaderFrame:SetTextColor(rgb.r, rgb.g, rgb.b)
-    local maxMambers = Meeting.GetActivityMaxMembers(activity.category)
+    local maxMambers = Meeting.GetActivityMaxMembers(activity.code)
     local isChat = activity:IsChat()
     if isChat then
         frame.membersFrame:SetText("-")
@@ -545,7 +693,7 @@ local function ReloadCell(frame, activity)
     end
 
     frame.id = activity.unitname
-    frame.category = category.name
+    frame.name = info.name
     frame.isChat = isChat
     frame.leader = activity.unitname
     frame.classColor = rgb
@@ -573,8 +721,8 @@ function Meeting.BrowserFrame:UpdateList(force, scroll)
         activities = {}
 
         local function search(activity)
-            if Meeting.searchInfo.parent == "" or Meeting.searchInfo.parent == activity.parent then
-                if Meeting.searchInfo.category == "" or Meeting.searchInfo.category == activity.category then
+            if Meeting.searchInfo.category == "" or Meeting.searchInfo.category == activity.category then
+                if Meeting.searchInfo.code == "" or Meeting.searchInfo.code == activity.code then
                     table.insert(activities, activity)
                 end
             end
@@ -582,11 +730,11 @@ function Meeting.BrowserFrame:UpdateList(force, scroll)
 
         for _, activity in ipairs(Meeting.activities) do
             if activity:IsChat() then
-                if Meeting.searchInfo.category ~= "" then
+                if Meeting.searchInfo.code ~= "" then
                     local lower = string.lower(activity.comment)
-                    local category = Meeting.FindCaregoryByCode(Meeting.searchInfo.category)
-                    if category.match then
-                        for _, v in ipairs(category.match) do
+                    local info = Meeting.GetActivityInfo(Meeting.searchInfo.code)
+                    if info.match then
+                        for _, v in ipairs(info.match) do
                             if string.find(lower, v) then
                                 table.insert(activities, activity)
                                 break

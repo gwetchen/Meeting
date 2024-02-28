@@ -49,7 +49,7 @@ f:SetScript("OnEvent", function()
                 activity.members = members
                 Meeting.Message.SyncMembers(members)
                 Meeting.CreatorFrame:UpdateList()
-                if members >= Meeting.GetActivityMaxMembers(activity.category) then
+                if members >= Meeting.GetActivityMaxMembers(activity.code) then
                     Meeting.Message.CloseActivity()
                 end
             end
@@ -82,10 +82,10 @@ f:SetScript("OnEvent", function()
             local now = time()
             if now - MEETING_DB.activity.lastTime < 120 then
                 MEETING_DB.activity.lastTime = now
-                Meeting.createInfo.category = MEETING_DB.activity.category
+                Meeting.createInfo.code = MEETING_DB.activity.code
                 Meeting.createInfo.comment = MEETING_DB.activity.comment == "_" and "" or MEETING_DB.activity.comment
                 Meeting.CreatorFrame.UpdateActivity()
-                Meeting.Message.CreateActivity(Meeting.createInfo.category, Meeting.createInfo.comment)
+                Meeting.Message.CreateActivity(Meeting.createInfo.code, Meeting.createInfo.comment)
             end
         end
     elseif event == "PLAYER_LEAVING_WORLD" then
@@ -296,14 +296,14 @@ function Meeting:DeleteActivity(id)
     end
 end
 
-function Meeting:OnCreate(id, category, comment, level, class, members, hc, classnum)
+function Meeting:OnCreate(id, code, comment, level, class, members, hc, classnum)
     local item, index = Meeting:FindActivity(id)
-    local category = (Meeting.FindCaregoryByCode(category) or Meeting.FindCaregoryByCode("OTHER")).key
+    local code = Meeting.GetActivityInfo(code).key
     local classMap = Meeting.DecodeGroupClass(classnum)
     local class = Meeting.NumberToClass(tonumber(class))
     if item then
-        item.parent = Meeting.GetCategoryParent(category).key
-        item.category = category
+        item.category = Meeting.GetActivityCategory(code).key
+        item.code = code
         item.comment = comment
         item.level = tonumber(level)
         item.class = class
@@ -315,8 +315,8 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc, clas
     else
         item = {
             unitname = id,
-            parent = Meeting.GetCategoryParent(category).key,
-            category = category,
+            category = Meeting.GetActivityCategory(code).key,
+            code = code,
             comment = comment,
             level = tonumber(level),
             class = class,
@@ -326,7 +326,7 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc, clas
             applicantList = {},
             classMap = classMap,
             IsChat = function(self)
-                return self.parent == "CHAT"
+                return self.category == "CHAT"
             end
         }
     end
