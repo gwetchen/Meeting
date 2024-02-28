@@ -419,6 +419,7 @@ function Meeting:OnClose(id)
     local activity = Meeting:DeleteActivity(id)
     if activity and activity.unitname == Meeting.player then
         Meeting.CreatorFrame.UpdateActivity()
+        MEETING_DB.activity = nil
     end
 
     if Meeting.joinedActivity and Meeting.joinedActivity.unitname == id then
