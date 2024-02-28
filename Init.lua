@@ -195,6 +195,7 @@ Meeting.Categories = {
                 key = "ST",
                 name = "阿塔哈卡神庙",
                 minLevel = 50,
+                match = { "神庙" }
             },
             {
                 key = "HFQ",
@@ -331,6 +332,7 @@ Meeting.Categories = {
                 key = "ES",
                 name = "翡翠圣殿",
                 minLevel = 60,
+                match = { "翡翠" }
             }
         }
     },
@@ -595,7 +597,7 @@ function Meeting.GetClassLocaleName(i)
     end
     local color = Meeting.GetClassRGBColor(Meeting.NumberToClass(i))
     local str = string.format("|cff%02x%02x%02x%s|r", color.r * 255, color.g * 255, color.b * 255, classChineseNameMap
-    [i])
+        [i])
     colorCache[i] = str
     return str
 end

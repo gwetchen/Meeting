@@ -312,9 +312,8 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc, clas
         item.updated = time()
         item.classMap = classMap
         table.remove(Meeting.activities, index)
-        table.insert(Meeting.activities, 1, item)
     else
-        table.insert(Meeting.activities, 1, {
+        item = {
             unitname = id,
             parent = Meeting.GetCategoryParent(category).key,
             category = category,
@@ -329,8 +328,27 @@ function Meeting:OnCreate(id, category, comment, level, class, members, hc, clas
             IsChat = function(self)
                 return self.parent == "CHAT"
             end
-        })
+        }
     end
+
+    local idx = 1
+    if item:IsChat() then
+        local i = -1
+        local t = time() + 999
+        for index, value in ipairs(Meeting.activities) do
+            if not value:IsChat() then
+                if value.updated < t then
+                    t = value.updated
+                    i = index
+                end
+            end
+        end
+        if i ~= -1 then
+            idx = i + 1
+        end
+    end
+
+    table.insert(Meeting.activities, idx, item)
 
     Meeting.FloatFrame.Update()
     Meeting.CreatorFrame.UpdateActivity()
