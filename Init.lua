@@ -150,6 +150,7 @@ Meeting.Categories = {
                 key = "TCG",
                 name = "新月林地",
                 minLevel = 32,
+                match = { "新月" }
             },
             {
                 key = "SMARMORY",

@@ -728,19 +728,45 @@ function Meeting.BrowserFrame:UpdateList(force, scroll)
             end
         end
 
-        for _, activity in ipairs(Meeting.activities) do
-            if activity:IsChat() then
-                if Meeting.searchInfo.code ~= "" then
-                    local lower = string.lower(activity.comment)
-                    local info = Meeting.GetActivityInfo(Meeting.searchInfo.code)
-                    if info.match then
-                        for _, v in ipairs(info.match) do
-                            if string.find(lower, v) then
-                                table.insert(activities, activity)
-                                break
+        local matchs = {}
+        if Meeting.searchInfo.category ~= "" and Meeting.searchInfo.code == "" then
+            for _, value in ipairs(Meeting.Categories) do
+                if value.key == Meeting.searchInfo.category then
+                    for _, child in ipairs(value.children) do
+                        if child.match then
+                            for _, match in ipairs(child.match) do
+                                table.insert(matchs, match)
                             end
                         end
                     end
+                    break
+                end
+            end
+        elseif Meeting.searchInfo.code ~= "" then
+            local info = Meeting.GetActivityInfo(Meeting.searchInfo.code)
+            if info.match then
+                for _, v in ipairs(info.match) do
+                    table.insert(matchs, v)
+                end
+            end
+        end
+
+        local function match(activity)
+            local lower = string.lower(activity.comment)
+            for _, match in ipairs(matchs) do
+                if string.find(lower, match) then
+                    table.insert(activities, activity)
+                    break
+                end
+            end
+        end
+
+        for _, activity in ipairs(Meeting.activities) do
+            if activity:IsChat() then
+                if Meeting.searchInfo.category ~= "" and Meeting.searchInfo.code == "" then
+                    match(activity)
+                elseif Meeting.searchInfo.code ~= "" then
+                    match(activity)
                 else
                     search(activity)
                 end
