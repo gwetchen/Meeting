@@ -458,18 +458,16 @@ C_Timer.NewTicker(5, function()
     local now = time()
     local update = false
     for index, activity in ipairs(Meeting.activities) do
-        if activity.unitname ~= Meeting.player then
-            local rm = false
-            if activity:IsChat() then
-                rm = activity.updated + 60 < now
-            else
-                rm = activity.updated + 120 < now
-            end
+        local rm = false
+        if activity:IsChat() then
+            rm = activity.updated + 60 < now
+        elseif activity.unitname ~= Meeting.player then
+            rm = activity.updated + 120 < now
+        end
 
-            if rm then
-                update = true
-                table.remove(Meeting.activities, index)
-            end
+        if rm then
+            update = true
+            table.remove(Meeting.activities, index)
         end
     end
 
