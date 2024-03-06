@@ -331,24 +331,18 @@ function Meeting:OnCreate(id, code, comment, level, class, members, hc, classnum
         }
     end
 
-    local idx = 1
-    if item:IsChat() then
-        local i = -1
-        local t = time() + 999
-        for index, value in ipairs(Meeting.activities) do
-            if not value:IsChat() then
-                if value.updated < t then
-                    t = value.updated
-                    i = index
-                end
+    table.insert(Meeting.activities, 1, item)
+    if item:IsChat() and table.getn(Meeting.activities) > 1 then
+        table.sort(Meeting.activities, function(a, b)
+            if a:IsChat() and not b:IsChat() then
+                return false
+            elseif not a:IsChat() and b:IsChat() then
+                return true
+            else
+                return a.updated > b.updated
             end
-        end
-        if i ~= -1 then
-            idx = i + 1
-        end
+        end)
     end
-
-    table.insert(Meeting.activities, idx, item)
 
     Meeting.FloatFrame.Update()
     Meeting.CreatorFrame.UpdateActivity()
