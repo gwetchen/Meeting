@@ -20,12 +20,13 @@ f:SetScript("OnEvent", function()
             else
                 local lowname = string.lower(name)
                 if lowname == "world" or lowname == "china" then
-                    Meeting.Message.OnRecvFormChat(arg2, arg1)
+                    Meeting.Message.OnRecvFormChat(lowname, arg2, arg1)
                 end
             end
         end
     elseif event == "CHAT_MSG_HARDCORE" then
         Meeting.playerIsHC = true
+        Meeting.Message.OnRecvFormChat("hardcore", arg2, arg1)
     elseif event == "PARTY_LEADER_CHANGED" then
         if Meeting:GetMembers() > 1 and IsRaidLeader() ~= 1 then
             if Meeting:FindActivity(Meeting.player) then

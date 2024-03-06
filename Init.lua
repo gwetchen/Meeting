@@ -419,6 +419,16 @@ Meeting.Categories = {
                 name = "世界频道",
                 minLevel = 1,
             },
+            {
+                key = "CHINA",
+                name = "中文频道",
+                minLevel = 1,
+            },
+            {
+                key = "HARDCORE",
+                name = "硬核频道",
+                minLevel = 1,
+            },
         }
     }
 }

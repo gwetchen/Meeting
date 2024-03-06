@@ -60,7 +60,7 @@ for k, _ in pairs(distinct) do
 end
 distinct = nil
 
-function Message.OnRecvFormChat(playerName, message)
+function Message.OnRecvFormChat(channel, playerName, message)
     local activity = Meeting:FindActivity(playerName)
     if activity and not activity:IsChat() then
         return
@@ -73,7 +73,8 @@ function Message.OnRecvFormChat(playerName, message)
     local lowerMessage = string.lower(message)
     for _, v in ipairs(matchText) do
         if string.find(lowerMessage, v) then
-            Meeting:OnCreate(playerName, "WORLD", message, "0", "0", "0", "0")
+            Meeting:OnCreate(playerName, string.upper(channel), message, "0", "0", "0",
+                channel == "hardcore" and "1" or "0")
             return
         end
     end
