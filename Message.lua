@@ -131,6 +131,9 @@ function Message.InvokeSyncActivityTimer()
     end
 
     syncTimer = C_Timer.NewTicker(60, function()
+        if Meeting.isAFK then
+            return
+        end
         local activity = Meeting:FindActivity(Meeting.player)
         if activity then
             Message.CreateActivity(activity.code, activity.comment)

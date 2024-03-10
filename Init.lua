@@ -21,6 +21,8 @@ Meeting = {
     playerIsHC = false,
 
     channel = "LFT",
+
+    isAFK = false,
 }
 
 local classNameMap = {
@@ -78,6 +80,9 @@ function Meeting.GetClassRGBColor(class, unitname)
         end
         rgb = RAID_CLASS_COLORS[nil]
     end
+    if not rgb then
+        rgb = { r = 0.6, g = 0.6, b = 0.6 }
+    end
     return rgb
 end
 
@@ -91,13 +96,13 @@ Meeting.Categories = {
                 key = "RFC",
                 name = "怒焰裂谷",
                 minLevel = 13,
-                match = { "怒焰" }
+                match = { "怒焰", "ny" }
             },
             {
                 key = "WC",
                 name = "哀嚎洞穴",
                 minLevel = 17,
-                match = { "哀嚎" }
+                match = { "哀嚎", "ah" }
             },
             {
                 key = "DM",
@@ -121,7 +126,7 @@ Meeting.Categories = {
                 key = "BFD",
                 name = "黑暗深渊",
                 minLevel = 23,
-                match = { "黑暗深渊" }
+                match = { "深渊" }
             },
             {
                 key = "SMGY",
@@ -599,7 +604,7 @@ function Meeting.DecodeGroupClass(str)
     for i = 1, string.len(str) do
         local c = string.sub(str, i, i)
         local num = fortyoneIndexes[c]
-        if num > 0 then
+        if num ~= nil and num > 0 then
             arr[i] = num
         end
     end

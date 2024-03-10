@@ -1,3 +1,5 @@
+local AFK_MESSAGE = string.format(MARKED_AFK_MESSAGE, DEFAULT_AFK_MESSAGE)
+
 local f = CreateFrame("Frame")
 f:RegisterEvent("CHAT_MSG_HARDCORE")
 f:RegisterEvent("CHAT_MSG_CHANNEL")
@@ -100,6 +102,12 @@ f:SetScript("OnEvent", function()
         local _, _, playerName = string.find(arg1, "^(.+)拒绝了你邀请其加入队伍的请求。")
         if playerName then
             Meeting.DeclinedInvite(playerName)
+        end
+
+        if arg1 == AFK_MESSAGE then
+            Meeting.isAFK = true
+        elseif arg1 == CLEARED_AFK then
+            Meeting.isAFK = false
         end
     end
 end)
