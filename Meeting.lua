@@ -460,6 +460,20 @@ function Meeting.CheckLFTChannel()
     if i == -1 then
         JoinChannelByName(Meeting.channel)
     end
+    Meeting.RemoveLFTChannelFromWindows()
+end
+
+function Meeting.RemoveLFTChannelFromWindows()
+    for windowIndex = 1, 9 do
+        local DefaultChannels = { GetChatWindowChannels(windowIndex) }
+        for _, v in DefaultChannels do
+            if v == Meeting.channel then
+                if getglobal("ChatFrame" .. windowIndex) then
+                    ChatFrame_RemoveChannel(getglobal("ChatFrame" .. windowIndex), Meeting.channel)
+                end
+            end
+        end
+    end
 end
 
 C_Timer.NewTicker(5, function()
