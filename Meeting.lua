@@ -96,7 +96,7 @@ f:SetScript("OnEvent", function()
         end
     elseif event == "PLAYER_LEAVING_WORLD" then
         if Meeting:FindActivity(Meeting.player) then
-            Meeting.Message.CloseActivity()
+            Meeting.Message.CloseActivity(true)
         end
     elseif event == "CHAT_MSG_SYSTEM" then
         local _, _, playerName = string.find(arg1, "^(.+)拒绝了你邀请其加入队伍的请求。")

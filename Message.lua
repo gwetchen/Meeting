@@ -118,9 +118,11 @@ function Message.SyncMembers(members)
     Message.Send(EVENTS.MEMBERS, string.format("%d:%s", members, Meeting.EncodeGroupClass()))
 end
 
-function Message.CloseActivity()
+function Message.CloseActivity(leave)
     Message.Send(EVENTS.CLOSE, "")
-    MEETING_DB.activity = nil
+    if not leave then
+        MEETING_DB.activity = nil
+    end
 end
 
 local syncTimer = nil
