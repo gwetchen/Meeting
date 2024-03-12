@@ -142,7 +142,15 @@ commentFrame:SetJustifyH("LEFT")
 commentFrame:SetMaxBytes(128)
 commentFrame:SetAutoFocus(false)
 commentFrame:SetFontObject("ChatFontNormal")
+commentFrame._focus = false
+commentFrame.HasFocus = function(self)
+    return self._focus == true
+end
+commentFrame:SetScript("OnEditFocusGained", function()
+    this._focus = true
+end)
 commentFrame:SetScript("OnEditFocusLost", function()
+    this._focus = false
     local text = commentFrame:GetText()
     text = string.gsub(text, "\n", "")
     text = string.gsub(text, ":", "：")
@@ -540,7 +548,10 @@ function Meeting.CreatorFrame.UpdateActivity()
     if Meeting.createInfo.code then
         selectButton:SetText(Meeting.GetActivityInfo(Meeting.createInfo.code).name)
     end
-    commentFrame:SetText(Meeting.createInfo.comment or "")
+
+    if not commentFrame:HasFocus() then
+        commentFrame:SetText(Meeting.createInfo.comment or "")
+    end
 
     if Meeting:GetMembers() > 1 and IsRaidLeader() ~= 1 then
         createButton:Disable()
