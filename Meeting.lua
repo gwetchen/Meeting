@@ -9,6 +9,7 @@ f:RegisterEvent("PLAYER_LEAVING_WORLD")
 f:RegisterEvent("PARTY_MEMBERS_CHANGED")
 f:RegisterEvent("PARTY_LEADER_CHANGED")
 f:RegisterEvent("RAID_ROSTER_UPDATE")
+f:RegisterEvent("SPELLS_CHANGED")
 f:SetScript("OnEvent", function()
     if event == "CHAT_MSG_CHANNEL" then
         local _, _, source = string.find(arg4, "(%d+)%.")
@@ -27,7 +28,6 @@ f:SetScript("OnEvent", function()
             end
         end
     elseif event == "CHAT_MSG_HARDCORE" then
-        Meeting.playerIsHC = true
         Meeting.Message.OnRecvFormChat("hardcore", arg2, arg1)
     elseif event == "PARTY_LEADER_CHANGED" then
         if Meeting:GetMembers() > 1 and IsRaidLeader() ~= 1 then
@@ -109,6 +109,8 @@ f:SetScript("OnEvent", function()
         elseif arg1 == CLEARED_AFK then
             Meeting.isAFK = false
         end
+    elseif event == "SPELLS_CHANGED" then
+        Meeting.CheckPlayerHCMode()
     end
 end)
 
@@ -133,6 +135,7 @@ f:SetScript("OnUpdate", function()
 end)
 
 function Meeting.CheckPlayerHCMode()
+    local isHC = false
     local i = 1
     while true do
         local spellName, _ = GetSpellName(i, BOOKTYPE_SPELL)
@@ -140,12 +143,13 @@ function Meeting.CheckPlayerHCMode()
             break
         end
         if spellName == "硬核模式" then
-            Meeting.playerIsHC = true
+            isHC = true
             break
         else
             i = i + 1
         end
     end
+    Meeting.playerIsHC = isHC
 end
 
 function Meeting:HasActivity()
