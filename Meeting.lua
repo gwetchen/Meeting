@@ -84,6 +84,7 @@ f:SetScript("OnEvent", function()
     elseif event == "PLAYER_ENTERING_WORLD" then
         Meeting.CheckLFTChannel()
         Meeting.CheckPlayerHCMode()
+        Meeting.Message.SendVersion()
         if MEETING_DB.activity then
             local now = time()
             if now - MEETING_DB.activity.lastTime < 120 then
@@ -194,9 +195,10 @@ line:SetHeight(0.5)
 line:SetTexture(1, 1, 1, 0.5)
 line:SetPoint("TOPLEFT", headerFrame, "BOTTOMLEFT", 0, 0)
 
-Meeting.GUI.CreateText({
+local title = "集合石 " .. Meeting.VERSION.MAJOR .. "." .. Meeting.VERSION.MINOR .. "." .. Meeting.VERSION.PATCH
+local titleFrame = Meeting.GUI.CreateText({
     parent = headerFrame,
-    text = "集合石 " .. tostring(GetAddOnMetadata("Meeting", "Version")),
+    text = title,
     fontSize = 16,
     anchor = {
         point = "TOP",
@@ -450,6 +452,25 @@ function Meeting.DeclinedInvite(playerName)
                 break
             end
         end
+    end
+end
+
+local needUpdate = false
+function Meeting:OnVersion(version)
+    if needUpdate then
+        return
+    end
+    local major, minor, patch = string.meetingsplit(version, ".")
+    if not major or not minor or not patch then
+        return
+    end
+    major, minor, patch = tonumber(major), tonumber(minor), tonumber(patch)
+    if major > Meeting.VERSION.MAJOR or (major == Meeting.VERSION.MAJOR and minor > Meeting.VERSION.MINOR) or
+        (major == Meeting.VERSION.MAJOR and minor == Meeting.VERSION.MINOR and patch > Meeting.VERSION.PATCH) then
+        needUpdate = true
+    end
+    if needUpdate then
+        titleFrame:SetText(title .. "  (有新版本，请更新)")
     end
 end
 

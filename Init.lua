@@ -6,6 +6,12 @@ MEETING_DB = {}
 local _, class = UnitClass("player")
 
 Meeting = {
+    VERSION = {
+        MAJOR = 0,
+        MINOR = 8,
+        PATCH = 0
+    },
+
     player = UnitName("player"),
 
     playerClass = class,

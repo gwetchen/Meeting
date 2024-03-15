@@ -8,22 +8,11 @@ local EVENTS = {
     DECLINE = "D",
     MEMBERS = "M",
     CLOSE = "L",
+    VERSION = "V",
 }
 
-local function stringsplit(str, delimiter)
-    if not str then
-        return nil
-    end
-    local delimiter, fields = delimiter or ":", {}
-    local pattern = string.format("([^%s]+)", delimiter)
-    string.gsub(str, pattern, function(c)
-        fields[table.getn(fields) + 1] = c
-    end)
-    return unpack(fields)
-end
-
 function Message.OnRecv(playerName, data)
-    local _, event, arg1, arg2, arg3, arg4, arg5, arg6, arg7 = stringsplit(data, ":")
+    local _, event, arg1, arg2, arg3, arg4, arg5, arg6, arg7 = string.meetingsplit(data, ":")
     if event == EVENTS.CREATE then
         Meeting:OnCreate(playerName, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
     elseif event == EVENTS.REQUEST then
@@ -34,6 +23,8 @@ function Message.OnRecv(playerName, data)
         Meeting:OnMembers(playerName, arg1, arg2)
     elseif event == EVENTS.CLOSE then
         Meeting:OnClose(playerName)
+    elseif event == EVENTS.VERSION then
+        Meeting:OnVersion(arg1)
     end
 end
 
@@ -123,6 +114,10 @@ function Message.CloseActivity(leave)
     if not leave then
         MEETING_DB.activity = nil
     end
+end
+
+function Message.SendVersion()
+    Message.Send(EVENTS.VERSION, Meeting.VERSION.MAJOR .. "." .. Meeting.VERSION.MINOR .. "." .. Meeting.VERSION.PATCH)
 end
 
 local syncTimer = nil

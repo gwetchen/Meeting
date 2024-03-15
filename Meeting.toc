@@ -1,13 +1,13 @@
 ## Interface: 11200
 ## Title: Meeting
 ## Title-zhCN: 集合石 Meeting
-## Version: 0.7.18
+## Version: 0.8.0
 ## Author: 龟壳
 ## SavedVariablesPerCharacter: MEETING_DB
 
+Util.lua
 Compat.lua
 Init.lua
-Util.lua
 GUI.lua
 Message.lua
 Meeting.lua
