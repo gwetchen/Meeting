@@ -1,5 +1,104 @@
 local AFK_MESSAGE = string.format(MARKED_AFK_MESSAGE, DEFAULT_AFK_MESSAGE)
 
+local function GetMembers()
+    local members = {}
+    for i = 1, GetNumRaidMembers() do
+        local n = UnitName("raid" .. i)
+        table.insert(members, n)
+    end
+    if table.getn(members) == 0 then
+        for i = 1, GetNumPartyMembers() do
+            local n = UnitName("party" .. i)
+            table.insert(members, n)
+        end
+    end
+    return members
+end
+
+local function OnMemberChange()
+    Meeting.members = GetMembers()
+
+    local joined = nil
+    for _, activity in ipairs(Meeting.activities) do
+        for _, member in ipairs(Meeting.members) do
+            if member == activity.unitname then
+                joined = activity
+                break
+            end
+        end
+    end
+
+    local needUpdateBrowser = false
+    local needUpdateCreator = false
+    local activity = joined or Meeting:FindActivity(Meeting.player)
+    if activity then
+        needUpdateBrowser = true
+        for i, applicant in ipairs(activity.applicantList) do
+            local isMember = false
+            for _, member in ipairs(Meeting.members) do
+                if member == applicant.name then
+                    isMember = true
+                    break
+                end
+            end
+            if isMember then
+                table.remove(activity.applicantList, i)
+            else
+                applicant.status = Meeting.APPLICANT_STATUS.None
+            end
+        end
+
+        if activity.unitname == Meeting.player then
+            local members = table.getn(Meeting.members) + 1
+            activity.members = members
+            Meeting.Message.SyncMembers(members)
+            if members >= Meeting.GetActivityMaxMembers(activity.code) then
+                Meeting.Message.CloseActivity()
+            end
+        end
+        needUpdateCreator = true
+    end
+
+    local ml = table.getn(Meeting.members)
+    local isLeader = ml == 0 or (ml > 0 and IsRaidLeader() == 1)
+    if not isLeader then
+        local activity
+        Meeting:FindActivity(Meeting.player)
+        if activity and not activity:IsChat() then
+            Meeting.Message.CloseActivity()
+            needUpdateBrowser = true
+            needUpdateCreator = true
+        end
+    end
+
+    if joined and joined.unitname ~= Meeting.player then
+        joined.applicantStatus = Meeting.APPLICANT_STATUS.Joined
+        Meeting.BrowserFrame:UpdateActivity(joined)
+        needUpdateBrowser = true
+    end
+
+    if Meeting.joinedActivity then
+        local activity = Meeting:FindActivity(Meeting.joinedActivity.unitname)
+        if activity then
+            activity.applicantStatus = Meeting.APPLICANT_STATUS.None
+            needUpdateBrowser = true
+        end
+        if not joined then
+            needUpdateCreator = true
+        end
+    end
+
+    Meeting.joinedActivity = joined
+
+    if needUpdateBrowser then
+        Meeting.BrowserFrame:UpdateList()
+    end
+    Meeting.CreatorFrame.UpdateActivity()
+    if needUpdateCreator then
+        Meeting.CreatorFrame:UpdateList()
+    end
+end
+
 local f = CreateFrame("Frame")
 f:RegisterEvent("CHAT_MSG_HARDCORE")
 f:RegisterEvent("CHAT_MSG_CHANNEL")
@@ -30,61 +129,19 @@ f:SetScript("OnEvent", function()
     elseif event == "CHAT_MSG_HARDCORE" then
         Meeting.Message.OnRecvFormChat("hardcore", arg2, arg1)
     elseif event == "PARTY_LEADER_CHANGED" then
-        if Meeting:GetMembers() > 1 and IsRaidLeader() ~= 1 then
+        if table.getn(Meeting.members) > 0 and IsRaidLeader() ~= 1 then
             if Meeting:FindActivity(Meeting.player) then
                 Meeting.Message.CloseActivity()
             end
         end
         Meeting.CreatorFrame.UpdateActivity()
     elseif event == "PARTY_MEMBERS_CHANGED" or event == "RAID_ROSTER_UPDATE" then
-        local needUpdateBrowser = false
-
-        local activity = Meeting:FindActivity(Meeting.player)
-        if activity then
-            needUpdateBrowser = true
-            for i, applicant in ipairs(activity.applicantList) do
-                if Meeting:IsInActivity(applicant.name) then
-                    table.remove(activity.applicantList, i)
-                else
-                    applicant.status = Meeting.APPLICANT_STATUS.None
-                end
-            end
-
-            local members = Meeting:GetMembers()
-            activity.members = members
-            Meeting.Message.SyncMembers(members)
-            Meeting.CreatorFrame:UpdateList()
-            if not activity:IsChat() then
-                if members >= Meeting.GetActivityMaxMembers(activity.code) then
-                    Meeting.Message.CloseActivity()
-                end
-            end
-        end
-
-        local joined = Meeting:FindJoinedActivity()
-        if joined and joined.unitname ~= Meeting.player then
-            joined.applicantStatus = Meeting.APPLICANT_STATUS.Joined
-            Meeting.BrowserFrame:UpdateActivity(joined)
-            needUpdateBrowser = true
-        end
-
-        if Meeting.joinedActivity then
-            local activity = Meeting:FindActivity(Meeting.joinedActivity.unitname)
-            if activity then
-                activity.applicantStatus = Meeting.APPLICANT_STATUS.None
-                needUpdateBrowser = true
-            end
-        end
-
-        if needUpdateBrowser then
-            Meeting.BrowserFrame:UpdateList()
-        end
-        Meeting.CreatorFrame.UpdateActivity()
-        Meeting.joinedActivity = joined
+        OnMemberChange()
     elseif event == "PLAYER_ENTERING_WORLD" then
         Meeting.CheckLFTChannel()
         Meeting.CheckPlayerHCMode()
         Meeting.Message.SendVersion()
+        Meeting.members = GetMembers()
         if MEETING_DB.activity then
             local now = time()
             if now - MEETING_DB.activity.lastTime < 120 then
@@ -153,13 +210,13 @@ function Meeting.CheckPlayerHCMode()
     Meeting.playerIsHC = isHC
 end
 
-function Meeting:HasActivity()
+function Meeting:OwnerActivity()
     for i, item in ipairs(Meeting.activities) do
         if item.unitname == Meeting.player then
-            return true
+            return item
         end
     end
-    return false
+    return nil
 end
 
 local mainFrame = Meeting.GUI.CreateFrame({
@@ -266,6 +323,7 @@ Meeting.GUI.CreateTabs({
                 Meeting.BrowserFrame:Hide()
                 Meeting.CreatorFrame:Show()
                 Meeting.CreatorFrame:UpdateList()
+                Meeting.CreatorFrame:UpdateActivity()
             end
         },
     }
@@ -349,6 +407,13 @@ function Meeting:OnCreate(id, code, comment, level, class, members, hc, classnum
         }
     end
 
+    for _, member in ipairs(Meeting.members) do
+        if member == item.unitname then
+            Meeting.joinedActivity = item
+            break
+        end
+    end
+
     table.insert(Meeting.activities, 1, item)
     if item:IsChat() and table.getn(Meeting.activities) > 1 then
         table.sort(Meeting.activities, function(a, b)
@@ -369,7 +434,7 @@ end
 
 function Meeting:OnRequest(name, id, level, class, score, comment, role)
     local activity = Meeting:FindActivity(id)
-    if activity and activity.unitname == Meeting.player then
+    if activity and (activity.unitname == Meeting.player or (Meeting.joinedActivity and Meeting.joinedActivity.unitname == id)) then
         local i = -1
         for index, value in ipairs(activity.applicantList) do
             if value.name == name then
@@ -411,6 +476,17 @@ function Meeting:OnDecline(id, name)
             Meeting.BrowserFrame:UpdateActivity(activity)
             Meeting.BrowserFrame:UpdateList()
         end
+    end
+    if id ~= Meeting.player and Meeting.joinedActivity and Meeting.joinedActivity.unitname == id then
+        local i = -1
+        for index, value in ipairs(Meeting.joinedActivity.applicantList) do
+            if value.name == name then
+                i = index
+                break
+            end
+        end
+        table.remove(Meeting.joinedActivity.applicantList, i)
+        Meeting.CreatorFrame:UpdateList()
     end
     Meeting.FloatFrame.Update()
 end

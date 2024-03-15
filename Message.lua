@@ -84,7 +84,7 @@ function Message.CreateActivity(code, comment)
     local data = string.format("%s:%s:%d:%d:%d:%d:%s", code,
         string.isempty(comment) and "_" or comment, UnitLevel("player"),
         Meeting.ClassToNumber(Meeting.playerClass),
-        Meeting:GetMembers(), Meeting.playerIsHC and 1 or 0, Meeting.EncodeGroupClass())
+        table.getn(Meeting.members) + 1, Meeting.playerIsHC and 1 or 0, Meeting.EncodeGroupClass())
     MEETING_DB.activity = {
         code = code,
         comment = comment,

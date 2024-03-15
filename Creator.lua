@@ -155,7 +155,9 @@ commentFrame:SetScript("OnEditFocusLost", function()
     text = string.gsub(text, "\n", "")
     text = string.gsub(text, ":", "：")
     commentFrame:SetText(text)
-    Meeting.createInfo.comment = text
+    if not Meeting.joinedActivity then
+        Meeting.createInfo.comment = text
+    end
 end)
 commentFrame:SetScript("OnEscapePressed", function()
     commentFrame:ClearFocus()
@@ -485,7 +487,8 @@ function Meeting.CreatorFrame:UpdateList()
         return
     end
 
-    local activity = Meeting:FindActivity(Meeting.player)
+    local activity = Meeting.joinedActivity or Meeting:FindActivity(Meeting.player)
+    local notLeader = IsRaidLeader() ~= 1
     applicantListFrame:Reload(activity and table.getn(activity.applicantList) or 0, function(frame, index)
         local applicant = activity.applicantList[index]
         local name = applicant.name
@@ -527,6 +530,14 @@ function Meeting.CreatorFrame:UpdateList()
             end
         end
 
+        if notLeader then
+            frame.acceptButton:Hide()
+            frame.declineButton:Hide()
+        else
+            frame.acceptButton:Show()
+            frame.declineButton:Show()
+        end
+
         if applicant.status == Meeting.APPLICANT_STATUS.Accepted then
             frame.acceptButton:SetText("已同意")
             frame.acceptButton:Disable()
@@ -545,19 +556,23 @@ end
 applicantListFrame.OnScroll = Meeting.CreatorFrame.UpdateList
 
 function Meeting.CreatorFrame.UpdateActivity()
-    if Meeting.createInfo.code then
-        selectButton:SetText(Meeting.GetActivityInfo(Meeting.createInfo.code).name)
+    if not Meeting.CreatorFrame:IsShown() then
+        return
     end
 
-    if not commentFrame:HasFocus() then
-        commentFrame:SetText(Meeting.createInfo.comment or "")
-    end
-
-    if Meeting:GetMembers() > 1 and IsRaidLeader() ~= 1 then
-        createButton:Disable()
-        closeButton:Disable()
-    else
-        local has = Meeting:HasActivity()
+    local ml = table.getn(Meeting.members)
+    local isLeader = ml == 0 or (ml > 0 and IsRaidLeader() == 1)
+    if isLeader then
+        if Meeting.createInfo.code then
+            selectButton:SetText(Meeting.GetActivityInfo(Meeting.createInfo.code).name)
+        else
+            selectButton:SetText("选择活动")
+        end
+        if not commentFrame:HasFocus() then
+            commentFrame:SetText(Meeting.createInfo.comment or "")
+        end
+        selectButton:Enable()
+        local has = Meeting:OwnerActivity()
         if has then
             createButton:SetText("修改活动")
         else
@@ -575,6 +590,26 @@ function Meeting.CreatorFrame.UpdateActivity()
         else
             closeButton:Disable()
         end
+
+        if table.getn(Meeting.members) > 0 and IsRaidLeader() ~= 1 then
+            createButton:Hide()
+            closeButton:Hide()
+        else
+            createButton:Show()
+            closeButton:Show()
+        end
+    elseif Meeting.joinedActivity then
+        selectButton:SetText(Meeting.GetActivityInfo(Meeting.joinedActivity.code).name)
+        commentFrame:SetText(Meeting.joinedActivity.comment == "_" and "" or Meeting.joinedActivity.comment or "")
+        selectButton:Disable()
+        createButton:Hide()
+        closeButton:Hide()
+    else
+        selectButton:SetText("选择活动")
+        commentFrame:SetText("")
+        selectButton:Disable()
+        createButton:Hide()
+        closeButton:Hide()
     end
 end
 

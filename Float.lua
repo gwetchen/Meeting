@@ -31,7 +31,7 @@ end)
 Meeting.FloatFrame = floatFrame
 
 function floatFrame.Update()
-    local activity = Meeting:FindActivity(Meeting.player)
+    local activity = Meeting.joinedActivity or Meeting:FindActivity(Meeting.player)
     local n = activity and table.getn(activity.applicantList) or 0
     floatFrame:SetText("集合石 " .. n .. "/" .. table.getn(Meeting.activities))
 end

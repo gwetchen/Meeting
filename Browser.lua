@@ -652,7 +652,7 @@ local function ReloadCell(frame, activity)
 
     frame.commentFrame:SetText(activity.comment ~= "_" and activity.comment or "")
 
-    if activity.unitname == Meeting.player or Meeting:IsInActivity(activity.unitname) then
+    if activity.unitname == Meeting.player or (Meeting.joinedActivity and Meeting.joinedActivity.unitname == activity.unitname) then
         frame.statusFrame:SetText("已加入")
         frame.statusFrame:SetTextColor(Meeting.GUI.Theme.Green.r, Meeting.GUI.Theme.Green.g,
             Meeting.GUI.Theme.Green.b)

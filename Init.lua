@@ -8,7 +8,7 @@ local _, class = UnitClass("player")
 Meeting = {
     VERSION = {
         MAJOR = 0,
-        MINOR = 8,
+        MINOR = 9,
         PATCH = 0
     },
 
@@ -29,6 +29,8 @@ Meeting = {
     channel = "LFT",
 
     isAFK = false,
+
+    members = {}
 }
 
 local classNameMap = {
@@ -265,7 +267,7 @@ Meeting.Categories = {
                 name = "斯坦索姆",
                 minLevel = 58,
                 members = 10,
-                match = { "stsm" }
+                match = { "斯坦索姆", "stsm" }
             },
             {
                 key = "KC",
@@ -487,40 +489,6 @@ function Meeting.GetActivityInfo(code)
     local other = Meeting.GetActivityInfo("OTHER")
     activityInfoMap[code] = other
     return other
-end
-
-function Meeting:GetMembers()
-    local partyCount = GetNumPartyMembers()
-    local raidCount = GetNumRaidMembers()
-    if raidCount > 0 then
-        return raidCount + 1
-    else
-        return partyCount + 1
-    end
-end
-
-function Meeting:IsInActivity(id)
-    for i = 1, GetNumRaidMembers() do
-        local n = UnitName("raid" .. i)
-        if n and n == id then
-            return true
-        end
-    end
-    for i = 1, GetNumPartyMembers() do
-        local n = UnitName("party" .. i)
-        if n and n == id then
-            return true
-        end
-    end
-    return false
-end
-
-function Meeting:FindJoinedActivity()
-    for _, item in ipairs(Meeting.activities) do
-        if Meeting:IsInActivity(item.unitname) then
-            return item
-        end
-    end
 end
 
 function Meeting.GetPlayerScore()
