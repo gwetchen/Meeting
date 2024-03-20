@@ -556,7 +556,7 @@ end
 applicantListFrame.OnScroll = Meeting.CreatorFrame.UpdateList
 
 function Meeting.CreatorFrame.UpdateActivity()
-    if not Meeting.CreatorFrame:IsShown() then
+    if not Meeting.MainFrame:IsShown() or not Meeting.CreatorFrame:IsShown() then
         return
     end
 

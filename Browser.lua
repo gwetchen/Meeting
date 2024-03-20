@@ -736,7 +736,7 @@ end
 local activities = {}
 
 function Meeting.BrowserFrame:UpdateList(force, scroll)
-    if not Meeting.BrowserFrame:IsShown() then
+    if not Meeting.MainFrame:IsShown() or not Meeting.BrowserFrame:IsShown() then
         return
     end
 
