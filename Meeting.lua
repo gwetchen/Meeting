@@ -99,7 +99,7 @@ local function OnMemberChange()
     end
 end
 
-local f = CreateFrame("Frame")
+local f = CreateFrame("Frame", "Meeting", UIParent)
 f:RegisterEvent("CHAT_MSG_HARDCORE")
 f:RegisterEvent("CHAT_MSG_CHANNEL")
 f:RegisterEvent("CHAT_MSG_SYSTEM")
@@ -375,8 +375,8 @@ end
 function Meeting:OnCreate(id, code, comment, level, class, members, hc, classnum)
     local item, index = Meeting:FindActivity(id)
     local code = Meeting.GetActivityInfo(code).key
-    local classMap = Meeting.DecodeGroupClass(classnum)
     local class = Meeting.NumberToClass(tonumber(class))
+    local classColor = Meeting.GetClassRGBColor(class, id)
     if item then
         item.category = Meeting.GetActivityCategory(code).key
         item.code = code
@@ -386,7 +386,10 @@ function Meeting:OnCreate(id, code, comment, level, class, members, hc, classnum
         item.members = tonumber(members)
         item.isHC = hc == "1"
         item.updated = time()
-        item.classMap = classMap
+        item.classColor = classColor
+        if classnum then
+            item.classnum = classnum
+        end
         table.remove(Meeting.activities, index)
     else
         item = {
@@ -400,9 +403,13 @@ function Meeting:OnCreate(id, code, comment, level, class, members, hc, classnum
             isHC = hc == "1",
             updated = time(),
             applicantList = {},
-            classMap = classMap,
+            classnum = classnum,
+            classColor = classColor,
             IsChat = function(self)
                 return self.category == "CHAT"
+            end,
+            GetClassMap = function(self)
+                return Meeting.DecodeGroupClass(self.classnum)
             end
         }
     end
@@ -495,8 +502,7 @@ function Meeting:OnMembers(id, members, classnum)
     local activity, index = Meeting:FindActivity(id)
     if activity then
         activity.members = tonumber(members)
-        local classMap = Meeting.DecodeGroupClass(classnum)
-        activity.classMap = classMap
+        activity.classnum = classnum
         table.remove(Meeting.activities, index)
         table.insert(Meeting.activities, 1, activity)
         Meeting.BrowserFrame:UpdateList()

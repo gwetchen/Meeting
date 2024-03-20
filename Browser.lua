@@ -75,6 +75,33 @@ local activityTypeTextFrame = Meeting.GUI.CreateText({
 Meeting.searchInfo.category = ""
 Meeting.searchInfo.code = ""
 
+local matchs = {}
+local function SetMathcKeyWorlds()
+    matchs = {}
+    if Meeting.searchInfo.category ~= "" and Meeting.searchInfo.code == "" then
+        for _, value in ipairs(Meeting.Categories) do
+            if value.key == Meeting.searchInfo.category then
+                for _, child in ipairs(value.children) do
+                    if child.match then
+                        for _, match in ipairs(child.match) do
+                            table.insert(matchs, match)
+                        end
+                    end
+                end
+                break
+            end
+        end
+    elseif Meeting.searchInfo.code ~= "" then
+        local info = Meeting.GetActivityInfo(Meeting.searchInfo.code)
+        if info.match then
+            for _, v in ipairs(info.match) do
+                table.insert(matchs, v)
+            end
+        end
+    end
+end
+
+
 local options = {
     type = 'group',
     args = {
@@ -87,6 +114,7 @@ local options = {
             set = function()
                 Meeting.searchInfo.category = ""
                 Meeting.searchInfo.code = ""
+                SetMathcKeyWorlds()
                 Menu:Close()
                 MeetingBworserSelectButton:SetText("选择活动")
                 Meeting.BrowserFrame:UpdateList(true)
@@ -109,6 +137,7 @@ for i, value in ipairs(Meeting.Categories) do
                 set = function()
                     Meeting.searchInfo.category = k
                     Meeting.searchInfo.code = ""
+                    SetMathcKeyWorlds()
                     Menu:Close()
                     MeetingBworserSelectButton:SetText("全部" .. name)
                     Meeting.BrowserFrame:UpdateList(true)
@@ -127,6 +156,7 @@ for i, value in ipairs(Meeting.Categories) do
                 get = function() return Meeting.searchInfo.code == k end,
                 set = function()
                     Meeting.searchInfo.code = k
+                    SetMathcKeyWorlds()
                     Menu:Close()
                     MeetingBworserSelectButton:SetText(name)
                     Meeting.BrowserFrame:UpdateList(true)
@@ -471,7 +501,8 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
             if isHover then
                 GameTooltip:SetOwner(this, "ANCHOR_RIGHT", 40)
                 GameTooltip:SetText(this.name, 1, 1, 1, 1)
-                GameTooltip:AddLine(this.leader, this.classColor.r, this.classColor.g, this.classColor.b, 1)
+                local classColor = this.activity.classColor
+                GameTooltip:AddLine(this.leader, classColor.r, classColor.g, classColor.b, 1)
 
                 if this.level > 0 then
                     local color = GetDifficultyColor(this.level)
@@ -484,10 +515,11 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
                     GameTooltip:AddLine(this.comment, 0.75, 0.75, 0.75, 1)
                 end
 
-                if this.classMap then
+                local classMap = this.activity:GetClassMap()
+                if classMap then
                     GameTooltip:AddLine(" ")
                     GameTooltip:AddLine("-- 成员 --", 0.75, 0.75, 0.75, 1)
-                    for k, v in pairs(this.classMap) do
+                    for k, v in pairs(classMap) do
                         local clsname = Meeting.GetClassLocaleName(k)
                         GameTooltip:AddLine(clsname .. " " .. v .. "个", 1, 1, 1, 1)
                     end
@@ -639,9 +671,9 @@ local function ReloadCell(frame, activity)
     local info = Meeting.GetActivityInfo(activity.code)
     frame.nameFrame:SetText(info.name)
     frame.hcFrame:SetText(activity.isHC and "HC" or "")
-    local rgb = Meeting.GetClassRGBColor(activity.class, activity.unitname)
     frame.leaderFrame:SetText(activity.unitname)
-    frame.leaderFrame:SetTextColor(rgb.r, rgb.g, rgb.b)
+    local classColor = activity.classColor
+    frame.leaderFrame:SetTextColor(classColor.r, classColor.g, classColor.b)
     local maxMambers = Meeting.GetActivityMaxMembers(activity.code)
     local isChat = activity:IsChat()
     if isChat then
@@ -692,14 +724,13 @@ local function ReloadCell(frame, activity)
         end
     end
 
+    frame.activity = activity
     frame.id = activity.unitname
     frame.name = info.name
     frame.isChat = isChat
     frame.leader = activity.unitname
-    frame.classColor = rgb
     frame.level = activity.level
     frame.comment = activity.comment
-    frame.classMap = activity.classMap
 end
 
 local activities = {}
@@ -724,29 +755,6 @@ function Meeting.BrowserFrame:UpdateList(force, scroll)
             if Meeting.searchInfo.category == "" or Meeting.searchInfo.category == activity.category then
                 if Meeting.searchInfo.code == "" or Meeting.searchInfo.code == activity.code then
                     table.insert(activities, activity)
-                end
-            end
-        end
-
-        local matchs = {}
-        if Meeting.searchInfo.category ~= "" and Meeting.searchInfo.code == "" then
-            for _, value in ipairs(Meeting.Categories) do
-                if value.key == Meeting.searchInfo.category then
-                    for _, child in ipairs(value.children) do
-                        if child.match then
-                            for _, match in ipairs(child.match) do
-                                table.insert(matchs, match)
-                            end
-                        end
-                    end
-                    break
-                end
-            end
-        elseif Meeting.searchInfo.code ~= "" then
-            local info = Meeting.GetActivityInfo(Meeting.searchInfo.code)
-            if info.match then
-                for _, v in ipairs(info.match) do
-                    table.insert(matchs, v)
                 end
             end
         end
