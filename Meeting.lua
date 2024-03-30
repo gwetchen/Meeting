@@ -547,9 +547,11 @@ function Meeting:OnVersion(version)
         return
     end
     major, minor, patch = tonumber(major), tonumber(minor), tonumber(patch)
-    if major > Meeting.VERSION.MAJOR or (major == Meeting.VERSION.MAJOR and minor > Meeting.VERSION.MINOR) or
-        (major == Meeting.VERSION.MAJOR and minor == Meeting.VERSION.MINOR and patch > Meeting.VERSION.PATCH) then
-        needUpdate = true
+    if major ~= nil and minor ~= nil and patch ~= nil then
+        if major > Meeting.VERSION.MAJOR or (major == Meeting.VERSION.MAJOR and minor > Meeting.VERSION.MINOR) or
+            (major == Meeting.VERSION.MAJOR and minor == Meeting.VERSION.MINOR and patch > Meeting.VERSION.PATCH) then
+            needUpdate = true
+        end
     end
     if needUpdate then
         titleFrame:SetText(title .. "  (有新版本，请更新)")
