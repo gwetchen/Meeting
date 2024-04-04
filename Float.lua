@@ -6,8 +6,6 @@ local floatFrame = Meeting.GUI.CreateButton({
     type = Meeting.GUI.BUTTON_TYPE.NORMAL,
     anchor = {
         point = "TOP",
-        x = 0,
-        y = 0
     },
     movable = true,
     click = function()
@@ -31,6 +29,9 @@ end)
 Meeting.FloatFrame = floatFrame
 
 function floatFrame.Update()
+    if not floatFrame:IsShown() then
+        return
+    end
     local activity = Meeting.joinedActivity or Meeting:FindActivity(Meeting.player)
     local n = activity and table.getn(activity.applicantList) or 0
     floatFrame:SetText("集合石 " .. n .. "/" .. table.getn(Meeting.activities))

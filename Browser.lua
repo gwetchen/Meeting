@@ -504,7 +504,7 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
                 local classColor = this.activity.classColor
                 GameTooltip:AddLine(this.leader, classColor.r, classColor.g, classColor.b, 1)
 
-                if this.level > 0 then
+                if this.level ~= nil and this.level > 0 then
                     local color = GetDifficultyColor(this.level)
                     GameTooltip:AddLine(
                         format('%s |cff%02x%02x%02x%s|r', LEVEL, color.r * 255, color.g * 255, color.b * 255,

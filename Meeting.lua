@@ -152,6 +152,12 @@ f:SetScript("OnEvent", function()
                 Meeting.Message.CreateActivity(Meeting.createInfo.code, Meeting.createInfo.comment)
             end
         end
+
+        if MEETING_DB.hideFloat == 1 then
+            Meeting.FloatFrame:Hide()
+        else
+            Meeting.FloatFrame:Show()
+        end
     elseif event == "PLAYER_LEAVING_WORLD" then
         if Meeting:FindActivity(Meeting.player) then
             Meeting.Message.CloseActivity(true)
@@ -607,3 +613,35 @@ C_Timer.NewTicker(5, function()
         Meeting.FloatFrame.Update()
     end
 end)
+
+SLASH_MEETING1 = "/meeting"
+SlashCmdList["MEETING"] = function(msg, editbox)
+    if (msg == "" or msg == nil) then
+        print("Meeting 集合石:")
+        print("  /meeting visible |cffcccccc- 显示或关闭悬浮窗")
+        print("  /meeting toggle |cffcccccc- 显示或者关闭集合石主界面")
+        print("  /meeting reset |cffcccccc- 重置")
+        return
+    end
+
+    local _, _, cmd, args = string.find(msg, "%s?(%w+)%s?(.*)")
+    cmd = string.lower(cmd)
+    if cmd == "visible" then
+        MEETING_DB.hideFloat = MEETING_DB.hideFloat == 1 and 0 or 1
+        if MEETING_DB.hideFloat == 1 then
+            Meeting.FloatFrame:Hide()
+        else
+            Meeting.FloatFrame:Show()
+        end
+    elseif cmd == "toggle" then
+        Meeting:Toggle()
+    elseif cmd == "reset" then
+        MEETING_DB = {}
+        Meeting.FloatFrame:ClearAllPoints()
+        Meeting.FloatFrame:SetPoint("TOP", 0, -20)
+        Meeting.FloatFrame:Show()
+
+        Meeting.MainFrame:ClearAllPoints()
+        Meeting.MainFrame:SetPoint("CENTER", 0, 0)
+    end
+end

@@ -8,8 +8,8 @@ local _, class = UnitClass("player")
 Meeting = {
     VERSION = {
         MAJOR = 0,
-        MINOR = 9,
-        PATCH = 3
+        MINOR = 10,
+        PATCH = 1
     },
 
     player = UnitName("player"),
