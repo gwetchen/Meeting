@@ -8,8 +8,8 @@ local _, class = UnitClass("player")
 Meeting = {
     VERSION = {
         MAJOR = 0,
-        MINOR = 10,
-        PATCH = 1
+        MINOR = 11,
+        PATCH = 0
     },
 
     player = UnitName("player"),
@@ -30,7 +30,14 @@ Meeting = {
 
     isAFK = false,
 
-    members = {}
+    members = {},
+
+    blockWorlds = {
+        '加速器',
+        '淘宝',
+        '代充',
+        '代练'
+    }
 }
 
 local classNameMap = {
