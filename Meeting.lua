@@ -379,14 +379,6 @@ function Meeting:DeleteActivity(id)
 end
 
 function Meeting:OnCreate(id, code, comment, level, class, members, hc, classnum)
-    if id ~= Meeting.player then
-        for _, world in ipairs(Meeting.blockWorlds) do
-            if string.find(comment, world) then
-                return
-            end
-        end
-    end
-
     local item, index = Meeting:FindActivity(id)
     local code = Meeting.GetActivityInfo(code).key
     local class = Meeting.NumberToClass(tonumber(class))

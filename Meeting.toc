@@ -1,7 +1,7 @@
 ## Interface: 11200
 ## Title: Meeting
 ## Title-zhCN: 集合石 Meeting
-## Version: 0.11.0
+## Version: 0.11.1
 ## Author: 龟壳
 ## SavedVariablesPerCharacter: MEETING_DB
 
