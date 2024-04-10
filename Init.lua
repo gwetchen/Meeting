@@ -9,7 +9,7 @@ Meeting = {
     VERSION = {
         MAJOR = 0,
         MINOR = 11,
-        PATCH = 1
+        PATCH = 2
     },
 
     player = UnitName("player"),
