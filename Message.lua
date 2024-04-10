@@ -11,10 +11,10 @@ local EVENTS = {
     VERSION = "V",
 }
 
-local function CheckBlockWorld(playerName, message)
+local function CheckBlockWords(playerName, message)
     if playerName ~= Meeting.player and message and message ~= "_" then
-        for _, world in ipairs(Meeting.blockWorlds) do
-            if string.find(message, world) then
+        for _, word in ipairs(Meeting.blockWords) do
+            if string.find(message, word) then
                 return true
             end
         end
@@ -25,7 +25,7 @@ end
 function Message.OnRecv(playerName, data)
     local _, event, arg1, arg2, arg3, arg4, arg5, arg6, arg7 = string.meetingsplit(data, ":")
     if event == EVENTS.CREATE then
-        if CheckBlockWorld(playerName, arg2) then
+        if CheckBlockWords(playerName, arg2) then
             return
         end
         Meeting:OnCreate(playerName, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
@@ -75,7 +75,7 @@ function Message.OnRecvFormChat(channel, playerName, message)
         return
     end
 
-    if CheckBlockWorld(playerName, message) then
+    if CheckBlockWords(playerName, message) then
         return
     end
 

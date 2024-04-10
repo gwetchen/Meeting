@@ -76,7 +76,7 @@ Meeting.searchInfo.category = ""
 Meeting.searchInfo.code = ""
 
 local matchs = {}
-local function SetMathcKeyWorlds()
+local function SetMathcKeyWords()
     matchs = {}
     if Meeting.searchInfo.category ~= "" and Meeting.searchInfo.code == "" then
         for _, value in ipairs(Meeting.Categories) do
@@ -114,7 +114,7 @@ local options = {
             set = function()
                 Meeting.searchInfo.category = ""
                 Meeting.searchInfo.code = ""
-                SetMathcKeyWorlds()
+                SetMathcKeyWords()
                 Menu:Close()
                 MeetingBworserSelectButton:SetText("选择活动")
                 Meeting.BrowserFrame:UpdateList(true)
@@ -137,7 +137,7 @@ for i, value in ipairs(Meeting.Categories) do
                 set = function()
                     Meeting.searchInfo.category = k
                     Meeting.searchInfo.code = ""
-                    SetMathcKeyWorlds()
+                    SetMathcKeyWords()
                     Menu:Close()
                     MeetingBworserSelectButton:SetText("全部" .. name)
                     Meeting.BrowserFrame:UpdateList(true)
@@ -156,7 +156,7 @@ for i, value in ipairs(Meeting.Categories) do
                 get = function() return Meeting.searchInfo.code == k end,
                 set = function()
                     Meeting.searchInfo.code = k
-                    SetMathcKeyWorlds()
+                    SetMathcKeyWords()
                     Menu:Close()
                     MeetingBworserSelectButton:SetText(name)
                     Meeting.BrowserFrame:UpdateList(true)

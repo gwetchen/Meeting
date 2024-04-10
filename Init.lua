@@ -32,7 +32,7 @@ Meeting = {
 
     members = {},
 
-    blockWorlds = {
+    blockWords = {
         '加速器',
         '淘宝',
         '代充',
