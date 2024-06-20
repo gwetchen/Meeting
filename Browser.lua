@@ -15,7 +15,7 @@ local function CreateSyncTip()
     })
     tip.text = Meeting.GUI.CreateText({
         parent = tip,
-        text = "正在同步数据...",
+        text = "Syncing data...",
         fontSize = 10,
         width = 200,
         anchor = {
@@ -29,7 +29,7 @@ local function CreateSyncTip()
     local i = 0
     C_Timer.NewTicker(1, function()
         i = i + 1
-        tip.text:SetText("正在同步数据..." .. (math.mod(i, 2) == 0 and "" or "..."))
+        tip.text:SetText("Syncing data..." .. (math.mod(i, 2) == 0 and "" or "..."))
         if i >= 60 then
             tip:Hide()
             return
@@ -62,7 +62,7 @@ browserFrame:EnableMouseWheel(true)
 
 local activityTypeTextFrame = Meeting.GUI.CreateText({
     parent = browserFrame,
-    text = "活动类型：",
+    text = "type of activity：",
     fontSize = 16,
     anchor = {
         point = "TOPLEFT",
@@ -108,15 +108,15 @@ local options = {
         ALL = {
             order = 1,
             type = "toggle",
-            name = "全部",
-            desc = "全部",
+            name = "all",
+            desc = "all",
             get = function() return Meeting.searchInfo.category == "" end,
             set = function()
                 Meeting.searchInfo.category = ""
                 Meeting.searchInfo.code = ""
                 SetMathcKeyWords()
                 Menu:Close()
-                MeetingBworserSelectButton:SetText("选择活动")
+                MeetingBworserSelectButton:SetText("Select Activity")
                 Meeting.BrowserFrame:UpdateList(true)
             end,
         }
@@ -131,15 +131,15 @@ for i, value in ipairs(Meeting.Categories) do
             ALL = {
                 order = 1,
                 type = "toggle",
-                name = "全部",
-                desc = "全部",
+                name = "all",
+                desc = "all",
                 get = function() return Meeting.searchInfo.category == k and Meeting.searchInfo.code == "" end,
                 set = function()
                     Meeting.searchInfo.category = k
                     Meeting.searchInfo.code = ""
                     SetMathcKeyWords()
                     Menu:Close()
-                    MeetingBworserSelectButton:SetText("全部" .. name)
+                    MeetingBworserSelectButton:SetText("all" .. name)
                     Meeting.BrowserFrame:UpdateList(true)
                 end,
             }
@@ -177,7 +177,7 @@ end
 local selectButton = Meeting.GUI.CreateButton({
     name = "MeetingBworserSelectButton",
     parent = browserFrame,
-    text = "选择活动",
+    text = "Select activity",
     type = Meeting.GUI.BUTTON_TYPE.PRIMARY,
     width = 120,
     height = 24,
@@ -220,7 +220,7 @@ Menu:Register(selectButton,
 
 local refreshButton = Meeting.GUI.CreateButton({
     parent = browserFrame,
-    text = "刷新",
+    text = "refresh",
     type = Meeting.GUI.BUTTON_TYPE.SUCCESS,
     width = 80,
     height = 24,
@@ -251,7 +251,7 @@ local activityListHeaderFrame = Meeting.GUI.CreateFrame({
 
 local activityTypeText = Meeting.GUI.CreateText({
     parent = activityListHeaderFrame,
-    text = "活动类型",
+    text = "Activity",
     fontSize = 14,
     width = 135,
     height = 24,
@@ -264,7 +264,7 @@ local activityTypeText = Meeting.GUI.CreateText({
 
 local modeText = Meeting.GUI.CreateText({
     parent = activityListHeaderFrame,
-    text = "模式",
+    text = "HC",
     fontSize = 14,
     width = 40,
     height = 24,
@@ -277,7 +277,7 @@ local modeText = Meeting.GUI.CreateText({
 
 local membersText = Meeting.GUI.CreateText({
     parent = activityListHeaderFrame,
-    text = "队伍人数",
+    text = "Size",
     fontSize = 14,
     width = 70,
     height = 24,
@@ -291,7 +291,7 @@ local membersText = Meeting.GUI.CreateText({
 
 local leaderText = Meeting.GUI.CreateText({
     parent = activityListHeaderFrame,
-    text = "队长",
+    text = "Leader",
     fontSize = 14,
     width = 90,
     height = 24,
@@ -304,7 +304,7 @@ local leaderText = Meeting.GUI.CreateText({
 
 local commentText = Meeting.GUI.CreateText({
     parent = activityListHeaderFrame,
-    text = "说明",
+    text = "Message",
     fontSize = 14,
     width = 370,
     height = 24,
@@ -317,7 +317,7 @@ local commentText = Meeting.GUI.CreateText({
 
 local actionText = Meeting.GUI.CreateText({
     parent = activityListHeaderFrame,
-    text = "操作",
+    text = "Interact",
     fontSize = 14,
     width = 150,
     height = 24,
@@ -451,7 +451,7 @@ local function CreateRequestPrompt(config)
                 x = -70,
                 y = -5
             },
-            text = "备注",
+            text = "Remark",
         })
 
         local input = Meeting.GUI.CreateInput({
@@ -518,14 +518,14 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
                 local classMap = this.activity:GetClassMap()
                 if classMap then
                     GameTooltip:AddLine(" ")
-                    GameTooltip:AddLine("-- 成员 --", 0.75, 0.75, 0.75, 1)
+                    GameTooltip:AddLine("-- member --", 0.75, 0.75, 0.75, 1)
                     for k, v in pairs(classMap) do
                         local clsname = Meeting.GetClassLocaleName(k)
                         GameTooltip:AddLine(clsname .. " " .. v .. "个", 1, 1, 1, 1)
                     end
                 end
                 GameTooltip:AddLine(" ")
-                GameTooltip:AddLine("<双击>悄悄话", 1, 1, 1, 1)
+                GameTooltip:AddLine("<Double click> Private message", 1, 1, 1, 1)
                 GameTooltip:SetWidth(220)
                 GameTooltip:Show()
             else
@@ -627,7 +627,7 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
 
         f.requestButton = Meeting.GUI.CreateButton({
             parent = f,
-            text = "申请",
+            text = "Apply",
             width = 34,
             height = 18,
             type = Meeting.GUI.BUTTON_TYPE.PRIMARY,
@@ -651,7 +651,7 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
                             x = 0,
                             y = 0
                         },
-                        title = "申请加入" .. f.name,
+                        title = "Apply join in" .. f.name,
                         confirm = function(text, role)
                             Meeting.Message.Request(f.id, text, role)
                             local activity = Meeting:FindActivity(f.id)
@@ -685,25 +685,25 @@ local function ReloadCell(frame, activity)
     frame.commentFrame:SetText(activity.comment ~= "_" and activity.comment or "")
 
     if activity.unitname == Meeting.player or (Meeting.joinedActivity and Meeting.joinedActivity.unitname == activity.unitname) then
-        frame.statusFrame:SetText("已加入")
+        frame.statusFrame:SetText("already join in")
         frame.statusFrame:SetTextColor(Meeting.GUI.Theme.Green.r, Meeting.GUI.Theme.Green.g,
             Meeting.GUI.Theme.Green.b)
         frame.statusFrame:Show()
         frame.requestButton:Hide()
     else
         if activity.applicantStatus == Meeting.APPLICANT_STATUS.Invited then
-            frame.statusFrame:SetText("已申请")
+            frame.statusFrame:SetText("already Apply")
             frame.statusFrame:SetTextColor(Meeting.GUI.Theme.Green.r, Meeting.GUI.Theme.Green.g,
                 Meeting.GUI.Theme.Green.b)
             frame.statusFrame:Show()
             frame.requestButton:Hide()
         elseif activity.applicantStatus == Meeting.APPLICANT_STATUS.Declined then
-            frame.statusFrame:SetText("已拒绝")
+            frame.statusFrame:SetText("already reject")
             frame.statusFrame:SetTextColor(Meeting.GUI.Theme.Red.r, Meeting.GUI.Theme.Red.g, Meeting.GUI.Theme.Red.b)
             frame.statusFrame:Show()
             frame.requestButton:Hide()
         elseif activity.applicantStatus == Meeting.APPLICANT_STATUS.Joined then
-            frame.statusFrame:SetText("已加入")
+            frame.statusFrame:SetText("already join in")
             frame.statusFrame:SetTextColor(Meeting.GUI.Theme.Green.r, Meeting.GUI.Theme.Green.g,
                 Meeting.GUI.Theme.Green.b)
             frame.statusFrame:Show()
@@ -713,13 +713,13 @@ local function ReloadCell(frame, activity)
             frame.requestButton:Show()
             if isChat then
                 frame.requestButton:Enable()
-                frame.requestButton:SetText("密语")
+                frame.requestButton:SetText("DM")
             elseif activity.members >= maxMambers then
                 frame.requestButton:Disable()
-                frame.requestButton:SetText("满员")
+                frame.requestButton:SetText("Full")
             else
                 frame.requestButton:Enable()
-                frame.requestButton:SetText("申请")
+                frame.requestButton:SetText("Apply")
             end
         end
     end

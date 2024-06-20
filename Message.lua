@@ -94,7 +94,7 @@ function Message.Send(event, msg)
     if channel ~= 0 then
         SendChatMessage("Meeting:" .. event .. ":" .. msg, "CHANNEL", nil, channel)
     else
-        print("请先加入" .. Meeting.channel .. "频道")
+        print("Plaese join the " .. Meeting.channel .. " channel first")
     end
 end
 

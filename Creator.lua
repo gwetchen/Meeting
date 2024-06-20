@@ -85,7 +85,7 @@ end
 local selectButton = Meeting.GUI.CreateButton({
     parent = creatorInfoFrame,
     name = "MeetingCreatorSelectButton",
-    text = "选择活动",
+    text = "Select activity",
     width = 120,
     height = 24,
     type = Meeting.GUI.BUTTON_TYPE.PRIMARY,
@@ -112,7 +112,7 @@ Menu:Register(selectButton,
 
 local commentTextFrame = Meeting.GUI.CreateText({
     parent = creatorInfoFrame,
-    text = "活动说明：",
+    text = "Group Description：",
     fontSize = 16,
     anchor = {
         point = "TOPLEFT",
@@ -167,7 +167,7 @@ local createButton = Meeting.GUI.CreateButton({
     parent = creatorInfoFrame,
     width = 80,
     height = 24,
-    text = "创建活动",
+    text = "CList Group",
     type = Meeting.GUI.BUTTON_TYPE.SUCCESS,
     anchor = {
         point = "TOPLEFT",
@@ -187,7 +187,7 @@ local closeButton = Meeting.GUI.CreateButton({
     parent = creatorInfoFrame,
     width = 80,
     height = 24,
-    text = "解散活动",
+    text = "Delete",
     type = Meeting.GUI.BUTTON_TYPE.DANGER,
     anchor = {
         point = "TOP",
@@ -216,7 +216,7 @@ local applicantListHeaderFrame = Meeting.GUI.CreateFrame({
 
 local nameText = Meeting.GUI.CreateText({
     parent = applicantListHeaderFrame,
-    text = "角色名",
+    text = "Name",
     fontSize = 14,
     width = 80,
     height = 24,
@@ -229,7 +229,7 @@ local nameText = Meeting.GUI.CreateText({
 
 local levelText = Meeting.GUI.CreateText({
     parent = applicantListHeaderFrame,
-    text = "等级",
+    text = "Level",
     fontSize = 14,
     width = 40,
     height = 24,
@@ -242,7 +242,7 @@ local levelText = Meeting.GUI.CreateText({
 
 local roleText = Meeting.GUI.CreateText({
     parent = applicantListHeaderFrame,
-    text = "职责",
+    text = "Role",
     fontSize = 14,
     width = 40,
     height = 24,
@@ -255,9 +255,9 @@ local roleText = Meeting.GUI.CreateText({
 
 local scoreText = Meeting.GUI.CreateText({
     parent = applicantListHeaderFrame,
-    text = "装等",
+    text = "Equipment etc.",
     fontSize = 14,
-    width = 40,
+    width = 160,
     height = 24,
     anchor = {
         point = "TOPLEFT",
@@ -269,7 +269,7 @@ local scoreText = Meeting.GUI.CreateText({
 
 local commentText = Meeting.GUI.CreateText({
     parent = applicantListHeaderFrame,
-    text = "说明",
+    text = "message",
     fontSize = 14,
     width = 250,
     height = 24,
@@ -282,7 +282,7 @@ local commentText = Meeting.GUI.CreateText({
 
 local actionText = Meeting.GUI.CreateText({
     parent = applicantListHeaderFrame,
-    text = "操作",
+    text = "operate",
     fontSize = 14,
     width = 100,
     height = 24,
@@ -313,7 +313,7 @@ local applicantListFrame = Meeting.GUI.CreateListFrame({
                 GameTooltip:SetOwner(this, "ANCHOR_RIGHT", 40)
                 GameTooltip:SetText(this.applicant.name, this.classColor.r, this.classColor.g, this.classColor.b, 1)
                 if this.applicant.score > 0 then
-                    GameTooltip:AddLine("装等：" .. this.applicant.score)
+                    GameTooltip:AddLine("Decoration: " .. this.applicant.score)
                 end
 
                 local color = GetDifficultyColor(this.applicant.level)
@@ -325,7 +325,7 @@ local applicantListFrame = Meeting.GUI.CreateListFrame({
                     GameTooltip:AddLine(this.applicant.comment, 0.75, 0.75, 0.75, 1)
                 end
                 GameTooltip:AddLine(" ")
-                GameTooltip:AddLine("<双击>悄悄话", 1, 1, 1, 1)
+                GameTooltip:AddLine("<Double click> Private message", 1, 1, 1, 1)
                 GameTooltip:SetWidth(220)
                 GameTooltip:Show()
             else
@@ -430,7 +430,7 @@ local applicantListFrame = Meeting.GUI.CreateListFrame({
 
         f.acceptButton = Meeting.GUI.CreateButton({
             parent = f,
-            text = "同意",
+            text = "agree",
             type = Meeting.GUI.BUTTON_TYPE.SUCCESS,
             width = 34,
             height = 18,
@@ -444,7 +444,7 @@ local applicantListFrame = Meeting.GUI.CreateListFrame({
             click = function()
                 f.applicant.status = Meeting.APPLICANT_STATUS.Invited
                 InviteByName(f.applicant.name)
-                this:SetText("已同意")
+                this:SetText("already agree")
                 this:Disable()
             end
         })
@@ -539,13 +539,13 @@ function Meeting.CreatorFrame:UpdateList()
         end
 
         if applicant.status == Meeting.APPLICANT_STATUS.Accepted then
-            frame.acceptButton:SetText("已同意")
+            frame.acceptButton:SetText("already agree")
             frame.acceptButton:Disable()
         elseif applicant.status == Meeting.APPLICANT_STATUS.None then
-            frame.acceptButton:SetText("同意")
+            frame.acceptButton:SetText("agree")
             frame.acceptButton:Enable()
         elseif applicant.status == Meeting.APPLICANT_STATUS.Declined then
-            frame.acceptButton:SetText("已拒绝")
+            frame.acceptButton:SetText("already reject")
             frame.acceptButton:Enable()
         end
         frame.applicant = applicant
@@ -566,7 +566,7 @@ function Meeting.CreatorFrame.UpdateActivity()
         if Meeting.createInfo.code then
             selectButton:SetText(Meeting.GetActivityInfo(Meeting.createInfo.code).name)
         else
-            selectButton:SetText("选择活动")
+            selectButton:SetText("Select activity")
         end
         if not commentFrame:HasFocus() then
             commentFrame:SetText(Meeting.createInfo.comment or "")
@@ -574,9 +574,9 @@ function Meeting.CreatorFrame.UpdateActivity()
         selectButton:Enable()
         local has = Meeting:OwnerActivity()
         if has then
-            createButton:SetText("修改活动")
+            createButton:SetText("Update Listing")
         else
-            createButton:SetText("创建活动")
+            createButton:SetText("List Group")
         end
 
         if string.isempty(Meeting.createInfo.code) then
@@ -605,7 +605,7 @@ function Meeting.CreatorFrame.UpdateActivity()
         createButton:Hide()
         closeButton:Hide()
     else
-        selectButton:SetText("选择活动")
+        selectButton:SetText("Select activity")
         commentFrame:SetText("")
         selectButton:Disable()
         createButton:Hide()

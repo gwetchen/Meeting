@@ -104,258 +104,262 @@ end
 Meeting.Categories = {
     {
         key = "DUNGENO",
-        name = "地下城",
+        name = "Dungeons",
         members = 5,
         children = {
             {
                 key = "RFC",
-                name = "怒焰裂谷",
+                name = "Ragefire Chasm",
                 minLevel = 13,
-                match = { "怒焰", "ny" }
+                match = { "rfc", "Ragefire" }
             },
             {
                 key = "WC",
-                name = "哀嚎洞穴",
+                name = "Wailing Caverns",
                 minLevel = 17,
-                match = { "哀嚎", "ah" }
+                match = { "wc", "Wailing Caverns" }
             },
             {
                 key = "DM",
-                name = "死亡矿井",
+                name = "The Dead Mines",
                 minLevel = 17,
-                match = { "死矿" }
+                match = { "DM", "Dead Mines" }
             },
             {
                 key = "SFK",
-                name = "影牙城堡",
+                name = "Shadowfang Keep",
                 minLevel = 22,
-                match = { "影牙" }
+                match = { "SFK", "Shadowfang" }
             },
             {
                 key = "STOCKS",
-                name = "暴风城：监狱",
+                name = "The Stockades",
                 minLevel = 22,
-                match = { "监狱" }
+                match = { "stockades", "stocks" }
             },
             {
                 key = "BFD",
-                name = "黑暗深渊",
+                name = "Blackfathom Deeps",
                 minLevel = 23,
-                match = { "深渊" }
+                match = { "bfd", "Blackfathom" }
             },
             {
                 key = "SMGY",
-                name = "血色修道院墓地",
+                name = "Scarlet Monastery: Graveyard",
                 minLevel = 27,
-                match = { "血色" }
+                match = { "smgy", "sm gy", "sm Graveyard", "Graveyard" }
             },
             {
                 key = "SMLIB",
-                name = "血色修道院图书馆",
+                name = "Scarlet Monastery: Library",
                 minLevel = 28,
-                match = { "血色" }
+                match = { "smlib", "sm library", "Library" }
             },
             {
                 key = "GNOMER",
-                name = "诺莫瑞根",
+                name = "Gnomeregan",
                 minLevel = 29,
+                match = {"gnomer", "Gnomeregan"}
             },
             {
                 key = "RFK",
-                name = "剃刀沼泽",
+                name = "Razorfen Kraul",
                 minLevel = 29,
-                match = { "剃刀" }
+                match = { "rfk", "kraul" }
             },
             {
                 key = "TCG",
-                name = "新月林地",
+                name = "The Crescent Grove",
                 minLevel = 32,
-                match = { "新月" }
+                match = { "Crescent Grove" }
             },
             {
                 key = "SMARMORY",
-                name = "血色修道院军械库",
+                name = "Scarlet Monastery: Armory",
                 minLevel = 32,
-                match = { "血色" }
+                match = { "smarmory", "sm armory", "Armory" }
             },
             {
                 key = "SMCATH",
-                name = "血色修道院大教堂",
+                name = "Scarlet Monastery: Cathedral",
                 minLevel = 35,
-                match = { "血色" }
+                match = { "smcath", "sm cath", "Cathedral" }
             },
             {
                 key = "RFD",
-                name = "剃刀高地",
+                name = "Razorfen Downs",
                 minLevel = 36,
-                match = { "剃刀" }
+                match = { "rfd", "Razorfen Downs" }
             },
             {
                 key = "ULDA",
-                name = "奥达曼",
+                name = "Uldaman",
                 minLevel = 40,
-                match = { "奥达曼" }
+                match = { "Uldaman" }
             },
             {
                 key = "GILNEAS",
-                name = "吉尔尼斯城",
+                name = "Gilneas City",
                 minLevel = 42,
+                match = {"Gilneas City"}
             },
             {
                 key = "ZF",
-                name = "祖尔法拉克",
+                name = "Zul'Farrak",
                 minLevel = 44,
-                match = { "祖尔", "zul" }
+                match = { "zf", "zul" }
             },
             {
                 key = "MARA",
-                name = "玛拉顿",
+                name = "Maraudon",
                 minLevel = 45,
-                match = { "玛拉顿" }
+                match = { "Mara", "Maraudon" }
             },
             {
                 key = "ST",
-                name = "阿塔哈卡神庙",
+                name = "The Sunken Temple",
                 minLevel = 50,
-                match = { "神庙" }
+                match = { "st", "sunken temple" }
             },
             {
                 key = "HFQ",
-                name = "仇恨熔炉采石场",
+                name = "Hateforge Quarry",
                 minLevel = 50,
-                match = { "采石场" }
+                match = { "HFQ", "Hateforge" }
             },
             {
                 key = "BRD",
-                name = "黑石深渊",
+                name = "Blackrock Depths",
                 minLevel = 52,
+                match = {"brd"}
             },
             {
                 key = "UBRS",
-                name = "黑石塔上层",
+                name = "Upper Blackrock Spire",
                 minLevel = 55,
                 members = 10,
-                match = { "黑上" }
+                match = { "UBRS" }
             },
             {
                 key = "LBRS",
-                name = "黑石塔下层",
+                name = "Lower Blackrock Spire",
                 minLevel = 55,
-                match = { "黑下" }
+                match = { "LBRS" }
 
             },
             {
                 key = "DME",
-                name = "厄运之槌：东",
+                name = "Dire Maul: East",
                 minLevel = 55,
-                match = { "厄运东" }
+                match = { "DME", "DM:E", "DM East", "DMEast", "DM:East" }
             },
             {
                 key = "DMN",
-                name = "厄运之槌：北",
+                name = "Dire Maul: North",
                 minLevel = 57,
-                match = { "厄运北" }
+                match = { "DMN", "DM:N", "DM North", "DMNorth", "DM:North" }
             },
             {
                 key = "DMW",
-                name = "厄运之槌：西",
+                name = "Dire Maul: West",
                 minLevel = 57,
-                match = { "厄运西" }
+                match = { "DMW", "DM:W", "DM West", "DMWwest", "DM:West" }
             },
             {
                 key = "SCHOLO",
-                name = "通灵学院",
+                name = "Scholomance",
                 minLevel = 58,
                 members = 10,
-                match = { "通灵", "tl" }
+                match = { "scholo", "Scholomance" }
             },
             {
                 key = "STRAT",
-                name = "斯坦索姆",
+                name = "Stratholme",
                 minLevel = 58,
                 members = 10,
-                match = { "斯坦索姆", "stsm" }
+                match = { "strat", "Stratholme" }
             },
             {
                 key = "KC",
-                name = "卡拉赞地穴",
+                name = "Karazhan Crypt",
                 minLevel = 58,
-                match = { "卡拉赞", "klz" }
+                match = { "crypts" }
             },
             {
                 key = "COTBM",
-                name = "时间之穴：黑色沼泽",
+                name = "Caverns of Time: Black Morass",
                 minLevel = 60,
-                match = { "时光", "沼泽" }
+                match = { "CoT", "BM" }
             },
             {
                 key = "SWV",
-                name = "暴风城：地牢",
+                name = "Stormwind Vault",
                 minLevel = 60,
+                match = { "SWV", "Stormwind Vault" }
             },
         }
     },
     {
         key = "RAID",
-        name = "团队副本",
+        name = "Raids ",
         members = 40,
         children = {
             {
                 key = "MC",
-                name = "熔火之心",
+                name = "Molten Core",
                 minLevel = 60,
                 match = { "mc" }
             },
             {
                 key = "ONY",
-                name = "奥妮克希亚的巢穴",
+                name = "Onyxia's Lair",
                 minLevel = 60,
-                match = { "黑龙" }
+                match = { "ony", "onyxia" }
             },
             {
                 key = "BWL",
-                name = "黑翼之巢",
+                name = "Blackwing Lair",
                 minLevel = 60,
-                match = { "黑翼", "bwl" }
+                match = { "bwl" }
             },
             {
                 key = "AQ40",
-                name = "安其拉神殿",
+                name = "Temple of Ahn'Qiraj",
                 minLevel = 60,
-                match = { "安其拉", "taq" }
+                match = { "AQ40" }
             },
             {
                 key = "NAXX",
-                name = "纳克萨玛斯",
+                name = "Naxxramas",
                 minLevel = 60,
                 match = { "naxx" }
             },
             {
                 key = "ZUG",
-                name = "祖尔格拉布",
+                name = "Zul'Gurub",
                 minLevel = 60,
                 members = 20,
-                match = { "祖格", "zug", "zg", "龙虎金" }
+                match = { "zg" }
             },
             {
                 key = "AQ20",
-                name = "安其拉废墟",
+                name = "Ruins of Ahn'Qiraj",
                 minLevel = 60,
                 members = 20,
-                match = { "废墟", "fx" }
+                match = { "aq20" }
             },
             {
                 key = "LKH",
-                name = "卡拉赞下层",
+                name = "Lower Karazhan  Halls",
                 minLevel = 60,
                 members = 10,
-                match = { "卡拉赞", "klz" }
+                match = { "kara", "kara10", "lkh" }
             },
             {
                 key = "ES",
-                name = "翡翠圣殿",
+                name = "Emerald Sanctum",
                 minLevel = 60,
-                match = { "翡翠" }
+                match = { "ES", "Emerald Sanctum" }
             }
         }
     },
@@ -381,31 +385,31 @@ Meeting.Categories = {
         children = {
             {
                 key = "AV",
-                name = "奥特兰克山谷",
+                name = "Alterac Valley",
                 minLevel = 51,
                 members = 40,
             },
             {
                 key = "WSG",
-                name = "战歌峡谷",
+                name = "Warsong Gulch",
                 minLevel = 10,
                 members = 10,
             },
             {
                 key = "AB",
-                name = "阿拉希盆地",
+                name = "Arathi Basin",
                 minLevel = 20,
                 members = 15,
             },
             {
                 key = "BR",
-                name = "血环竞技场",
+                name = "Blood Ring",
                 minLevel = 11,
                 members = 3
             },
             {
                 key = "PVP",
-                name = "野外PvP",
+                name = "Open World PvP",
                 minLevel = 1,
                 members = 40
             },
@@ -413,40 +417,40 @@ Meeting.Categories = {
     },
     {
         key = "OTHER",
-        name = "其它",
+        name = "Other",
         members = 40,
         children = {
             {
                 key = "QUEST",
-                name = "任务",
+                name = "Quest",
                 minLevel = 1,
             },
             {
                 key = "OTHER",
-                name = "其它",
+                name = "Other",
                 minLevel = 1,
             },
         }
     },
     {
         key = "CHAT",
-        name = "频道",
+        name = "Channels",
         members = 40,
         hide = true,
         children = {
             {
                 key = "WORLD",
-                name = "世界频道",
+                name = "/World",
                 minLevel = 1,
             },
             {
                 key = "CHINA",
-                name = "中文频道",
+                name = "/China",
                 minLevel = 1,
             },
             {
                 key = "HARDCORE",
-                name = "硬核频道",
+                name = "/Hardcore",
                 minLevel = 1,
             },
         }

@@ -121,10 +121,10 @@ f:SetScript("OnEvent", function()
                 Meeting.Message.OnRecv(arg2, arg1)
             else
                 local lowname = string.lower(name)
-                if lowname == "world" or lowname == "china" or lowname == "世界频道" or lowname == "寻求组队" then
-                    if lowname == "世界频道" or lowname == "寻求组队" then
+                if lowname == "world" then --or lowname == "china" or lowname == "世界频道" or lowname == "寻求组队" then
+                    --[[if lowname == "世界频道" or lowname == "寻求组队" then
                         lowname = "world"
-                    end
+                    end]]--
                     Meeting.Message.OnRecvFormChat(lowname, arg2, arg1)
                 end
             end
@@ -261,7 +261,7 @@ line:SetHeight(0.5)
 line:SetTexture(1, 1, 1, 0.5)
 line:SetPoint("TOPLEFT", headerFrame, "BOTTOMLEFT", 0, 0)
 
-local title = "集合石 " .. Meeting.VERSION.MAJOR .. "." .. Meeting.VERSION.MINOR .. "." .. Meeting.VERSION.PATCH
+local title = "Meeting " .. Meeting.VERSION.MAJOR .. "." .. Meeting.VERSION.MINOR .. "." .. Meeting.VERSION.PATCH
 local titleFrame = Meeting.GUI.CreateText({
     parent = headerFrame,
     text = title,
@@ -277,7 +277,7 @@ local titleFrame = Meeting.GUI.CreateText({
 
 Meeting.GUI.CreateText({
     parent = headerFrame,
-    text = "问题和建议前往龟壳KOOK",
+    text = "English version",
     fontSize = 10,
     anchor = {
         point = "TOPLEFT",
@@ -319,7 +319,7 @@ Meeting.GUI.CreateTabs({
     },
     list = {
         {
-            title = "浏览活动",
+            title = "Browse",
             select = function()
                 Meeting.CreatorFrame:Hide()
                 Meeting.BrowserFrame:Show()
@@ -327,7 +327,7 @@ Meeting.GUI.CreateTabs({
             end
         },
         {
-            title = "管理活动",
+            title = "List",
             select = function()
                 Meeting.BrowserFrame:Hide()
                 Meeting.CreatorFrame:Show()
@@ -563,7 +563,7 @@ function Meeting:OnVersion(version)
         end
     end
     if needUpdate then
-        titleFrame:SetText(title .. "  (有新版本，请更新)")
+        titleFrame:SetText(title .. "  (New version available，please update)")
     end
 end
 
@@ -621,9 +621,9 @@ SLASH_MEETING1 = "/meeting"
 SlashCmdList["MEETING"] = function(msg, editbox)
     if (msg == "" or msg == nil) then
         print("Meeting 集合石:")
-        print("  /meeting visible |cffcccccc- 显示或关闭悬浮窗")
-        print("  /meeting toggle |cffcccccc- 显示或者关闭集合石主界面")
-        print("  /meeting reset |cffcccccc- 重置")
+        print("  /meeting visible |cffcccccc- Show or hide the small window")
+        print("  /meeting toggle |cffcccccc- Show or hide the main window")
+        print("  /meeting reset |cffcccccc- reset")
         return
     end
 

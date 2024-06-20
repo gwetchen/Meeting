@@ -308,7 +308,7 @@ function GUI.CreateDialog(config)
         parent = parent,
         width = 80,
         height = 24,
-        text = "确定",
+        text = "Confirm",
         type = GUI.BUTTON_TYPE.PRIMARY,
         anchor = {
             point = "TOPRIGHT",
@@ -328,7 +328,7 @@ function GUI.CreateDialog(config)
         parent = parent,
         width = 80,
         height = 24,
-        text = "取消",
+        text = "Cancel",
         type = GUI.BUTTON_TYPE.DANGER,
         anchor = {
             point = "TOPLEFT",
