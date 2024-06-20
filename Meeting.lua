@@ -621,9 +621,9 @@ SLASH_MEETING1 = "/tub"
 SlashCmdList["MEETING"] = function(msg, editbox)
     if (msg == "" or msg == nil) then
         print("Turtle Hub:")
-        print("  /meeting visible |cffcccccc- Show or hide the small window")
-        print("  /meeting toggle |cffcccccc- Show or hide the main window")
-        print("  /meeting reset |cffcccccc- reset")
+        print("  /tub visible |cffcccccc- Show or hide the small window")
+        print("  /tub toggle |cffcccccc- Show or hide the main window")
+        print("  /tub reset |cffcccccc- reset")
         return
     end
 
