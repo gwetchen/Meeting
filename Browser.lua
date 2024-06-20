@@ -62,7 +62,7 @@ browserFrame:EnableMouseWheel(true)
 
 local activityTypeTextFrame = Meeting.GUI.CreateText({
     parent = browserFrame,
-    text = "type of activity：",
+    text = "Looking for: ",
     fontSize = 16,
     anchor = {
         point = "TOPLEFT",
