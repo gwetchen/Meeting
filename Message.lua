@@ -92,7 +92,7 @@ end
 function Message.Send(event, msg)
     local channel = GetChannelName(Meeting.channel)
     if channel ~= 0 then
-        SendChatMessage("TurtleHub:" .. event .. ":" .. msg, "CHANNEL", nil, channel)
+        SendChatMessage("Tub:" .. event .. ":" .. msg, "CHANNEL", nil, channel)
     else
         print("Plaese join the " .. Meeting.channel .. " channel first")
     end
