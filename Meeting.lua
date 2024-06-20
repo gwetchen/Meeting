@@ -261,7 +261,7 @@ line:SetHeight(0.5)
 line:SetTexture(1, 1, 1, 0.5)
 line:SetPoint("TOPLEFT", headerFrame, "BOTTOMLEFT", 0, 0)
 
-local title = "Meeting " .. Meeting.VERSION.MAJOR .. "." .. Meeting.VERSION.MINOR .. "." .. Meeting.VERSION.PATCH
+local title = "Turtle Hub " .. Meeting.VERSION.MAJOR .. "." .. Meeting.VERSION.MINOR .. "." .. Meeting.VERSION.PATCH
 local titleFrame = Meeting.GUI.CreateText({
     parent = headerFrame,
     text = title,

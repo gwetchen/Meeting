@@ -255,7 +255,7 @@ local roleText = Meeting.GUI.CreateText({
 
 local scoreText = Meeting.GUI.CreateText({
     parent = applicantListHeaderFrame,
-    text = "Equipment etc.",
+    text = "Gearscore",
     fontSize = 14,
     width = 160,
     height = 24,
