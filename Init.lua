@@ -257,7 +257,7 @@ Meeting.Categories = {
                 key = "DMN",
                 name = "Dire Maul: North",
                 minLevel = 57,
-                match = { "DMN", "DM:N", "DM North", "DMNorth", "DM:North" }
+                match = { "DMN", "DM:N", "DM North", "DMNorth", "DM:North", "tribute" }
             },
             {
                 key = "DMW",
