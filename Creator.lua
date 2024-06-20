@@ -313,7 +313,7 @@ local applicantListFrame = Meeting.GUI.CreateListFrame({
                 GameTooltip:SetOwner(this, "ANCHOR_RIGHT", 40)
                 GameTooltip:SetText(this.applicant.name, this.classColor.r, this.classColor.g, this.classColor.b, 1)
                 if this.applicant.score > 0 then
-                    GameTooltip:AddLine("Decoration: " .. this.applicant.score)
+                    GameTooltip:AddLine("Score?: " .. this.applicant.score)
                 end
 
                 local color = GetDifficultyColor(this.applicant.level)
