@@ -71,7 +71,7 @@ function Message.OnRecvFormChat(channel, playerName, message)
         return
     end
 
-    if string.find(message, "求组") then
+    if string.find(message, "LFG") then
         return
     end
 

@@ -219,7 +219,7 @@ Meeting.Categories = {
                 key = "ST",
                 name = "The Sunken Temple",
                 minLevel = 50,
-                match = { "st", "sunken temple" }
+                match = { "sunken temple" }
             },
             {
                 key = "HFQ",
@@ -301,7 +301,7 @@ Meeting.Categories = {
     },
     {
         key = "RAID",
-        name = "Raids ",
+        name = "Raids",
         members = 40,
         children = {
             {
