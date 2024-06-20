@@ -4,6 +4,8 @@
 
 English version of the group finding addon [Meeting](https://github.com/yizhi996/Meeting).
 
+Type /tub to open the options.
+
 The addon scans the /World chat channel for group adds and lists them in a convenient manner similar to the Classic WoW addon Bulletin Board. Message the group leader by double clicking their add or pressing the DM button.
 
 Additionally the addon allows the user to list groups in it's own system. These groups can not be seen by players without the addon but provide some additional functionality.   

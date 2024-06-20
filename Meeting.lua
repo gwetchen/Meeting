@@ -117,7 +117,7 @@ f:SetScript("OnEvent", function()
             _, name = GetChannelName(source)
         end
         if name then
-            if name == Meeting.channel and string.startswith(arg1, "Meeting:") then
+            if name == Meeting.channel and string.startswith(arg1, "Tub:") then
                 Meeting.Message.OnRecv(arg2, arg1)
             else
                 local lowname = string.lower(name)
@@ -617,10 +617,10 @@ C_Timer.NewTicker(5, function()
     end
 end)
 
-SLASH_MEETING1 = "/meeting"
+SLASH_MEETING1 = "/tub"
 SlashCmdList["MEETING"] = function(msg, editbox)
     if (msg == "" or msg == nil) then
-        print("Meeting 集合石:")
+        print("Turtle Hub:")
         print("  /meeting visible |cffcccccc- Show or hide the small window")
         print("  /meeting toggle |cffcccccc- Show or hide the main window")
         print("  /meeting reset |cffcccccc- reset")
