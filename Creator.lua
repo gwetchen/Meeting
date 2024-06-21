@@ -34,7 +34,7 @@ line:SetPoint("TOPLEFT", creatorInfoFrame, "TOPRIGHT", -18, 0)
 
 local activityTypeTextFrame = Meeting.GUI.CreateText({
     parent = creatorInfoFrame,
-    text = "活动类型：",
+    text = "Activity：",
     fontSize = 16,
     anchor = {
         point = "TOPLEFT",
