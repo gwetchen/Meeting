@@ -111,25 +111,25 @@ Meeting.Categories = {
                 key = "RFC",
                 name = "Ragefire Chasm",
                 minLevel = 13,
-                match = { "rfc", "Ragefire" }
+                match = { "rfc", "ragefire" }
             },
             {
                 key = "WC",
                 name = "Wailing Caverns",
                 minLevel = 17,
-                match = { "wc", "Wailing Caverns" }
+                match = { "wc", "wailing caverns" }
             },
             {
                 key = "DM",
                 name = "The Dead Mines",
                 minLevel = 17,
-                match = { "DM", "Dead Mines" }
+                match = { "dm", "dead mines" }
             },
             {
                 key = "SFK",
                 name = "Shadowfang Keep",
                 minLevel = 22,
-                match = { "SFK", "Shadowfang" }
+                match = { "sfk", "shadowfang" }
             },
             {
                 key = "STOCKS",
@@ -141,25 +141,25 @@ Meeting.Categories = {
                 key = "BFD",
                 name = "Blackfathom Deeps",
                 minLevel = 23,
-                match = { "bfd", "Blackfathom" }
+                match = { "bfd", "blackfathom" }
             },
             {
                 key = "SMGY",
                 name = "Scarlet Monastery: Graveyard",
                 minLevel = 27,
-                match = { "smgy", "sm gy", "sm Graveyard", "Graveyard" }
+                match = { "smgy", "sm gy", "sm graveyard", "graveyard" }
             },
             {
                 key = "SMLIB",
                 name = "Scarlet Monastery: Library",
                 minLevel = 28,
-                match = { "smlib", "sm library", "Library" }
+                match = { "smlib", "sm library", "library" }
             },
             {
                 key = "GNOMER",
                 name = "Gnomeregan",
                 minLevel = 29,
-                match = {"gnomer", "Gnomeregan"}
+                match = {"gnomer", "gnomeregan"}
             },
             {
                 key = "RFK",
@@ -171,37 +171,37 @@ Meeting.Categories = {
                 key = "TCG",
                 name = "The Crescent Grove",
                 minLevel = 32,
-                match = { "Crescent Grove" }
+                match = { "crescent grove" }
             },
             {
                 key = "SMARMORY",
                 name = "Scarlet Monastery: Armory",
                 minLevel = 32,
-                match = { "smarmory", "sm armory", "Armory" }
+                match = { "smarmory", "sm armory", "armory" }
             },
             {
                 key = "SMCATH",
                 name = "Scarlet Monastery: Cathedral",
                 minLevel = 35,
-                match = { "smcath", "sm cath", "Cathedral" }
+                match = { "smcath", "sm cath", "cathedral" }
             },
             {
                 key = "RFD",
                 name = "Razorfen Downs",
                 minLevel = 36,
-                match = { "rfd", "Razorfen Downs" }
+                match = { "rfd", "razorfen downs" }
             },
             {
                 key = "ULDA",
                 name = "Uldaman",
                 minLevel = 40,
-                match = { "Uldaman" }
+                match = { "uldaman" }
             },
             {
                 key = "GILNEAS",
                 name = "Gilneas City",
                 minLevel = 42,
-                match = {"Gilneas City"}
+                match = {"gilneas city"}
             },
             {
                 key = "ZF",
@@ -213,7 +213,7 @@ Meeting.Categories = {
                 key = "MARA",
                 name = "Maraudon",
                 minLevel = 45,
-                match = { "Mara", "Maraudon" }
+                match = { "mara", "maraudon" }
             },
             {
                 key = "ST",
@@ -225,7 +225,7 @@ Meeting.Categories = {
                 key = "HFQ",
                 name = "Hateforge Quarry",
                 minLevel = 50,
-                match = { "HFQ", "Hateforge" }
+                match = { "hfq", "hateforge" }
             },
             {
                 key = "BRD",
@@ -238,46 +238,46 @@ Meeting.Categories = {
                 name = "Upper Blackrock Spire",
                 minLevel = 55,
                 members = 10,
-                match = { "UBRS" }
+                match = { "urbs" }
             },
             {
                 key = "LBRS",
                 name = "Lower Blackrock Spire",
                 minLevel = 55,
-                match = { "LBRS" }
+                match = { "lbrs" }
 
             },
             {
                 key = "DME",
                 name = "Dire Maul: East",
                 minLevel = 55,
-                match = { "DME", "DM:E", "DM East", "DMEast", "DM:East" }
+                match = { "dme", "dme:e", "dnm east", "dmeast", "dm:east" }
             },
             {
                 key = "DMN",
                 name = "Dire Maul: North",
                 minLevel = 57,
-                match = { "DMN", "DM:N", "DM North", "DMNorth", "DM:North", "tribute" }
+                match = { "dmn", "dm:e", "dm north", "dmnorth", "dm:north", "tribute" }
             },
             {
                 key = "DMW",
                 name = "Dire Maul: West",
                 minLevel = 57,
-                match = { "DMW", "DM:W", "DM West", "DMWwest", "DM:West" }
+                match = { "dmw", "dm:w", "dm west", "dmwest", "dm:west" }
             },
             {
                 key = "SCHOLO",
                 name = "Scholomance",
                 minLevel = 58,
                 members = 10,
-                match = { "scholo", "Scholomance" }
+                match = { "scholo", "scholomance" }
             },
             {
                 key = "STRAT",
                 name = "Stratholme",
                 minLevel = 58,
                 members = 10,
-                match = { "strat", "Stratholme" }
+                match = { "strat", "stratholme" }
             },
             {
                 key = "KC",
@@ -289,13 +289,13 @@ Meeting.Categories = {
                 key = "COTBM",
                 name = "Caverns of Time: Black Morass",
                 minLevel = 60,
-                match = { "CoT", "BM" }
+                match = { "cot", "bm" }
             },
             {
                 key = "SWV",
                 name = "Stormwind Vault",
                 minLevel = 60,
-                match = { "SWV", "Stormwind Vault" }
+                match = { "smv", "stormwind vault" }
             },
         }
     },
@@ -326,7 +326,7 @@ Meeting.Categories = {
                 key = "AQ40",
                 name = "Temple of Ahn'Qiraj",
                 minLevel = 60,
-                match = { "AQ40" }
+                match = { "aq40" }
             },
             {
                 key = "NAXX",
@@ -359,7 +359,7 @@ Meeting.Categories = {
                 key = "ES",
                 name = "Emerald Sanctum",
                 minLevel = 60,
-                match = { "ES", "Emerald Sanctum" }
+                match = { "es", "emerald sanctum" }
             }
         }
     },
@@ -441,11 +441,6 @@ Meeting.Categories = {
             {
                 key = "WORLD",
                 name = "/World",
-                minLevel = 1,
-            },
-            {
-                key = "CHINA",
-                name = "/China",
                 minLevel = 1,
             },
             {
