@@ -325,7 +325,7 @@ local applicantListFrame = Meeting.GUI.CreateListFrame({
                     GameTooltip:AddLine(this.applicant.comment, 0.75, 0.75, 0.75, 1)
                 end
                 GameTooltip:AddLine(" ")
-                GameTooltip:AddLine("<Double click> Private message", 1, 1, 1, 1)
+                GameTooltip:AddLine("Double click to whisper", 1, 1, 1, 1)
                 GameTooltip:SetWidth(220)
                 GameTooltip:Show()
             else

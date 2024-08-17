@@ -525,7 +525,7 @@ local activityListFrame = Meeting.GUI.CreateListFrame({
                     end
                 end
                 GameTooltip:AddLine(" ")
-                GameTooltip:AddLine("<Double click> Private message", 1, 1, 1, 1)
+                GameTooltip:AddLine("Double click to whisper", 1, 1, 1, 1)
                 GameTooltip:SetWidth(220)
                 GameTooltip:Show()
             else
