@@ -359,7 +359,7 @@ Meeting.Categories = {
                 key = "ES",
                 name = "Emerald Sanctum",
                 minLevel = 60,
-                match = { "es", "emerald sanctum" }
+                match = { " es ", "emerald sanctum" }
             }
         }
     },
