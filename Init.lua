@@ -111,7 +111,7 @@ Meeting.Categories = {
                 key = "RFC",
                 name = "Ragefire Chasm",
                 minLevel = 13,
-                match = { "rfc", "ragefire" }
+                match = { "rfc", "ragefire", "chasm" }
             },
             {
                 key = "WC",
@@ -123,7 +123,7 @@ Meeting.Categories = {
                 key = "DM",
                 name = "The Dead Mines",
                 minLevel = 17,
-                match = { "dm", "dead mines" }
+                match = { "dm", "deadmines" }
             },
             {
                 key = "SFK",
@@ -195,13 +195,13 @@ Meeting.Categories = {
                 key = "ULDA",
                 name = "Uldaman",
                 minLevel = 40,
-                match = { "uldaman" }
+                match = { "uldaman", "ulda" }
             },
             {
                 key = "GILNEAS",
                 name = "Gilneas City",
                 minLevel = 42,
-                match = {"gilneas city"}
+                match = {"gilneas city", "gilneas"}
             },
             {
                 key = "ZF",
@@ -231,14 +231,14 @@ Meeting.Categories = {
                 key = "BRD",
                 name = "Blackrock Depths",
                 minLevel = 52,
-                match = {"brd"}
+                match = {"brd", "brd emp", "lava run"}
             },
             {
                 key = "UBRS",
                 name = "Upper Blackrock Spire",
                 minLevel = 55,
                 members = 10,
-                match = { "urbs" }
+                match = { "ubrs" }
             },
             {
                 key = "LBRS",
@@ -283,19 +283,19 @@ Meeting.Categories = {
                 key = "KC",
                 name = "Karazhan Crypt",
                 minLevel = 58,
-                match = { "crypts" }
+                match = { "crypts", "karazhan crypts"}
             },
             {
                 key = "COTBM",
                 name = "Caverns of Time: Black Morass",
                 minLevel = 60,
-                match = { "cot", "bm" }
+                match = { "cot", "bm", "morass" }
             },
             {
                 key = "SWV",
                 name = "Stormwind Vault",
                 minLevel = 60,
-                match = { "smv", "stormwind vault" }
+                match = { "smv", "stormwind vault", "vault"}
             },
         }
     },
@@ -308,7 +308,7 @@ Meeting.Categories = {
                 key = "MC",
                 name = "Molten Core",
                 minLevel = 60,
-                match = { "mc" }
+                match = { "mc", "molten core" }
             },
             {
                 key = "ONY",
